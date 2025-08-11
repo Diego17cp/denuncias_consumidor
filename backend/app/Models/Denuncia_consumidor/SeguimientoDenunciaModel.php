@@ -1,0 +1,62 @@
+<?php namespace App\Models\Denuncia_consumidor;
+
+use CodeIgniter\Model;
+
+class SeguimientoDenunciaModel extends Model
+{
+    protected $table            = 'seguimiento_denuncia';
+    protected $primaryKey       = 'id';
+    protected $useAutoIncrement = true;
+    protected $returnType       = 'array';
+    protected $useSoftDeletes   = false;
+
+    protected $allowedFields    = [
+        'denuncia_id',
+        'estado',
+        'comentario',
+        'administrador_id'
+    ];
+
+    // Manejo automático de fechas
+    protected $useTimestamps = true;
+    protected $dateFormat    = 'datetime';
+    protected $createdField  = 'fecha_actualizacion';
+    protected $updatedField  = null; 
+
+    // Validaciones
+    protected $validationRules = [
+        'denuncia_id'     => 'required|integer',
+        'estado'          => 'required|string|max_length[50]',
+        'comentario'      => 'permit_empty|string|max_length[500]',
+        'administrador_id'=> 'required|integer'
+    ];
+
+    protected $validationMessages = [
+        'denuncia_id' => [
+            'required' => 'El ID de la denuncia es obligatorio',
+            'integer'  => 'El ID de la denuncia debe ser un número entero'
+        ],
+        'estado' => [
+            'required'   => 'El estado es obligatorio',
+            'max_length' => 'El estado no puede exceder los 50 caracteres'
+        ],
+        'comentario' => [
+            'max_length' => 'El comentario no puede exceder los 500 caracteres'
+        ],
+        'administrador_id' => [
+            'required' => 'El ID del administrador es obligatorio',
+            'integer'  => 'El ID del administrador debe ser un número entero'
+        ]
+    ];
+
+    protected $skipValidation = false;
+
+     // Obtiener siguimiento de las denuncias por su ID 
+    
+    public function obtenerPorDenunciaId(int $denunciaId)
+    {
+        return $this->where('denuncia_id', $denunciaId)
+                    ->orderBy('fecha_actualizacion', 'DESC')
+                    ->findAll();
+    }
+}
