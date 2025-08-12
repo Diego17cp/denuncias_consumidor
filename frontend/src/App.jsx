@@ -3,9 +3,10 @@ import { BrowserRouter, Route, Routes, Navigate } from "react-router";
 
 // Componentes
 // import { loader } from "./components/loaders/Loader";
+import { Layout } from "./layouts/Layout";
 
 // Paginas Admin
-const Login = lazy(() => import("./pages/admin/Login"));
+const LoginAdmin = lazy(() => import("./pages/admin/Login"));
 const DashboardAdmin = lazy(() => import("./pages/admin/Dashboard"));
 const AdminsHistorial = lazy(() => import("./pages/admin/AdminsHistorial"));
 const SearchAdmin = lazy(() => import("./pages/admin/AdministrarUsuarios/SearchAdmin"));
@@ -19,6 +20,7 @@ const NotFound = lazy(() => import("./pages/404"));
 const Tracking = lazy(() => import("./pages/public/Tracking/TrackingDenuncia"));
 const InfoDenuncia = lazy(() => import("./pages/public/Form/InfoDenuncia"));
 const Unauthorized = lazy(() => import("./pages/Unauthorized"));
+const FormularioDenuncia = lazy(() => import("./pages/public/Form/FormularioDenuncia"));
 
 
 
@@ -33,7 +35,14 @@ function App() {
                     </div>
                 }
                 >
-                
+                <Routes>
+                    <Route path="/" element={<Layout />}>
+                        <Route index element={<FormularioDenuncia />} />
+                        <Route path="/tracking-denuncia" element={<Tracking />} />
+                        <Route path="/admin/login" element={<LoginAdmin/>} />
+                        <Route path="/unauthorized" element={<Unauthorized/>} />
+                    </Route>
+                </Routes>
                 </Suspense>
         </BrowserRouter>
     )
