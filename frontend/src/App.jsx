@@ -1,6 +1,9 @@
 import { Suspense, lazy } from "react";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router";
 
+// Componentes
+// import { loader } from "./components/loaders/Loader";
+
 // Paginas Admin
 const Login = lazy(() => import("./pages/admin/Login"));
 const DashboardAdmin = lazy(() => import("./pages/admin/Dashboard"));
@@ -23,7 +26,15 @@ function App() {
 
     return (
         <BrowserRouter>
-            
+            <Suspense
+                fallback={
+                    <div className="flex min-h-screen w-full justify-center items-center h-screen">
+                        {/* <Loader  isBtn={true}/> */}
+                    </div>
+                }
+                >
+                
+                </Suspense>
         </BrowserRouter>
     )
 }
