@@ -1,4 +1,5 @@
 import { Suspense, lazy } from "react";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router";
 
 // Paginas Admin
 const Login = lazy(() => import("./pages/admin/Login"));
@@ -15,3 +16,16 @@ const NotFound = lazy(() => import("./pages/404"));
 const Tracking = lazy(() => import("./pages/public/Tracking/TrackingDenuncia"));
 const InfoDenuncia = lazy(() => import("./pages/public/Form/InfoDenuncia"));
 const Unauthorized = lazy(() => import("./pages/Unauthorized"));
+
+
+
+function App() {
+
+    return (
+        <BrowserRouter>
+            
+        </BrowserRouter>
+    )
+}
+
+export default App
