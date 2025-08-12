@@ -9,3 +9,9 @@ const DenunciasRecibidas = lazy(() => import("./pages/admin/denuncias/DenunciasR
 const SearchDenuncia = lazy(() => import("./pages/admin/denucias/SearchDenuncia"));
 const Denuncias = lazy(() => import("./pages/admin/denucias/Denuncias"));
 const AdministrarUsuarios = lazy(() => import("./pages/admin/administrarUsuarios/AdministrarUsuarios"));
+
+// Paginas Generales
+const NotFound = lazy(() => import("./pages/404"));
+const Tracking = lazy(() => import("./pages/public/Tracking/TrackingDenuncia"));
+const InfoDenuncia = lazy(() => import("./pages/public/Form/InfoDenuncia"));
+const Unauthorized = lazy(() => import("./pages/Unauthorized"));
