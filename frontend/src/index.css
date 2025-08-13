@@ -6,17 +6,20 @@
 	/* --titles: "Amaranth", serif;
 	--font: "Saira Condensed", serif; */
 }
-@import "tailwindcss"
+
+@import "tailwindcss";
+@plugin "daisyui";
 
 @theme {
-  --color-primary: var(--primary-color);
-  --color-secondary: var(--secondary-color);
-  --color-tertiary: var(--tertiary-color);
+	--color-primary: var(--primary-color);
+	--color-secondary: var(--secondary-color);
+	--color-tertiary: var(--tertiary-color);
 }
 
 .transitioned {
-  @apply transition-all duration-300 ease-in-out;
+	@apply transition-all duration-300 ease-in-out;
 }
+
 .btn {
-  @apply transition-all duration-300 ease-in-out cursor-pointer;
+	@apply transition-all duration-300 ease-in-out cursor-pointer;
 }
