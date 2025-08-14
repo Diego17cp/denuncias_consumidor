@@ -8,20 +8,15 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Home::index');
 
 
-$routes->post('admin/login', 'VerificarAdmi::login');
-$routes->get('admin/info', 'VerificarAdmi::getAdminInfo');
-$routes->post('admin/logout', 'VerificarAdmi::logout');
-
-
 /*---- GRUPO DE USUARIOS ----*/
 $routes->group('user', function($routes) {
 
-        /*---- ABJUNTOS ----*/
-    $routes->group('abjunto', function($routes) {
-        // Mostrar un denunciado por ID
-        $routes->get('(:num)', 'Denuncia_consumidor\User\AdjuntoController::subir/$1');
-        // Crear denunciado 
-        $routes->post('subir/(:num)', 'Denuncia_consumidor\User\AdjuntoController::listar/$1');
+    /*---- ADJUNTOS ----*/
+    $routes->group('adjunto', function($routes) {
+        // Subir uno o varios archivos a una denuncia
+        $routes->post('subir/(:num)', 'Denuncia_consumidor\User\AdjuntoController::subir/$1');
+        // Listar todos los archivos de una denuncia
+        $routes->get('listar/(:num)', 'Denuncia_consumidor\User\AdjuntoController::listar/$1');
     });
 
     /*---- DENUNCIANTES ----*/
@@ -29,13 +24,13 @@ $routes->group('user', function($routes) {
         // Listar todos los denunciantes
         $routes->get('/', 'Denuncia_consumidor\User\DenuncianteController::index');
         // Mostrar un denunciante por ID
-        $routes->get('(:num)', 'Denuncia_consumidor\User\DenuncianteController::show/$1');
+        $routes->get('show/(:num)', 'Denuncia_consumidor\User\DenuncianteController::show/$1');
         // Crear denunciante (POST JSON)
-        $routes->post('crear', 'Denuncia_consumidor\User\DenuncianteController::create');
+        $routes->post('/', 'Denuncia_consumidor\User\DenuncianteController::create');
         // Actualizar denunciante
-        $routes->put('(:num)', 'Denuncia_consumidor\User\DenuncianteController::update/$1');
+        $routes->put('update/(:num)', 'Denuncia_consumidor\User\DenuncianteController::update/$1');
         // Eliminar denunciante
-        $routes->delete('(:num)', 'Denuncia_consumidor\User\DenuncianteController::delete/$1');
+        $routes->delete('delete/(:num)', 'Denuncia_consumidor\User\DenuncianteController::delete/$1');
     });
 
 
@@ -44,22 +39,22 @@ $routes->group('user', function($routes) {
         // Listar todos los denunciados
         $routes->get('/', 'Denuncia_consumidor\User\DenunciadoController::index');
         // Mostrar un denunciado por ID
-        $routes->get('(:num)', 'Denuncia_consumidor\User\DenunciadoController::show/$1');
+        $routes->get('show/(:num)', 'Denuncia_consumidor\User\DenunciadoController::show/$1');
         // Crear denunciado 
-        $routes->post('crear', 'Denuncia_consumidor\User\DenunciadoController::create');
+        $routes->post('/', 'Denuncia_consumidor\User\DenunciadoController::create');
         // Actualizar denunciado
-        $routes->put('(:num)', 'Denuncia_consumidor\User\DenunciadoController::update/$1');
+        $routes->put('update/(:num)', 'Denuncia_consumidor\User\DenunciadoController::update/$1');
         // Eliminar denunciado
-        $routes->delete('(:num)', 'Denuncia_consumidor\User\DenunciadoController::delete/$1');
+        $routes->delete('delete/(:num)', 'Denuncia_consumidor\User\DenunciadoController::delete/$1');
     });
 
     /*---- DENUNCIAS ----*/
     $routes->group('denuncia', function($routes) {
         // Buscar denuncia por tracking_code
-        $routes->get('codigo/(:segment)', 'Denuncia_consumidor\User\DenunciaController::findByTrackingCode/$1');
+        $routes->get('codigo/(:segment)', 'Denuncia_consumidor\User\DenunciaController::query/$1');
         // Listar todas las denuncias
         $routes->get('/', 'Denuncia_consumidor\User\DenunciaController::index');
-        $routes->get('crear', 'Denuncia_consumidor\User\DenunciaController::create');
+        $routes->post('/', 'Denuncia_consumidor\User\DenunciaController::create');
 
     });
 
@@ -67,28 +62,33 @@ $routes->group('user', function($routes) {
 
 
 $routes->group('seguimiento', function($routes) {
-
-        $routes->get('crear', 'Denuncia_consumidor\Seguimiento\SeguimientoDenunciaController::create');
+        // Crear seguimiento
+        $routes->post('crear', 'Denuncia_consumidor\Seguimiento\SeguimientoDenunciaController::create');
         // Mostrar un denunciante por ID
-        $routes->post('(:num)', 'Denuncia_consumidor\Seguimiento\SeguimientoDenunciaController::getByDenunciaId/$1');
+        $routes->get('(:num)', 'Denuncia_consumidor\Seguimiento\SeguimientoDenunciaController::getByDenunciaId/$1');
 });
 
-// Grupo para administradores
-$routes->group('admin', function($routes) {
+/*---- GRUPO DE ADMINISTRADORES ----*/
 
-    $routes->get('dashboard', 'Denuncias_consumidor\Admin\AdminController::dashboard');
-    $routes->post('recibir-denuncia', 'Denuncias_consumidor\Admin\AdminController::receiveAdmin');
-    $routes->post('procesar-denuncia', 'Denuncias_consumidor\Admin\AdminController::procesosDenuncia');
-    $routes->get('buscar-denuncia', 'Denuncias_consumidor\Admin\AdminController::search');
+$routes->group('admin', ['namespace' => 'App\Controllers\Denuncia_consumidor\Admin'], function($routes) {
+
+    // Dashboard y gestión de denuncias
+    $routes->get('dashboard', 'AdminsController::dashboard');
+    $routes->post('receive', 'AdminsController::receiveAdmin');
+    $routes->post('procesos-denuncia', 'AdminsController::procesosDenuncia');
+    $routes->get('search-denuncias', 'AdminsController::searchDenuncias');
+
+    // Gestión de administradores
+    $routes->get('/', 'AdminsController::getAdministradores');
+    $routes->post('/', 'AdminsController::createAdministrador');
+    $routes->put('update', 'AdminsController::updateAdministrador');
+    $routes->get('buscar', 'AdminsController::searchAdmin');
+    $routes->get('history', 'AdminsController::historyAdmin');
+
 });
 
-$routes->group('superadmin', function($routes) {
-    $routes->get('/', 'Denuncias_consumidor\Admin\SuperAdminController::getAdministradores');
-    $routes->post('crear', 'Denuncias_consumidor\Admin\SuperAdminController::createAdministrador');
-    $routes->put('actualizar', 'Denuncias_consumidor\Admin\SuperAdminController::updateAdministrador');
-    $routes->get('buscar', 'Denuncias_consumidor\Admin\SuperAdminController::searchAdmin');
-    $routes->get('historial', 'Denuncias_consumidor\Admin\SuperAdminController::historyAdmin');
-});
+
+
 
 
 

@@ -14,7 +14,7 @@ class DenuncianteController extends ResourceController
         return $this->respond($this->model->findAll(), 200);
     }
 
-    // Mostrar un denunciante por ID
+    // Mostrar un denunciante por ID    
     public function show($id = null)
     {
         $denunciante = $this->model->find($id);

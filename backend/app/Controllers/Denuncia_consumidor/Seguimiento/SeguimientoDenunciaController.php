@@ -11,18 +11,33 @@ class SeguimientoDenunciaController extends ResourceController
     /**
      * Insertar un nuevo seguimiento
      */
-    public function create()
+  public function create()
     {
-        $data = $this->request->getJSON(true);
-
-        if (!$this->model->insert($data)) {
-            return $this->failValidationErrors($this->model->errors());
+        $input = $this->request->getJSON(true);
+        if (!$input) {
+            $input = $this->request->getPost();
         }
 
-        return $this->respondCreated([
-            'success' => true,
-            'message' => 'Seguimiento registrado correctamente'
-        ]);
+        // Mapear explícitamente a los campos permitidos
+        $seguimientoData = [
+            'denuncia_id'     => $input['denuncia_id'] ?? null,
+            'estado'          => $input['estado'] ?? null,
+            'comentario'      => $input['comentario'] ?? null,
+            'administrador_id'=> $input['administrador_id'] ?? null
+        ];
+
+        // Log para depuración
+        log_message('debug', 'Datos procesados: ' . json_encode($seguimientoData));
+
+        if ($this->model->insert($seguimientoData)) {
+            return $this->respondCreated([
+                'success' => true,
+                'message' => 'Seguimiento registrado correctamente',
+                'id'      => $this->model->getInsertID()
+            ]);
+        }
+
+        return $this->failValidationErrors($this->model->errors());
     }
 
     /**

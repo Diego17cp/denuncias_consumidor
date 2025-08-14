@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers\Denuncia_consumidor;
+namespace App\Controllers\Denuncia_consumidor\Admin;
 
 use App\Controllers\BaseController;
 use Firebase\JWT\JWT;
