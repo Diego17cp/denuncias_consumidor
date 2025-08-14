@@ -7,6 +7,12 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 
+
+$routes->post('admin/login', 'VerificarAdmi::login');
+$routes->get('admin/info', 'VerificarAdmi::getAdminInfo');
+$routes->post('admin/logout', 'VerificarAdmi::logout');
+
+
 /*---- GRUPO DE USUARIOS ----*/
 $routes->group('user', function($routes) {
 
@@ -69,14 +75,19 @@ $routes->group('seguimiento', function($routes) {
 
 // Grupo para administradores
 $routes->group('admin', function($routes) {
-    $routes->get('historial', 'HistorialAdminController::index');
-    $routes->get('/', 'Denuncia_consumidor\Admin\AdministradorController::index');
-    $routes->get('(:num)', 'Denuncia_consumidor\Admin\AdministradorController::show/$1');
-    $routes->post('/', 'Denuncia_consumidor\Admin\AdministradorController::store');
-    $routes->put('(:num)', 'Denuncia_consumidor\Admin\AdministradorController::update/$1');
-    $routes->delete('(:num)', 'Denuncia_consumidor\Admin\AdministradorController::delete/$1');
-    $routes->post('login', 'Denuncia_consumidor\Admin\AdministradorController::login');
-    //$routes->get('login', 'Denuncia_consumidor\Admin\AdministradorController::login');
+
+    $routes->get('dashboard', 'Denuncias_consumidor\Admin\AdminController::dashboard');
+    $routes->post('recibir-denuncia', 'Denuncias_consumidor\Admin\AdminController::receiveAdmin');
+    $routes->post('procesar-denuncia', 'Denuncias_consumidor\Admin\AdminController::procesosDenuncia');
+    $routes->get('buscar-denuncia', 'Denuncias_consumidor\Admin\AdminController::search');
+});
+
+$routes->group('superadmin', function($routes) {
+    $routes->get('/', 'Denuncias_consumidor\Admin\SuperAdminController::getAdministradores');
+    $routes->post('crear', 'Denuncias_consumidor\Admin\SuperAdminController::createAdministrador');
+    $routes->put('actualizar', 'Denuncias_consumidor\Admin\SuperAdminController::updateAdministrador');
+    $routes->get('buscar', 'Denuncias_consumidor\Admin\SuperAdminController::searchAdmin');
+    $routes->get('historial', 'Denuncias_consumidor\Admin\SuperAdminController::historyAdmin');
 });
 
 
