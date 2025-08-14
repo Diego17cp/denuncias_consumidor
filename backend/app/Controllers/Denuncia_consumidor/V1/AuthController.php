@@ -15,6 +15,10 @@ class AuthController extends ResourceController
     {
         $this->adminModel = new AdministradorModel();
     }
+    public function testFilter()
+    {
+        return $this->response->setJSON(['message' => 'Filter valid']);
+    }
     public function login()
     {
         $json = $this->request->getJSON();
@@ -92,22 +96,22 @@ class AuthController extends ResourceController
             ) throw new \Exception('Token inválido: Datos incompletos.');
 
             $adminModel = new AdministradorModel();
-            $user = $adminModel->getByDNI($decoded['data']['dni']);
-
+            $user = $adminModel->getByDNI($decoded->data->dni);
             if (!$user) {
                 $this->logout();
                 return $this->response
                     ->setStatusCode(401)
                     ->setJSON(['error' => 'Usuario no encontrado', 'forceLogout' => true]);
             }
-            if ($user['estado'] != '1') {
+            $estado = isset($user['estado']) ? strtolower(trim((string)$user['estado'])) : null;
+            if (! in_array($estado, ['1','activo','active','true'], true)) {
                 $this->logout();
                 return $this->response
                     ->setStatusCode(401)
                     ->setJSON(['error' => 'Tu cuenta ha sido desactivada', 'forceLogout' => true]);
             }
             $userRole = $user['rol'];
-            $decodedRole = $decoded['data']['rol'];
+            $decodedRole = $decoded->data->rol;
             $roleChanged = ($userRole !== $decodedRole);
             if ($roleChanged) {
                 $newToken = createJWT([
@@ -142,6 +146,18 @@ class AuthController extends ResourceController
                     ])
                     ->setStatusCode(200);
             }
+            return $this->response
+                ->setJSON([
+                    "role_changed" => false,
+                    "user" => [
+                        "id" => $user['id'],
+                        "dni" => $user['dni'],
+                        "estado" => $user['estado'],
+                        "rol" => $user['rol'],
+                    ]
+                ])
+                ->setStatusCode(200);
+
         } catch (\Throwable $e) {
             log_message('error', '[REFRESH ERROR] ' . $e->getMessage() . ' | ' . $e->getFile() . ':' . $e->getLine());
             $this->logout();
