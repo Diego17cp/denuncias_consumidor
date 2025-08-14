@@ -1,6 +1,6 @@
 import { useDenuncias } from "../../context/DenunciasContext";
 
-export default function StepDatosDenunciado() {
+export default function StepDatosDenunciado({ onNext, onPrev }) {
     const {
         tipoDocumento,
         setTipoDocumento,
@@ -17,6 +17,7 @@ export default function StepDatosDenunciado() {
         denunciante,
         handleDenuncianteChange,
         handleDenuncianteDigits,
+        isStepDenunciadoValid,
     } = useDenuncias();
 
     return (
@@ -68,7 +69,6 @@ export default function StepDatosDenunciado() {
                             className="w-full p-3 border border-black text-black placeholder-gray-500 rounded-lg focus:outline-none focus:ring focus:border-blue-500"
                         />
                     </div>
-
                 </>
             )}
 
@@ -98,7 +98,6 @@ export default function StepDatosDenunciado() {
                             className="w-full p-3 border border-black text-black placeholder-gray-500 rounded-lg focus:outline-none focus:ring focus:border-blue-500"
                         />
                     </div>
-
                     <div>
                         <label className="block mb-2 text-sm font-medium">Razón social</label>
                         <input
@@ -134,6 +133,27 @@ export default function StepDatosDenunciado() {
                     maxLength={9}
                     className="w-full p-3 border border-black text-black placeholder-gray-500 rounded-lg focus:outline-none focus:ring focus:border-blue-500"
                 />
+            </div>
+
+            {/* Botones de navegación */}
+            <div className="flex justify-between mt-6">
+                <button
+                    type="button"
+                    onClick={onPrev}
+                    className="px-6 py-2 cursor-pointer rounded-lg font-semibold bg-gray-300 text-black hover:bg-gray-400 transition"
+                >
+                    Atrás
+                </button>
+                <button
+                    type="button"
+                    onClick={onNext}
+                    disabled={!isStepDenunciadoValid}
+                    className={`px-6 py-2 cursor-pointer rounded-lg font-semibold bg-blue-600 text-white transition ${
+                        !isStepDenunciadoValid ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"
+                    }`}
+                >
+                    Siguiente
+                </button>
             </div>
         </div>
     );

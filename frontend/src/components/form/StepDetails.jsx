@@ -1,7 +1,7 @@
 import { FaClipboardCheck } from "react-icons/fa";
 import { useDenuncias } from "../../context/DenunciasContext";
 
-export default function StepDetalles() {
+export default function StepDetalles({ onNext }) {
     const {
         descripcion,
         setDescripcion,
@@ -12,6 +12,7 @@ export default function StepDetalles() {
         files,
         error,
         handleFileChange,
+        isStepDetailsValid,
     } = useDenuncias();
 
     return (
@@ -76,6 +77,19 @@ export default function StepDetalles() {
                         ))}
                     </ul>
                 )}
+            </div>
+
+            <div className="flex justify-end mt-6">
+                <button
+                    type="button"
+                    onClick={onNext}
+                    disabled={!isStepDetailsValid}
+                    className={`px-6 py-2 cursor-pointer rounded-lg font-semibold bg-blue-600 text-white transition ${
+                        !isStepDetailsValid ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"
+                    }`}
+                >
+                    Siguiente
+                </button>
             </div>
         </div>
     );
