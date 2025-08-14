@@ -2,6 +2,9 @@ import { defineStepper } from "@stepperize/react";
 import { FaRegFileAlt, FaUserTimes, FaClipboardCheck } from "react-icons/fa";
 import { BsPersonVcardFill } from "react-icons/bs";
 import { DropZone, InputField } from "dialca-ui";
+import StepDetalles from "../../../components/form/StepDetails";
+import StepDatosDenunciado from "../../../components/form/StepDenunciado";
+import StepDatosDenunciante from "../../../components/form/StepDenunciante";
 
 export const FormDenuncia = () => {
 	const { useStepper, steps } = defineStepper(
@@ -73,34 +76,21 @@ export const FormDenuncia = () => {
                 </div>
 
                 {/* Contenido de cada step, solo cambia  */}
-                <div className="flex flex-col gap-6 bg-gray-800 p-3">
+                <div className="flex flex-col gap-6 bg-white p-3"> {/* Se supone que el fondo es #002f59 pero te lo mandé asi y me dijiste q lo ponga blanco */}
                         {stepper.switch({
                             "details": () => (
                                 <div className="p-4">
-                                    <h2 className="text-lg font-semibold">Detalles</h2>
-                                    <p>Por favor, proporciona los detalles de la denuncia.</p>
-                                    {/* Variante custom si quieres lo personalizas completo */}
-                                    <InputField label="Descripción" variant="custom" placeholder="lo que sea" variants={{
-                                        custom: {
-                                            normal: {
-                                                input: "w-full p-3 bg-blue-500",
-                                                label: "absolute"
-                                            }
-                                        }
-                                    }} />
-                                    <DropZone icon={<FaClipboardCheck />} variant="dark" />
+                                    < StepDetalles />
                                 </div>
                             ),
                             "denounced-data": () => (
                                 <div className="p-4">
-                                    <h2 className="text-lg font-semibold">Denunciado</h2>
-                                    <p>Proporciona la información del denunciado.</p>
+                                    < StepDatosDenunciado />
                                 </div>
                             ),
                             "complainant-data": () => (
                                 <div className="p-4">
-                                    <h2 className="text-lg font-semibold">Denunciante</h2>
-                                    <p>Proporciona la información del denunciante.</p>
+                                    < StepDatosDenunciante />
                                 </div>
                             ),
                             "summary": () => (

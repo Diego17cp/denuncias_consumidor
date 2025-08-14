@@ -6,6 +6,9 @@ import { Loader } from "dialca-ui";
 import { BaseLayout } from "./layouts/BaseLayout";
 import { FormDenuncia } from "./pages/public/Form/FormDenuncia";
 
+// Importa el provider
+import { DenunciasProvider } from "./context/DenunciasContext";
+
 // Paginas Admin
 // const Login = lazy(() => import("./pages/admin/Login"));
 // const DashboardAdmin = lazy(() => import("./pages/admin/Dashboard"));
@@ -31,23 +34,25 @@ import { FormDenuncia } from "./pages/public/Form/FormDenuncia";
 // const Unauthorized = lazy(() => import("./pages/Unauthorized"));
 
 function App() {
-	return (
-		<BrowserRouter>
-			<Suspense
-				fallback={
-					<div className="flex min-h-screen w-full justify-center items-center h-screen">
-						<Loader />
-					</div>
-				}
-			>
-                <Routes>
-                    <Route path="/" element={<BaseLayout />}>
-						<Route index element={<FormDenuncia />} />
-					</Route>
-                </Routes>
-            </Suspense>
-		</BrowserRouter>
-	);
+    return (
+        <DenunciasProvider>
+            <BrowserRouter>
+                <Suspense
+                    fallback={
+                        <div className="flex min-h-screen w-full justify-center items-center h-screen">
+                            <Loader />
+                        </div>
+                    }
+                >
+                    <Routes>
+                        <Route path="/" element={<BaseLayout />}>
+                            <Route index element={<FormDenuncia />} />
+                        </Route>
+                    </Routes>
+                </Suspense>
+            </BrowserRouter>
+        </DenunciasProvider>
+    );
 }
 
 export default App;
