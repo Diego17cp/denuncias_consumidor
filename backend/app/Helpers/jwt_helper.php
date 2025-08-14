@@ -22,7 +22,7 @@ function verifyJWT($token)
 
     try {
         $decoded = JWT::decode($token, new Key($key, 'HS256'));
-        return (array)$decoded;
+        return $decoded;
     } catch (Exception $e) {
         throw new Exception('Invalid JWT: ' . $e->getMessage());
     }
