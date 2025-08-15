@@ -22,11 +22,12 @@ export default function StepDenunciante({ onNext, onPrev }) {
                 >
                     <option value="DNI">DNI</option>
                     <option value="RUC">RUC</option>
+                    <option value="CEDULA">CEDULA</option>
                 </select>
             </div>
 
             {/* Persona natural (DNI) */}
-            {tipoDocumento === "DNI" && (
+            {(tipoDocumento === "DNI" || tipoDocumento === "CEDULA") && (
                 <>
                     <div>
                         <label className="block mb-2 text-sm font-medium">DNI</label>
@@ -173,7 +174,7 @@ export default function StepDenunciante({ onNext, onPrev }) {
                     value={denunciante.correo}
                     onChange={handleDenuncianteChange}
                     placeholder="correo@ejemplo.com"
-                    className="w-full p-3 border border-black text-gray-600 placeholder-gray-500 rounded-lg focus:outline-none focus:ring focus:border-blue-500"
+                    className="w-full p-3 border border-black text-black placeholder-gray-500 rounded-lg focus:outline-none focus:ring focus:border-blue-500"
                 />
             </div>
 
