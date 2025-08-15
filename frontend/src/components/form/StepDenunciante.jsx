@@ -1,12 +1,13 @@
 import { useDenuncias } from "../../context/DenunciasContext";
 
-export default function StepDenunciante() {
+export default function StepDenunciante({ onNext, onPrev }) {
     const {
         tipoDocumento,
         setTipoDocumento,
         denunciante,
         handleDenuncianteChange,
         handleDenuncianteDigits,
+        isStepDenuncianteValid,
     } = useDenuncias();
 
     return (
@@ -174,6 +175,27 @@ export default function StepDenunciante() {
                     placeholder="correo@ejemplo.com"
                     className="w-full p-3 border border-black text-gray-600 placeholder-gray-500 rounded-lg focus:outline-none focus:ring focus:border-blue-500"
                 />
+            </div>
+
+            {/* Botones de navegación - siguiente y atrass*/}
+            <div className="flex justify-between mt-6">
+                <button
+                    type="button"
+                    onClick={onPrev}
+                    className="px-6 py-2 cursor-pointer rounded-lg font-semibold bg-gray-300 text-black hover:bg-gray-400 transition"
+                >
+                    Atrás
+                </button>
+                <button
+                    type="button"
+                    onClick={onNext}
+                    disabled={!isStepDenuncianteValid}
+                    className={`px-6 py-2 cursor-pointer rounded-lg font-semibold bg-blue-600 text-white transition ${
+                        !isStepDenuncianteValid ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"
+                    }`}
+                >
+                    Siguiente
+                </button>
             </div>
         </div>
     );

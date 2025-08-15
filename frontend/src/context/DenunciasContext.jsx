@@ -55,6 +55,46 @@ export function DenunciasProvider({ children }) {
         setDenunciante((p) => ({ ...p, [name]: only }));
     };
 
+    const isStepDetailsValid =
+        descripcion.trim() !== "" &&
+        lugar.trim() !== "" &&
+        fecha.trim() !== "" &&
+        files.length > 0;
+    
+    const isStepDenunciadoValid =
+        tipoDocumento === "DNI"
+            ? dniDenunciado.trim().length === 8 &&
+            nombreDenunciado.trim() !== "" &&
+            apellidosDenunciado.trim() !== "" &&
+            direccionDenunciado.trim() !== "" &&
+            celularDenunciado.trim().length === 9
+            : denunciante.ruc.trim().length === 11 &&
+            denunciante.representante.trim() !== "" &&
+            denunciante.razonSocial.trim() !== "" &&
+            direccionDenunciado.trim() !== "" &&
+            celularDenunciado.trim().length === 9;
+
+    const isStepDenuncianteValid =
+        tipoDocumento === "DNI"
+            ? denunciante.dni.trim().length === 8 &&
+            denunciante.nombres.trim() !== "" &&
+            denunciante.apellidos.trim() !== "" &&
+            denunciante.domicilio.trim() !== "" &&
+            denunciante.departamento.trim() !== "" &&
+            denunciante.provincia.trim() !== "" &&
+            denunciante.distrito.trim() !== "" &&
+            denunciante.celular.trim().length === 9 &&
+            denunciante.correo.trim() !== ""
+            : denunciante.ruc.trim().length === 11 &&
+            denunciante.razonSocial.trim() !== "" &&
+            denunciante.representante.trim() !== "" &&
+            denunciante.domicilio.trim() !== "" &&
+            denunciante.departamento.trim() !== "" &&
+            denunciante.provincia.trim() !== "" &&
+            denunciante.distrito.trim() !== "" &&
+            denunciante.celular.trim().length === 9 &&
+            denunciante.correo.trim() !== "";
+
     return (
         <DenunciasContext.Provider
             value={{
@@ -88,6 +128,9 @@ export function DenunciasProvider({ children }) {
                 setDenunciante,
                 handleDenuncianteChange,
                 handleDenuncianteDigits,
+                isStepDetailsValid,
+                isStepDenunciadoValid,
+                isStepDenuncianteValid,
             }}
         >
             {children}
