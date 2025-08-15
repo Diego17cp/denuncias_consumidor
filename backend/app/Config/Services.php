@@ -29,4 +29,13 @@ class Services extends BaseService
      *     return new \CodeIgniter\Example();
      * }
      */
+    public static function getSecretKey()
+    {
+        return getenv('JWT_SECRET');
+    }
+    public static function getTokenExpiration()
+    {
+        $exp = getenv('JWT_EXP');
+        return $exp ? (int)$exp : 3600; // Default to 1 hour if not set
+    }
 }

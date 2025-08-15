@@ -3,20 +3,27 @@
 	--secondary-color: #002f59;
 	--tertiary-color: #0dc1f2;
 	/* --bg-body: #eaf0f9; */
-	/* --titles: "Amaranth", serif;
-	--font: "Saira Condensed", serif; */
+	--titles: "Prompt", serif;
+	/*--font: "Saira Condensed", serif; */
 }
-@import "tailwindcss"
+
+@import "tailwindcss";
+@import "dialca-ui/styles";
+@plugin "daisyui" {
+	prefix: "d-";
+}
 
 @theme {
-  --color-primary: var(--primary-color);
-  --color-secondary: var(--secondary-color);
-  --color-tertiary: var(--tertiary-color);
+	--color-muni-primary: var(--primary-color);
+	--color-muni-secondary: var(--secondary-color);
+	--color-muni-tertiary: var(--tertiary-color);
+	--font-titles: var(--titles);
 }
 
 .transitioned {
-  @apply transition-all duration-300 ease-in-out;
+	@apply transition-all duration-300 ease-in-out;
 }
+
 .btn {
-  @apply transition-all duration-300 ease-in-out cursor-pointer;
+	@apply transition-all duration-300 ease-in-out cursor-pointer;
 }
