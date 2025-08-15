@@ -1,14 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { useTrackingCode } from "../tracking/Track";
-import { FaFileDownload, FaCopy } from "react-icons/fa";
+import { FaFileDownload } from "react-icons/fa";
 import { HiOutlineClipboardCheck } from "react-icons/hi";
 
 const TrackingCodeScreen = () => {
   const { trackingCode } = useTrackingCode();
+  const [copied, setCopied] = useState(false); // estado para la notificación
 
   const handleCopy = (e) => {
-    e.preventDefault(); // para q no refiria al principio
+    e.preventDefault();
     navigator.clipboard.writeText(trackingCode);
+    setCopied(true); // Muestra la notificación
+    setTimeout(() => setCopied(false), 2000); // oculta la notificación dsp de 2 segundos
   };
 
   return (
@@ -39,6 +42,12 @@ const TrackingCodeScreen = () => {
             <span>Copiar código</span>
           </button>
 
+          {/* notificación de copiado */}
+          {copied && (
+            <p className="text-green-600 pb-2 dark:text-green-400 text-sm mt-2">
+              ¡Código copiado en el portapapeles!
+            </p>
+          )}
         </div>
 
         <button
