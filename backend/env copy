@@ -14,13 +14,13 @@
 # ENVIRONMENT
 #--------------------------------------------------------------------
 
-# CI_ENVIRONMENT = development
+CI_ENVIRONMENT = development
 
 #--------------------------------------------------------------------
 # APP
 #--------------------------------------------------------------------
 
-# app.baseURL = 'http://localhost/denuncias_consumidor/backend/public/'
+app.baseURL = 'http://localhost/denuncias_consumidor/backend/'
 # If you have trouble with `.`, you could also use `_`.
 # app_baseURL = ''
 # app.forceGlobalSecureRequests = false
@@ -30,12 +30,12 @@
 # DATABASE
 #--------------------------------------------------------------------
 
-# database.default.hostname = localhost
-# database.default.database = denuncias_consumidor
-# database.default.username = root
-# database.default.password = Rakion2016123!
-# database.default.DBDriver = MySQLi
-# database.default.DBPrefix =
+database.default.hostname = localhost
+database.default.database = denuncias_consumidor
+database.default.username = root
+database.default.password = 
+database.default.DBDriver = MySQLi
+database.default.DBPrefix =
 # database.default.port = 3306
 
 # If you use MySQLi as tests, first update the values of Config\Database::$tests.
@@ -67,3 +67,10 @@
 #--------------------------------------------------------------------
 
 # logger.threshold = 4
+
+#--------------------------------------------------------------------
+# JWT
+#--------------------------------------------------------------------
+
+JWT_SECRET = 'UvhcTUVgdiWqeMkA7NGCW33vk7uLWMo4'
+JWT_EXP = 3600
