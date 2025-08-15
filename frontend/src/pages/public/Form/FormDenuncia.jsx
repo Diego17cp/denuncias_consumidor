@@ -6,6 +6,7 @@ import StepDetalles from "../../../components/form/StepDetails";
 import StepDatosDenunciado from "../../../components/form/StepDenunciado";
 import StepDatosDenunciante from "../../../components/form/StepDenunciante";
 import { useDenuncias } from "../../../context/DenunciasContext";
+import TrackingCodeScreen from "../../../components/form/StepTracking";
 
 export const FormDenuncia = () => {
     const { useStepper, steps } = defineStepper(
@@ -124,8 +125,7 @@ export const FormDenuncia = () => {
                         ),
                         summary: () => (
                             <div className="p-4">
-                                <h2 className="text-lg font-semibold">Resumen</h2>
-                                <p>Revisa la información antes de enviar la denuncia.</p>
+                                < TrackingCodeScreen />
                             </div>
                         ),
                     })}
