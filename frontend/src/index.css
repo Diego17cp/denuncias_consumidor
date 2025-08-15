@@ -9,9 +9,6 @@
 
 @import "tailwindcss";
 @import "dialca-ui/styles";
-@plugin "daisyui" {
-	prefix: "d-";
-}
 
 @theme {
 	--color-muni-primary: var(--primary-color);
