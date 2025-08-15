@@ -6,6 +6,10 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 $routes->group('/', ['namespace' => 'App\Controllers\DenunciasConsumidor\v1'], function($routes) {
+    /*---- RUTAS DE AUTENTICACION ----*/
+    $routes->post('login', 'AuthController::login');
+    $routes->post('logout', 'AuthController::logout');
+    $routes->get('refresh', 'AuthController::refresh');
     /*---- GRUPO DE USUARIOS ----*/
     $routes->group('user', function($routes) {
     
