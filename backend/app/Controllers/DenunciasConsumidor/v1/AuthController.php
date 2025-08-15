@@ -1,5 +1,5 @@
 <?php
-namespace App\Controllers\Denuncia_consumidor\v1;
+namespace App\Controllers\DenunciasConsumidor\v1;
 use CodeIgniter\RESTful\ResourceController;
 use App\Models\DenunciasConsumidor\v1\AdministradorModel;
 use CodeIgniter\Cookie\Cookie;
