@@ -47,7 +47,7 @@ export const FormDenuncia = () => {
         <div className="mx-auto p-2 md:p-6! max-w-4xl bg-white rounded-md mt-5">
             <form>
                 {/* STEPPER */}
-                <div className="sticky top-0 z-10 w-full">
+                <div className="flex top-0 z-10 w-full">
                     <div className="flex items-end gap-0 w-full">
                         {steps.map((step) => (
                             <div
