@@ -32,11 +32,12 @@ export default function StepDatosDenunciado({ onNext, onPrev }) {
                 >
                     <option value="DNI">DNI</option>
                     <option value="RUC">RUC</option>
+                    <option value="CEDULA">CEDULA</option>
                 </select>
             </div>
 
             {/* Si es DNI */}
-            {tipoDocumento === "DNI" && (
+            {(tipoDocumento === "DNI" || tipoDocumento === "CEDULA") &&  (
                 <>
                     <div>
                         <label className="block mb-2 text-sm font-medium">DNI</label>
