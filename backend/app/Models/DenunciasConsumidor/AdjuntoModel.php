@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Denuncia_consumidor;
+namespace App\Models\DenunciasConsumidor\v1;
 
 use CodeIgniter\Model;
 

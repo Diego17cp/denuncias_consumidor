@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Denuncia_consumidor;
+namespace App\Models\DenunciasConsumidor\v1;
 
 use CodeIgniter\Model;
 
@@ -11,7 +11,7 @@ class AdministradorModel extends Model
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = false;
+    protected $useSoftDeletes   = true;
     protected $protectFields    = true;
 
     protected $allowedFields    = [
@@ -35,7 +35,7 @@ class AdministradorModel extends Model
         'nombre'   => 'required|string|max_length[100]',
         'password' => 'required|string|min_length[6]|max_length[255]',
         'rol'      => 'required|string|max_length[50]',
-        'estado'   => 'required|in_list[activo,inactivo]'
+        'estado'   => 'required|in_list[activo,inactivo,1,0]'
     ];
 
     protected $validationMessages = [
@@ -60,7 +60,7 @@ class AdministradorModel extends Model
         ],
         'estado' => [
             'required' => 'El estado es obligatorio.',
-            'in_list'  => 'El estado debe ser "activo" o "inactivo".'
+            'in_list'  => 'El estado debe ser "activo", "inactivo", 1 o 0.'
         ]
     ];
 
