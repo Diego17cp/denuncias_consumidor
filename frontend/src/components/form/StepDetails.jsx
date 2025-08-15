@@ -1,4 +1,4 @@
-import { FaClipboardCheck } from "react-icons/fa";
+import { FaClipboardCheck, FaTrash } from "react-icons/fa";
 import { useDenuncias } from "../../context/DenunciasContext";
 
 export default function StepDetalles({ onNext }) {
@@ -87,10 +87,12 @@ export default function StepDetalles({ onNext }) {
                                         const updatedFiles = files.filter((_, i) => i !== index);
                                         setFiles(updatedFiles);
                                     }}
-                                    className="ml-4 cursor-pointer text-red-500 hover:underline"
+                                    className="ml-4 flex items-center text-red-500 hover:underline cursor-pointer"
                                 >
-                                    Eliminar
+                                    <FaTrash className="inline mr-2" />
+                                    <span>Eliminar</span>
                                 </button>
+
                             </li>
                         ))}
                     </ul>
