@@ -10,6 +10,7 @@ $routes->group('/', ['namespace' => 'App\Controllers\DenunciasConsumidor\v1'], f
     $routes->post('login', 'AuthController::login');
     $routes->post('logout', 'AuthController::logout');
     $routes->get('refresh', 'AuthController::refresh');
+    
     /*---- GRUPO DE USUARIOS ----*/
     $routes->group('user', function($routes) {
     
@@ -90,6 +91,7 @@ $routes->group('/', ['namespace' => 'App\Controllers\DenunciasConsumidor\v1'], f
         $routes->put('update', 'AdminsController::updateAdministrador');
         $routes->get('buscar', 'AdminsController::searchAdmin');
         $routes->get('buscar/(:num)', 'AdminsController::searchDenunciasByDenuncianteId/$1');
+        $routes->get('probar-correo', 'AdminsController::probarCorreo');
         //$routes->get('history', 'AdminsController::historyAdmin');
     
     });

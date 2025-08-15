@@ -76,9 +76,9 @@ class DenuncianteModel extends Model
             'max_length'  => 'El celular no puede superar los 15 dígitos',
             'min_length'  => 'El celular debe tener al menos 7 dígitos'
         ],
-        'numero_documento' => [
+        'documento' => [
             'required'   => 'El número de documento es obligatorio',
-            'numeric'    => 'El documento debe contener solo números',
+            'numeric'    =>'El documento debe contener solo números',
             'max_length' => 'El documento no puede superar los 15 dígitos'
         ],
         'tipo_documento' => [
