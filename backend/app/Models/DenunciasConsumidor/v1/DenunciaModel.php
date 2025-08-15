@@ -14,7 +14,7 @@ class DenunciaModel extends Model
         'id',
         'tracking_code',
         'denunciante_id',
-        'es_anonimo',,
+        'es_anonimo',
         'denunciado_id',
         'descripcion',
         'estado',
@@ -83,4 +83,35 @@ class DenunciaModel extends Model
         }
         return false;
     }
+
+    
+    public function receiveDenuncia($trackingCode, $dniAdmin, $estado, $comentario, $extraData = [])
+    {
+        return $this->where('tracking_code', $trackingCode)
+                    ->set([
+                        'estado'             => $estado,
+                        'comentario'         => $comentario,
+                        'fecha_actualizacion'=> date('Y-m-d H:i:s'),
+                        'dni_admin'          => $dniAdmin
+                    ])
+                    ->update();
+    }
+
+    public function searchByDocumento($documento)
+    {
+        return $this->select('denuncia.*')
+                    ->join('denunciante', 'denunciante.id = denuncia.denunciante_id')
+                    ->where('denunciante.documento', $documento)
+                    ->where('denuncia.deleted_at', null)
+                    ->findAll();
+    }
+
+    public function searchByDenuncianteId($denuncianteId)
+{
+    return $this->select('denuncia.*')
+                ->where('denuncia.denunciante_id', $denuncianteId)
+                ->where('denuncia.deleted_at', null)
+                ->findAll();
 }
+}
+

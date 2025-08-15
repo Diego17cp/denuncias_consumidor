@@ -8,7 +8,7 @@ use CodeIgniter\RESTful\ResourceController;
 
 class AdjuntoController extends ResourceController
 {
-    protected $modelName = 'App\Models\Denuncia_consumidor\AdjuntoModel';
+    protected $modelName = AdjuntoModel::class;
     protected $format    = 'json';
 
     /**

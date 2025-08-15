@@ -73,7 +73,7 @@ class DenunciaController extends ResourceController
             'denunciado_id'   => $input['denunciado_id'] ?? null,
             'fecha_registro'  => date('Y-m-d H:i:s'),
             'estado'          => 'registrado',
-            'pdf_path'        => $input['pdf_path'] ?? null
+            //'pdf_path'        => $input['pdf_path'] ?? null
         ];
 
         if ($this->denunciasModel->insert($denunciaData)) {

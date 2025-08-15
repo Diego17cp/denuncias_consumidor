@@ -53,7 +53,7 @@ $routes->group('/', ['namespace' => 'App\Controllers\DenunciasConsumidor\v1'], f
         /*---- DENUNCIAS ----*/
         $routes->group('denuncia', function($routes) {
             // Buscar denuncia por tracking_code
-            $routes->get('codigo/(:segment)', 'DenunciaController::query/$1');
+            $routes->get('codigo/(:alphanum)', 'DenunciaController::query/$1');
             // Listar todas las denuncias
             $routes->get('/', 'DenunciaController::index');
             $routes->post('/', 'DenunciaController::create');
@@ -62,12 +62,16 @@ $routes->group('/', ['namespace' => 'App\Controllers\DenunciasConsumidor\v1'], f
     
     });
     
-    
     $routes->group('seguimiento', function($routes) {
             // Crear seguimiento
             $routes->post('crear', 'SeguimientoDenunciaController::create');
             // Mostrar un denunciante por ID
             $routes->get('(:num)', 'SeguimientoDenunciaController::getByDenunciaId/$1');
+    });
+
+    $routes->group('api', function ($routes) {
+        $routes->get('dni/(:num)', 'Api::buscarDNI/$1');
+        $routes->get('ruc/(:num)', 'Api::buscarRUC/$1');
     });
     
     /*---- GRUPO DE ADMINISTRADORES ----*/
@@ -75,17 +79,18 @@ $routes->group('/', ['namespace' => 'App\Controllers\DenunciasConsumidor\v1'], f
     $routes->group('admin', function($routes) {
     
         // Dashboard y gestión de denuncias
-        $routes->get('dashboard', 'AdminsController::dashboard');
-        $routes->post('receive', 'AdminsController::receiveAdmin');
+        //$routes->get('dashboard', 'AdminsController::dashboard');
+        $routes->post('recibir', 'AdminsController::receiveAdmin');
         $routes->post('procesos-denuncia', 'AdminsController::procesosDenuncia');
-        $routes->get('search-denuncias', 'AdminsController::searchDenuncias');
+        $routes->get('buscar-denuncias', 'AdminsController::searchDenuncias');
     
         // Gestión de administradores
         $routes->get('/', 'AdminsController::getAdministradores');
         $routes->post('/', 'AdminsController::createAdministrador');
         $routes->put('update', 'AdminsController::updateAdministrador');
         $routes->get('buscar', 'AdminsController::searchAdmin');
-        $routes->get('history', 'AdminsController::historyAdmin');
+        $routes->get('buscar/(:num)', 'AdminsController::searchDenunciasByDenuncianteId/$1');
+        //$routes->get('history', 'AdminsController::historyAdmin');
     
     });
 });

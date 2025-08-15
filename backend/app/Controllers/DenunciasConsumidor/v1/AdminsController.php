@@ -7,8 +7,8 @@ use App\Models\DenunciasConsumidor\v1\DenuncianteModel;
 use App\Models\DenunciasConsumidor\v1\DenunciaModel;
 use App\Models\DenunciasConsumidor\v1\SeguimientoDenunciaModel;
 use App\Models\DenunciasConsumidor\v1\AdministradorModel;
-use App\Models\DenunciasConsumidor\v1\HistorialAdminModel;
-use App\Controllers\Denuncia_consumidor\Admin\VerificarAdmi;
+//use App\Models\DenunciasConsumidor\v1\HistorialAdminModel;
+use App\Controllers\DenunciasConsumidor\v1\AuthController;
 use CodeIgniter\Config\Services;
 
 class AdminsController extends ResourceController
@@ -18,11 +18,11 @@ class AdminsController extends ResourceController
     private $denunciaModel;
     private $seguimientoDenunciaModel;
     private $adminModel;
-    private $historialModel;
+    //private $historialModel;
 
     // Utils
     private $email;
-    private $verificarAdmi;
+    private $AuthController;
 
     public function __construct()
     {
@@ -33,75 +33,79 @@ class AdminsController extends ResourceController
 
         // Modelos de admins
         $this->adminModel     = new AdministradorModel();
-        $this->historialModel = new HistorialAdminModel();
+        //$this->historialModel = new HistorialAdminModel();
 
         // Servicios
         $this->email         = Services::email();
-        $this->verificarAdmi = new VerificarAdmi();
+        $this->AuthController = new AuthController();
     }
 
-    // =========================
-    // 🔹 Funciones de autenticación
-    // =========================
+
     private function authAdmin()
-    {
-        $dni_admin = $this->request->getVar('dni');
-        if (!$this->verificarAdmi->validar($dni_admin)) {
-            return $this->fail(['message' => 'Acceso denegado: administrador no válido'], 403);
-        }
-        return $dni_admin;
+{
+    $token = get_cookie('access_token');
+
+    if (!$token) {
+        return $this->respond(['error' => 'No autenticado'], 401);
     }
 
+    try {
+        $decoded = verifyJWT($token);
+
+        if (!isset($decoded->data->dni)) {
+            return $this->respond(['error' => 'Token inválido'], 401);
+        }
+
+        return $decoded->data->dni;
+
+    } catch (\Throwable $e) {
+        return $this->respond(['error' => 'Token inválido: ' . $e->getMessage()], 401);
+    }
+}
     // =========================
     // 📌 Funciones de denuncias
     // =========================
-    public function dashboard()
-    {
-        $dni_admin = $this->authAdmin();
-        if (is_object($dni_admin)) return $dni_admin;
-
-        $denuncias = $this->denunciaModel->getDashboardData();
-        return $this->respond($denuncias);
-    }
 
     public function receiveAdmin()
-    {
-        $dni_admin = $this->authAdmin();
-        if (is_object($dni_admin)) return $dni_admin;
-
-        $code       = $this->request->getVar('tracking_code');
-        $estado     = 'recibida';
-        $comentario = 'La denuncia ha sido recibida por el administrador';
-
-        $denuncia = $this->denunciaModel->receiveDenuncia(
-            $code,
-            $dni_admin,
-            $estado,
-            $comentario,
-            [
-                'denuncia_id'        => null,
-                'estado'             => $estado,
-                'comentario'         => $comentario,
-                'fecha_actualizacion'=> date('Y-m-d H:i:s'),
-                'dni'                => $dni_admin
-            ]
-        );
-
-        if (!$denuncia) {
-            return $this->fail(['message' => 'Error al recibir la denuncia']);
-        }
-
-        $correo = $this->denuncianteModel
-            ->select('email')
-            ->where('id', $denuncia['denunciante_id'])
-            ->first();
-
-        if ($correo) {
-            $this->enviarCorreo($correo['email'], $code, $estado, $comentario);
-        }
-
-        return $this->respond(['success' => true, 'message' => 'La denuncia fue recibida']);
+{
+    $dni_admin = $this->authAdmin();
+    if (!is_string($dni_admin)) {
+        // authAdmin ya devuelve la respuesta de error si falla
+        return $dni_admin;
     }
+
+    $code       = $this->request->getVar('tracking_code');
+    $estado     = 'recibida';
+    $comentario = 'La denuncia ha sido recibida por el administrador';
+
+    $seguimientoData = [
+        'estado'             => $estado,
+        'comentario'         => $comentario,
+        'fecha_actualizacion'=> date('Y-m-d H:i:s'),
+        'dni'                => $dni_admin
+    ];
+
+    $denuncia = $this->denunciaModel->receiveDenuncia(
+        $code,
+        $dni_admin,
+        $estado,
+        $comentario,
+        $seguimientoData
+    );
+
+    if (!$denuncia) {
+        return $this->respond([
+            'success' => false,
+            'message' => 'No se encontró la denuncia con el código ingresado.'
+        ], 404);
+    }
+
+    return $this->respond([
+        'success' => true,
+        'message' => 'Denuncia recibida correctamente',
+        'denuncia'=> $denuncia
+    ]);
+}
 
     public function procesosDenuncia()
     {
@@ -145,13 +149,28 @@ class AdminsController extends ResourceController
         return $this->respond(['success' => true, 'message' => 'Denuncia actualizada']);
     }
 
+    // public function searchDenuncias()
+    // {
+    //     $dni_admin = $this->authAdmin();
+    //     if (is_object($dni_admin)) return $dni_admin;
+
+    //     $dni = $this->request->getVar('numero_documento');
+    //     $denuncias = $this->denunciaModel->searchByDocumento($dni);
+
+    //     if (empty($denuncias)) {
+    //         return $this->fail(['message' => 'No se encontraron denuncias']);
+    //     }
+
+    //     return $this->respond(['success' => true, 'data' => $denuncias]);
+    // }
+
     public function searchDenuncias()
     {
         $dni_admin = $this->authAdmin();
         if (is_object($dni_admin)) return $dni_admin;
 
-        $dni = $this->request->getVar('numero_documento');
-        $denuncias = $this->denunciaModel->searchByDocumento($dni);
+        $documento = $this->request->getVar('documento');
+        $denuncias = $this->denunciaModel->searchByDocumento($documento);
 
         if (empty($denuncias)) {
             return $this->fail(['message' => 'No se encontraron denuncias']);
@@ -159,6 +178,25 @@ class AdminsController extends ResourceController
 
         return $this->respond(['success' => true, 'data' => $denuncias]);
     }
+
+    public function searchDenunciasByDenuncianteId($denuncianteId)
+    {
+        $dni_admin = $this->authAdmin();
+        if (is_object($dni_admin)) return $dni_admin;
+
+        if (empty($denuncianteId)) {
+            return $this->fail(['message' => 'Falta el parámetro denunciante_id']);
+        }
+
+        $denuncias = $this->denunciaModel->searchByDenuncianteId($denuncianteId);
+
+        if (empty($denuncias)) {
+            return $this->fail(['message' => 'No se encontraron denuncias para este denunciante']);
+        }
+
+        return $this->respond(['success' => true, 'data' => $denuncias]);
+    }
+
 
     // =========================
     // 👑 Funciones de SuperAdmin
@@ -254,14 +292,14 @@ class AdminsController extends ResourceController
         return $this->response->setJSON($admin);
     }
 
-    public function historyAdmin()
-    {
-        $history = $this->historialModel->obtenerHistorialCompleto();
-        if (!$history) {
-            return $this->response->setJSON(['error' => 'No se encontraron registros de historial'])->setStatusCode(404);
-        }
-        return $this->response->setJSON($history);
-    }
+    // public function historyAdmin()
+    // {
+    //     $history = $this->historialModel->obtenerHistorialCompleto();
+    //     if (!$history) {
+    //         return $this->response->setJSON(['error' => 'No se encontraron registros de historial'])->setStatusCode(404);
+    //     }
+    //     return $this->response->setJSON($history);
+    // }
 
     // =========================
     // 📧 Función auxiliar
