@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Routes, Navigate } from "react-router";
 import { Loader } from "dialca-ui";
 import { BaseLayout } from "./layouts/BaseLayout";
 import { FormDenuncia } from "./pages/public/Form/FormDenuncia";
+import  TrackingDenuncia from "./pages/public/Tracking/TrackingDenuncia";
 
 // Importa el provider
 import { DenunciasProvider } from "./context/DenunciasContext";
@@ -47,6 +48,7 @@ function App() {
                     <Routes>
                         <Route path="/" element={<BaseLayout />}>
                             <Route index element={<FormDenuncia />} />
+                        <Route path="/tracking-denuncia" element={<TrackingDenuncia />} />
                         </Route>
                         <Route path="/admin/login" element={<Login />} />
                     </Routes>
