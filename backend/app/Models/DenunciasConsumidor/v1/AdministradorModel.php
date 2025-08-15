@@ -15,6 +15,7 @@ class AdministradorModel extends Model
     protected $protectFields    = true;
 
     protected $allowedFields    = [
+        'id',
         'dni',
         'nombre',
         'password',
@@ -31,9 +32,9 @@ class AdministradorModel extends Model
 
     // Validaciones
     protected $validationRules = [
-        'dni'      => 'required|numeric|min_length[8]|max_length[15]',
+        'dni'      => 'required|numeric|min_length[8]|max_length[20]',
         'nombre'   => 'required|string|max_length[100]',
-        'password' => 'required|string|min_length[6]|max_length[255]',
+        'password' => 'required|string|min_length[8]|max_length[255]',
         'rol'      => 'required|string|max_length[50]',
         'estado'   => 'required|in_list[activo,inactivo,1,0]'
     ];
