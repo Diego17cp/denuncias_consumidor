@@ -1,4 +1,4 @@
-<?php namespace App\Models\Denuncia_consumidor;
+<?php namespace App\Models\DenunciasConsumidor\v1;
 
 use CodeIgniter\Model;
 
@@ -8,19 +8,18 @@ class DenunciaModel extends Model
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = false;
+    protected $useSoftDeletes   = true;
 
     protected $allowedFields    = [
+        'id',
         'tracking_code',
-        'es_anonimo',
         'denunciante_id',
-        'motivo_otro',
-        'descripcion',
-        'fecha_incidente',
+        'es_anonimo',,
         'denunciado_id',
-        'fecha_registro',
+        'descripcion',
         'estado',
-        'pdf_path'
+        'fecha_incidente',
+        // 'pdf_path'
     ];
 
     // Fechas
@@ -34,13 +33,11 @@ class DenunciaModel extends Model
         'tracking_code'   => 'required|string|max_length[50]',
         'es_anonimo'      => 'required|in_list[0,1]',
         'denunciante_id'  => 'permit_empty|integer',
-        'motivo_otro'     => 'permit_empty|string|max_length[255]',
         'descripcion'     => 'required|string',
         'fecha_incidente' => 'required|valid_date',
         'denunciado_id'   => 'required|integer',
-        'fecha_registro'  => 'permit_empty|valid_date',
         'estado'          => 'required|string|max_length[50]',
-        'pdf_path'        => 'permit_empty|string|max_length[255]',
+        // 'pdf_path'       => 'permit_empty|string|max_length[255]',
     ];
 
     protected $validationMessages = [
@@ -66,6 +63,7 @@ class DenunciaModel extends Model
     ];
 
     protected $skipValidation = false;
+    protected $cleanValidationRules = true;
 
     // Métodos personalizados
     public function obtenerPorEstado(string $estado): array

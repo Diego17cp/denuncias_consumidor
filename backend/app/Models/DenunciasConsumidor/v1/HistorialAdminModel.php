@@ -1,4 +1,4 @@
-<?php namespace App\Models\Denuncia_consumidor;
+<?php namespace App\Models\DenunciasConsumidor\v1;
 
 use CodeIgniter\Model;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Denuncia_consumidor;
+namespace App\Models\DenunciasConsumidor\v1;
 
 use CodeIgniter\Model;
 
@@ -11,14 +11,18 @@ class DenunciadoModel extends Model
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = false;
+    protected $useSoftDeletes   = true;
     protected $protectFields    = true;
 
     protected $allowedFields = [
+        'id',
         'nombre',
+        'documento',
+        'representante_legal',
+        'razon_social',
         'tipo_documento',
         'direccion',   
-        'telefono'     
+        'celular',
     ];
 
     // Fechas 
@@ -31,9 +35,12 @@ class DenunciadoModel extends Model
     // Validaciones
     protected $validationRules = [
         'nombre'         => 'required|min_length[3]|max_length[255]',
-        'tipo_documento' => 'required|in_list[DNI,CEDULA,RUC]',
+        'tipo_documento' => 'required|in_list[DNI,CE,RUC]',
         'direccion'      => 'permit_empty|max_length[50]',
-        'telefono'       => 'permit_empty|max_length[20]'
+        'celular'       => 'permit_empty|max_length[20]',
+        'documento'      => 'required|min_length[8]|max_length[20]',
+        'representante_legal' => 'permit_empty|max_length[255]',
+        'razon_social'   => 'permit_empty|max_length[255]',
     ];
 
     protected $validationMessages = [
@@ -49,7 +56,18 @@ class DenunciadoModel extends Model
         'direccion' => [
             'max_length' => 'El campo {field} no puede exceder {param} caracteres.'
         ],
-        'telefono' => [
+        'celular' => [
+            'max_length' => 'El campo {field} no puede exceder {param} caracteres.'
+        ],
+        'documento' => [
+            'required'    => 'El campo {field} es obligatorio.',
+            'min_length'  => 'El campo {field} debe tener al menos {param} caracteres.',
+            'max_length'  => 'El campo {field} no puede exceder {param} caracteres.'
+        ],
+        'representante_legal' => [
+            'max_length' => 'El campo {field} no puede exceder {param} caracteres.'
+        ],
+        'razon_social' => [
             'max_length' => 'El campo {field} no puede exceder {param} caracteres.'
         ]
     ];

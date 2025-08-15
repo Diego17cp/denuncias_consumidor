@@ -1,4 +1,6 @@
-<?php namespace App\Models\Denuncia_consumidor;
+<?php
+
+namespace App\Models\DenunciasConsumidor\v1;
 
 use CodeIgniter\Model;
 
@@ -6,11 +8,25 @@ class DenuncianteModel extends Model
 {
     protected $table      = 'denunciante';
     protected $primaryKey = 'id';
+    protected $useAutoIncrement = true;
+    protected $returnType = 'array';
+    protected $useSoftDeletes = true;
+    protected $protectFields = true;
 
     protected $allowedFields = [
-        'nombre', 'email', 'telefono', 'numero_documento',
-        'tipo_documento', 'razon_social', 'sexo', 
-        'distrito', 'provincia', 'departamento', 'direccion'
+        'id',
+        'nombre',
+        'razon_social',
+        'documento',
+        'tipo_documento',
+        'direccion',
+        'distrito',
+        'provincia',
+        'departamento',
+        'email',
+        'telefono',
+        'celular',
+        'sexo',
     ];
 
     // Fechas 
@@ -23,16 +39,17 @@ class DenuncianteModel extends Model
     // Validaciones
     protected $validationRules = [
         'nombre'           => 'required|min_length[3]|max_length[100]',
-        'email'            => 'required|valid_email|max_length[150]',
-        'telefono'         => 'required|regex_match[/^[0-9]{7,15}$/]',
-        'numero_documento' => 'required|numeric|max_length[15]',
-        'tipo_documento'   => 'required|in_list[DNI,CE,RUC]',
         'razon_social'     => 'permit_empty|max_length[150]',
-        'sexo'             => 'required|in_list[M,F,O]',
+        'documento'        => 'required|numeric|max_length[15]',
+        'tipo_documento'   => 'required|in_list[DNI,CE,RUC]',
+        'direccion'        => 'required|max_length[255]',
         'distrito'         => 'required|max_length[100]',
         'provincia'        => 'required|max_length[100]',
         'departamento'     => 'required|max_length[100]',
-        'direccion'        => 'required|max_length[255]'
+        'email'            => 'required|valid_email|max_length[150]',
+        'telefono'         => 'required|numeric|max_length[15]|min_length[7]',
+        'celular'          => 'required|numeric|max_length[15]|min_length[7]',
+        'sexo'             => 'required|in_list[M,F,O]',
     ];
 
     // Mensajes de las validaciones
@@ -49,7 +66,15 @@ class DenuncianteModel extends Model
         ],
         'telefono' => [
             'required'    => 'El teléfono es obligatorio',
-            'regex_match' => 'El teléfono debe tener entre 7 y 15 dígitos numéricos'
+            'numeric'     => 'El teléfono debe contener solo números',
+            'max_length'  => 'El teléfono no puede superar los 15 dígitos',
+            'min_length'  => 'El teléfono debe tener al menos 7 dígitos'
+        ],
+        'celular' => [
+            'required'    => 'El celular es obligatorio',
+            'numeric'     => 'El celular debe contener solo números',
+            'max_length'  => 'El celular no puede superar los 15 dígitos',
+            'min_length'  => 'El celular debe tener al menos 7 dígitos'
         ],
         'numero_documento' => [
             'required'   => 'El número de documento es obligatorio',

@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Controllers\Denuncia_consumidor\Admin;
+namespace App\Controllers\DenunciasConsumidor\v1;
 
 use CodeIgniter\RESTful\ResourceController;
-use App\Models\Denuncia_consumidor\DenuncianteModel;
-use App\Models\Denuncia_consumidor\DenunciaModel;
-use App\Models\Denuncia_consumidor\SeguimientoDenunciaModel;
-use App\Models\Denuncia_consumidor\AdministradorModel;
-use App\Models\Denuncia_consumidor\HistorialAdminModel;
+use App\Models\DenunciasConsumidor\v1\DenuncianteModel;
+use App\Models\DenunciasConsumidor\v1\DenunciaModel;
+use App\Models\DenunciasConsumidor\v1\SeguimientoDenunciaModel;
+use App\Models\DenunciasConsumidor\v1\AdministradorModel;
+use App\Models\DenunciasConsumidor\v1\HistorialAdminModel;
 use App\Controllers\Denuncia_consumidor\Admin\VerificarAdmi;
 use CodeIgniter\Config\Services;
 

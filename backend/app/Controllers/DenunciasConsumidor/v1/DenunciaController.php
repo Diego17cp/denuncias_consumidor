@@ -1,9 +1,11 @@
-<?php namespace App\Controllers\Denuncia_consumidor\User;
+<?php 
 
-use App\Models\Denuncia_consumidor\DenunciaModel;
-use App\Models\Denuncia_consumidor\DenuncianteModel;
-use App\Models\Denuncia_consumidor\DenunciadoModel;
-use App\Models\Denuncia_consumidor\SeguimientoDenunciaModel;
+namespace App\Controllers\DenunciasConsumidor\v1;
+
+use App\Models\DenunciasConsumidor\v1\DenunciaModel;
+use App\Models\DenunciasConsumidor\v1\DenuncianteModel;
+use App\Models\DenunciasConsumidor\v1\DenunciadoModel;
+use App\Models\DenunciasConsumidor\v1\SeguimientoDenunciaModel;
 use CodeIgniter\RESTful\ResourceController;
 
 class DenunciaController extends ResourceController

@@ -1,6 +1,8 @@
-<?php namespace App\Controllers\Denuncia_consumidor\Seguimiento;
+<?php 
 
-use App\Models\Denuncia_consumidor\SeguimientoDenunciaModel;
+namespace App\Controllers\DenunciasConsumidor\v1;
+
+use App\Models\DenunciasConsumidor\v1\SeguimientoDenunciaModel;
 use CodeIgniter\RESTful\ResourceController;
 
 class SeguimientoDenunciaController extends ResourceController
