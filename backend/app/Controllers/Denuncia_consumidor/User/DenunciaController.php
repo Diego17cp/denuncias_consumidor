@@ -35,6 +35,12 @@ class DenunciaController extends ResourceController
         return $trackingCode;
     }
 
+        public function index()
+    {
+        $denuncias = $this->denunciasModel->findAll();
+        return $this->respond($denuncias);
+    }
+
     /**
      * Crear una nueva denuncia
      */
