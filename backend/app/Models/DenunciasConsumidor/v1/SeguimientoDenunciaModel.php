@@ -20,7 +20,7 @@ class SeguimientoDenunciaModel extends Model
     // Manejo automático de fechas
     protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
-    protected $createdField  = 'fecha_actualizacion';
+    protected $createdField  = 'created_at';
     protected $updatedField  = null; 
 
     // Validaciones
@@ -56,7 +56,7 @@ class SeguimientoDenunciaModel extends Model
     public function obtenerPorDenunciaId(int $denunciaId)
     {
         return $this->where('denuncia_id', $denunciaId)
-                    ->orderBy('fecha_actualizacion', 'DESC')
+                    ->orderBy('created_at', 'DESC')
                     ->findAll();
     }
 }
