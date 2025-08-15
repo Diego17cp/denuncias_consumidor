@@ -306,11 +306,6 @@ class CreateTables extends Migration
                 'unsigned' => true,
                 'null' => false
             ],
-            'estado' => [
-                'type' => 'VARCHAR',
-                'constraint' => '100',
-                'null' => false
-            ],
             'comentario' => [
                 'type' => 'TEXT',
                 'null' => false
