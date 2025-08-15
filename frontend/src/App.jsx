@@ -6,6 +6,7 @@ import { Loader } from "dialca-ui";
 import { BaseLayout } from "./layouts/BaseLayout";
 import { FormDenuncia } from "./pages/public/Form/FormDenuncia";
 import  TrackingDenuncia from "./pages/public/Tracking/TrackingDenuncia";
+import { Toaster } from "sonner"
 
 // Importa el provider
 import { DenunciasProvider } from "./context/DenunciasContext";
@@ -53,6 +54,7 @@ function App() {
                         <Route path="/admin/login" element={<Login />} />
                     </Routes>
                 </Suspense>
+                <Toaster richColors closeButton />
             </BrowserRouter>
         </DenunciasProvider>
     );
