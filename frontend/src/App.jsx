@@ -5,11 +5,12 @@ import { BrowserRouter, Route, Routes, Navigate } from "react-router";
 import { Loader } from "dialca-ui";
 import { BaseLayout } from "./layouts/BaseLayout";
 import { FormDenuncia } from "./pages/public/Form/FormDenuncia";
-import  TrackingDenuncia from "./pages/public/Tracking/TrackingDenuncia";
-import { Toaster } from "sonner"
+import TrackingDenuncia from "./pages/public/Tracking/TrackingDenuncia";
+import { Toaster } from "sonner";
 
 // Importa el provider
 import { DenunciasProvider } from "./context/DenunciasContext";
+import { AuthProvider } from "./context/AuthContext";
 
 // Paginas Admin
 const Login = lazy(() => import("./pages/admin/Login"));
@@ -36,28 +37,33 @@ const Login = lazy(() => import("./pages/admin/Login"));
 // const Unauthorized = lazy(() => import("./pages/Unauthorized"));
 
 function App() {
-    return (
-        <DenunciasProvider>
-            <BrowserRouter>
-                <Suspense
-                    fallback={
-                        <div className="flex min-h-screen w-full justify-center items-center h-screen">
-                            <Loader />
-                        </div>
-                    }
-                >
-                    <Routes>
-                        <Route path="/" element={<BaseLayout />}>
-                            <Route index element={<FormDenuncia />} />
-                        <Route path="/tracking-denuncia" element={<TrackingDenuncia />} />
-                        </Route>
-                        <Route path="/admin/login" element={<Login />} />
-                    </Routes>
-                </Suspense>
-                <Toaster richColors closeButton />
-            </BrowserRouter>
-        </DenunciasProvider>
-    );
+	return (
+		<BrowserRouter>
+			<DenunciasProvider>
+				<AuthProvider>
+					<Suspense
+						fallback={
+							<div className="flex min-h-screen w-full justify-center items-center h-screen">
+								<Loader />
+							</div>
+						}
+					>
+						<Routes>
+							<Route path="/" element={<BaseLayout />}>
+								<Route index element={<FormDenuncia />} />
+								<Route
+									path="/tracking-denuncia"
+									element={<TrackingDenuncia />}
+								/>
+							</Route>
+							<Route path="/admin/login" element={<Login />} />
+						</Routes>
+					</Suspense>
+					<Toaster richColors closeButton />
+				</AuthProvider>
+			</DenunciasProvider>
+		</BrowserRouter>
+	);
 }
 
 export default App;
