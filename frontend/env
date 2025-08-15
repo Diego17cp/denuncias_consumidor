@@ -1,0 +1,1 @@
+VITE_CI_API_BASE_URL = "http://localhost/denuncias_consumidor/backend/"
