@@ -1,8 +1,7 @@
 <?php
 namespace App\Controllers\Denuncia_consumidor\v1;
 use CodeIgniter\RESTful\ResourceController;
-// Cambiar esto al nuevo en un futuroxd
-use App\Models\Denuncia_consumidor\AdministradorModel;
+use App\Models\DenunciasConsumidor\v1\AdministradorModel;
 use CodeIgniter\Cookie\Cookie;
 
 helper('jwt');
