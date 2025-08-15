@@ -2,7 +2,7 @@ import { Suspense, lazy } from "react";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router";
 
 // Componentes
-import { Loader } from "dialca-ui";
+// import { Loader } from "dialca-ui";
 import { BaseLayout } from "./layouts/BaseLayout";
 import { FormDenuncia } from "./pages/public/Form/FormDenuncia";
 
@@ -40,7 +40,7 @@ function App() {
                 <Suspense
                     fallback={
                         <div className="flex min-h-screen w-full justify-center items-center h-screen">
-                            <Loader />
+                            {/* <Loader /> */}
                         </div>
                     }
                 >
