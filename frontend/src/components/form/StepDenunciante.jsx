@@ -174,7 +174,7 @@ export default function StepDenunciante({ onNext, onPrev }) {
                     value={denunciante.correo}
                     onChange={handleDenuncianteChange}
                     placeholder="correo@ejemplo.com"
-                    className="w-full p-3 border border-black text-gray-600 placeholder-gray-500 rounded-lg focus:outline-none focus:ring focus:border-blue-500"
+                    className="w-full p-3 border border-black text-black placeholder-gray-500 rounded-lg focus:outline-none focus:ring focus:border-blue-500"
                 />
             </div>
 
