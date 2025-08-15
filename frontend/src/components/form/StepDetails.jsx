@@ -10,6 +10,7 @@ export default function StepDetalles({ onNext }) {
         fecha,
         setFecha,
         files,
+        setFiles,
         error,
         handleFileChange,
         isStepDetailsValid,
@@ -56,6 +57,7 @@ export default function StepDetalles({ onNext }) {
                 <label className="block mb-3 text-sm font-medium">
                     Subir fotos (máx. 10MB cada una)
                 </label>
+
                 <label className="flex flex-col items-center justify-center border-2 border-dashed border-black p-6 rounded-lg cursor-pointer hover:bg-gray-100">
                     <FaClipboardCheck className="text-black text-2xl mb-2" />
                     <span className="text-black">Haz clic o arrastra tus fotos aquí</span>
@@ -67,26 +69,42 @@ export default function StepDetalles({ onNext }) {
                         className="hidden"
                     />
                 </label>
-                {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+
+                {error && (
+                    <p className="text-red-500 text-sm mt-1">{error}</p>
+                )}
+
                 {files.length > 0 && (
                     <ul className="mt-2 text-sm list-disc pl-4">
                         {files.map((file, index) => (
-                            <li key={index}>
-                                {file.name} ({(file.size / (1024 * 1024)).toFixed(2)} MB)
+                            <li key={index} className="flex items-center justify-between">
+                                <span>
+                                    {file.name} ({(file.size / (1024 * 1024)).toFixed(2)} MB)
+                                </span>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const updatedFiles = files.filter((_, i) => i !== index);
+                                        setFiles(updatedFiles);
+                                    }}
+                                    className="ml-4 cursor-pointer text-red-500 hover:underline"
+                                >
+                                    Eliminar
+                                </button>
                             </li>
                         ))}
                     </ul>
                 )}
             </div>
 
+
             <div className="flex justify-end mt-6">
                 <button
                     type="button"
                     onClick={onNext}
                     disabled={!isStepDetailsValid}
-                    className={`px-6 py-2 cursor-pointer rounded-lg font-semibold bg-blue-600 text-white transition ${
-                        !isStepDetailsValid ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"
-                    }`}
+                    className={`px-6 py-2 cursor-pointer rounded-lg font-semibold bg-blue-600 text-white transition ${!isStepDetailsValid ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"
+                        }`}
                 >
                     Siguiente
                 </button>
