@@ -149,9 +149,8 @@ export default function StepDatosDenunciado({ onNext, onPrev }) {
                     type="button"
                     onClick={onNext}
                     disabled={!isStepDenunciadoValid}
-                    className={`px-6 py-2 cursor-pointer rounded-lg font-semibold bg-blue-600 text-white transition ${
-                        !isStepDenunciadoValid ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"
-                    }`}
+                    className={`px-6 py-2 cursor-pointer rounded-lg font-semibold bg-blue-600 text-white transition ${!isStepDenunciadoValid ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"
+                        }`}
                 >
                     Siguiente
                 </button>
