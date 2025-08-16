@@ -11,6 +11,8 @@ import { Toaster } from "sonner";
 // Importa el provider
 import { DenunciasProvider } from "./context/DenunciasContext";
 import { AuthProvider } from "./context/AuthContext";
+import { Dashboard } from "./pages/admin/Dashboard";
+import { ProtectedRoute } from "./components/admin/ProtectedRoute";
 
 // Paginas Admin
 const Login = lazy(() => import("./pages/admin/Login"));
@@ -55,6 +57,25 @@ function App() {
 									path="/tracking-denuncia"
 									element={<TrackingDenuncia />}
 								/>
+								<Route path="/admin">
+									<Route
+										index
+										element={
+											<ProtectedRoute
+												allowedRoles={[
+													"admin",
+													"super_admin",
+												]}
+											>
+												<Navigate to="/admin/dashboard" />
+											</ProtectedRoute>
+										}
+									/>
+									<Route
+										path="dashboard"
+										element={<Dashboard />}
+									/>
+								</Route>
 							</Route>
 							<Route path="/admin/login" element={<Login />} />
 						</Routes>
