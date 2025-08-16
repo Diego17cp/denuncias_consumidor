@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useDenuncias } from "../../context/DenunciasContext";
+import { FaUser, FaBuilding, FaAddressCard } from "react-icons/fa";
 
 export default function StepDatosDenunciado({ onNext, onPrev }) {
     const {
@@ -21,210 +22,228 @@ export default function StepDatosDenunciado({ onNext, onPrev }) {
         isStepDenunciadoValid,
     } = useDenuncias();
 
-    // Animaciones
+    // Animaciones simplificadas
     const containerVariants = {
         hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.1,
-            },
-        },
+        visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
     };
 
     const itemVariants = {
         hidden: { y: 20, opacity: 0 },
-        visible: {
-            y: 0,
-            opacity: 1,
-            transition: {
-                duration: 0.3,
-            },
-        },
+        visible: { y: 0, opacity: 1, transition: { duration: 0.3 } }
     };
 
     const buttonVariants = {
         hover: { scale: 1.03 },
-        tap: { scale: 0.98 },
+        tap: { scale: 0.98 }
     };
 
     const documentTypeVariants = {
         hidden: { opacity: 0, height: 0 },
-        visible: {
-            opacity: 1,
-            height: "auto",
-            transition: { duration: 0.3 }
-        },
+        visible: { opacity: 1, height: "auto", transition: { duration: 0.3 } },
         exit: { opacity: 0, height: 0 }
     };
+
+    // Opciones de tipo de documento
+    const documentOptions = [
+        { value: "DNI", label: "DNI", icon: <FaUser /> },
+        { value: "RUC", label: "RUC", icon: <FaBuilding /> },
+        { value: "CEDULA", label: "Cédula", icon: <FaAddressCard /> }
+    ];
 
     return (
         <motion.div
             initial="hidden"
             animate="visible"
             variants={containerVariants}
-            className="p-6 space-y-6 text-gray-800"
+            className="p-4 space-y-6"
         >
+            {/* Card principal */}
+            <motion.div variants={itemVariants} className="space-y-6">
 
-            {/* Tipo de documento */}
-            <motion.div variants={itemVariants}>
-                <label className="block mb-2 text-sm font-medium text-gray-700">
-                    Tipo de documento <span className="text-red-500">*</span>
-                </label>
-                <select
-                    value={tipoDocumento}
-                    onChange={(e) => setTipoDocumento(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
-                >
-                    <option value="DNI">DNI</option>
-                    <option value="RUC">RUC</option>
-                    <option value="CEDULA">Cédula</option>
-                </select>
-            </motion.div>
+                {/* Selector de tipo de documento */}
+                <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                        Tipo de Documento <span className="text-red-500">*</span>
+                    </label>
+                    <div className=" grid grid-cols-3 gap-3">
+                        {documentOptions.map((option) => (
+                            <motion.button
+                                key={option.value}
+                                whileHover="hover"
+                                whileTap="tap"
+                                variants={buttonVariants}
+                                onClick={() => setTipoDocumento(option.value)}
+                                className={`
+                                    cursor-pointer flex flex-col items-center justify-center p-4 rounded-lg border-2
+                                    transition-all duration-200
+                                    ${tipoDocumento === option.value
+                                        ? 'bg-blue-50 border-blue-500 text-blue-600'
+                                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                                    }
+                                `}
+                            >
+                                <div className="text-2xl mb-1">{option.icon}</div>
+                                <span className="font-medium text-sm">{option.label}</span>
+                            </motion.button>
+                        ))}
+                    </div>
+                </div>
 
-            {/* Campos según tipo de documento */}
-            <AnimatePresence mode="wait">
-                {(tipoDocumento === "DNI" || tipoDocumento === "CEDULA") && (
-                    <motion.div
-                        key="dniFields"
-                        variants={documentTypeVariants}
-                        initial="hidden"
-                        animate="visible"
-                        exit="exit"
-                        className="space-y-4"
-                    >
-                        <motion.div variants={itemVariants}>
-                            <label className="block mb-2 text-sm font-medium text-gray-700">
-                                {tipoDocumento === "DNI" ? "DNI" : "Cédula"} <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                value={dniDenunciado}
-                                onChange={(e) => setDniDenunciado(e.target.value.replace(/\D/g, "").slice(0, 8))}
-                                placeholder={`Ingrese el ${tipoDocumento === "DNI" ? "DNI" : "número de cédula"}`}
-                                maxLength={8}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
-                            />
+                {/* Campos dinámicos según tipo de documento */}
+                <AnimatePresence mode="wait">
+                    {(tipoDocumento === "DNI" || tipoDocumento === "CEDULA") && (
+                        <motion.div
+                            key="dniFields"
+                            variants={documentTypeVariants}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                        >
+                            <motion.div variants={itemVariants} className="space-y-1">
+                                <label className="block text-sm font-medium text-gray-700">
+                                    {tipoDocumento === "DNI" ? "DNI" : "Cédula"} <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    value={dniDenunciado}
+                                    onChange={(e) => setDniDenunciado(e.target.value.replace(/\D/g, "").slice(0, 8))}
+                                    placeholder={`Ingrese ${tipoDocumento === "DNI" ? "DNI" : "cédula"}`}
+                                    maxLength={8}
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                    
+                                />
+                                
+                            </motion.div>
+
+                            <motion.div variants={itemVariants} className="space-y-1">
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Nombre <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    value={nombreDenunciado}
+                                    onChange={(e) => setNombreDenunciado(e.target.value)}
+                                    placeholder="Nombre completo"
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                />
+                            </motion.div>
+
+                            <motion.div variants={itemVariants} className="space-y-1 md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Apellidos <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    value={apellidosDenunciado}
+                                    onChange={(e) => setApellidosDenunciado(e.target.value)}
+                                    placeholder="Apellidos completos"
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                />
+                            </motion.div>
                         </motion.div>
+                    )}
+                </AnimatePresence>
 
-                        <motion.div variants={itemVariants}>
-                            <label className="block mb-2 text-sm font-medium text-gray-700">
-                                Nombre <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                value={nombreDenunciado}
-                                onChange={(e) => setNombreDenunciado(e.target.value)}
-                                placeholder="Ingrese el nombre"
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
-                            />
-                        </motion.div>
+                <AnimatePresence mode="wait">
+                    {tipoDocumento === "RUC" && (
+                        <motion.div
+                            key="rucFields"
+                            variants={documentTypeVariants}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                        >
+                            <motion.div variants={itemVariants} className="space-y-1">
+                                <label className="block text-sm font-medium text-gray-700">
+                                    RUC <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="ruc"
+                                    value={denunciante.ruc}
+                                    onChange={handleDenuncianteDigits("ruc", 11)}
+                                    placeholder="Ingrese RUC"
+                                    maxLength={11}
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                />
 
-                        <motion.div variants={itemVariants}>
-                            <label className="block mb-2 text-sm font-medium text-gray-700">
-                                Apellidos <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                value={apellidosDenunciado}
-                                onChange={(e) => setApellidosDenunciado(e.target.value)}
-                                placeholder="Ingrese los apellidos"
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
-                            />
+                            </motion.div>
+
+                            <motion.div variants={itemVariants} className="space-y-1">
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Representante Legal <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="representante"
+                                    value={denunciante.representante}
+                                    onChange={handleDenuncianteChange}
+                                    placeholder="Nombre completo"
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                />
+                            </motion.div>
+
+                            <motion.div variants={itemVariants} className="space-y-1 md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Razón Social <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="razonSocial"
+                                    value={denunciante.razonSocial}
+                                    onChange={handleDenuncianteChange}
+                                    placeholder="Razón social completa"
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                />
+                            </motion.div>
                         </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Campos comunes */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <motion.div variants={itemVariants} className="space-y-1 md">
+                        <label className="block text-sm font-medium text-gray-700">
+                            Dirección <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            value={direccionDenunciado}
+                            onChange={(e) => setDireccionDenunciado(e.target.value)}
+                            placeholder="Dirección completa"
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                        />
                     </motion.div>
-                )}
-            </AnimatePresence>
 
-            <AnimatePresence mode="wait">
-                {tipoDocumento === "RUC" && (
-                    <motion.div
-                        key="rucFields"
-                        variants={documentTypeVariants}
-                        initial="hidden"
-                        animate="visible"
-                        exit="exit"
-                        className="space-y-4"
-                    >
-                        <motion.div variants={itemVariants}>
-                            <label className="block mb-2 text-sm font-medium text-gray-700">
-                                RUC <span className="text-red-500">*</span>
-                            </label>
+                    <motion.div variants={itemVariants} className="space-y-1 md">
+                        <label className="block text-sm font-medium text-gray-700">
+                            Celular <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                                +51
+                            </span>
                             <input
-                                type="text"
-                                name="ruc"
-                                value={denunciante.ruc}
-                                onChange={handleDenuncianteDigits("ruc", 11)}
-                                placeholder="Ingrese el RUC"
-                                maxLength={11}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
+                                type="tel"
+                                value={celularDenunciado}
+                                onChange={(e) => setCelularDenunciado(e.target.value.replace(/\D/g, "").slice(0, 9))}
+                                placeholder="987654321"
+                                maxLength={9}
+                                className="w-full p-3 pl-12 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
                             />
-                        </motion.div>
+                        </div>
 
-                        <motion.div variants={itemVariants}>
-                            <label className="block mb-2 text-sm font-medium text-gray-700">
-                                Representante legal <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                name="representante"
-                                value={denunciante.representante}
-                                onChange={handleDenuncianteChange}
-                                placeholder="Ingrese el representante legal"
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
-                            />
-                        </motion.div>
-
-                        <motion.div variants={itemVariants}>
-                            <label className="block mb-2 text-sm font-medium text-gray-700">
-                                Razón social <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                name="razonSocial"
-                                value={denunciante.razonSocial}
-                                onChange={handleDenuncianteChange}
-                                placeholder="Ingrese la razón social"
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
-                            />
-                        </motion.div>
                     </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* Campos comunes */}
-            <motion.div variants={itemVariants}>
-                <label className="block mb-2 text-sm font-medium text-gray-700">
-                    Dirección <span className="text-red-500">*</span>
-                </label>
-                <input
-                    type="text"
-                    value={direccionDenunciado}
-                    onChange={(e) => setDireccionDenunciado(e.target.value)}
-                    placeholder="Ingrese la dirección"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
-                />
-            </motion.div>
-
-            <motion.div variants={itemVariants}>
-                <label className="block mb-2 text-sm font-medium text-gray-700">
-                    Celular <span className="text-red-500">*</span>
-                </label>
-                <input
-                    type="tel"
-                    value={celularDenunciado}
-                    onChange={(e) => setCelularDenunciado(e.target.value.replace(/\D/g, "").slice(0, 9))}
-                    placeholder="Ingrese el número de celular"
-                    maxLength={9}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
-                />
-                <p className="mt-1 text-xs text-gray-500">Ejemplo: 987654321</p>
+                </div>
             </motion.div>
 
             {/* Botones de navegación */}
             <motion.div
                 variants={itemVariants}
-                className="flex justify-between pt-6 border-t border-gray-200"
+                className="flex justify-between pt-4"
             >
                 <motion.button
                     variants={buttonVariants}
@@ -232,9 +251,12 @@ export default function StepDatosDenunciado({ onNext, onPrev }) {
                     whileTap="tap"
                     type="button"
                     onClick={onPrev}
-                    className="cursor-pointer px-6 py-3 rounded-lg font-semibold bg-gray-200 text-gray-800 hover:bg-gray-300 transition duration-200"
+                    className="cursor-pointer flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition"
                 >
-                    Atrás
+                    <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
+                    </svg>
+                    <span>Atrás</span>
                 </motion.button>
 
                 <motion.button
@@ -244,29 +266,19 @@ export default function StepDatosDenunciado({ onNext, onPrev }) {
                     type="button"
                     onClick={onNext}
                     disabled={!isStepDenunciadoValid}
-                    className={`cursor-pointer flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-white transition-all duration-300 ${!isStepDenunciadoValid
-                            ? "bg-gray-400 cursor-not-allowed"
-                            : "bg-blue-600 hover:bg-blue-700 shadow-lg"
-                        }`}
+                    className={`
+                        cursor-pointer flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium
+                        transition ${!isStepDenunciadoValid
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "bg-blue-600 text-white hover:bg-blue-700"
+                        }
+                    `}
                 >
                     <span>Siguiente</span>
-                    <motion.svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        whileHover={{ x: 4 }} // pa la derecha
-                        transition={{ type: "spring", stiffness: 300 }}
-                    >
-                        <path
-                            fillRule="evenodd"
-                            d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
-                            clipRule="evenodd"
-                        />
-                    </motion.svg>
+                    <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
                 </motion.button>
-
-                
             </motion.div>
         </motion.div>
     );

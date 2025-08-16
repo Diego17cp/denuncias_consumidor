@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useDenuncias } from "../../context/DenunciasContext";
+import { FaUser, FaBuilding, FaAddressCard } from "react-icons/fa";
 
 export default function StepDenunciante({ onNext, onPrev }) {
     const {
@@ -11,65 +12,80 @@ export default function StepDenunciante({ onNext, onPrev }) {
         isStepDenuncianteValid,
     } = useDenuncias();
 
-    // Animaciones
+    // Animaciones optimizadas
     const containerVariants = {
         hidden: { opacity: 0 },
-        visible: {
+        visible: { 
             opacity: 1,
-            transition: {
-                staggerChildren: 0.1,
-            },
-        },
+            transition: { staggerChildren: 0.1 }
+        }
     };
 
     const itemVariants = {
-        hidden: { y: 20, opacity: 0 },
-        visible: {
-            y: 0,
+        hidden: { y: 10, opacity: 0 },
+        visible: { 
+            y: 0, 
             opacity: 1,
-            transition: {
-                duration: 0.3,
-            },
-        },
+            transition: { duration: 0.2 }
+        }
     };
 
     const buttonVariants = {
         hover: { scale: 1.03 },
-        tap: { scale: 0.98 },
+        tap: { scale: 0.98 }
     };
 
     const documentTypeVariants = {
         hidden: { opacity: 0, height: 0 },
-        visible: {
-            opacity: 1,
+        visible: { 
+            opacity: 1, 
             height: "auto",
-            transition: { duration: 0.3 }
+            transition: { duration: 0.25 }
         },
         exit: { opacity: 0, height: 0 }
     };
+
+    // Opciones de documento
+    const documentOptions = [
+        { value: "DNI", label: "DNI", icon: <FaUser /> },
+        { value: "RUC", label: "RUC", icon: <FaBuilding /> },
+        { value: "CEDULA", label: "Cédula", icon: <FaAddressCard /> }
+    ];
 
     return (
         <motion.div
             initial="hidden"
             animate="visible"
             variants={containerVariants}
-            className="p-6 space-y-6 text-gray-800"
+            className="mb-6 p-4 space-y-6"
         >
-
-            {/* Tipo de documento */}
-            <motion.div variants={itemVariants}>
-                <label className="block mb-2 text-sm font-medium text-gray-700">
-                    Tipo de documento <span className="text-red-500">*</span>
+            {/* Selector de tipo de documento con botones */}
+            <motion.div variants={itemVariants} className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                    Tipo de Documento <span className="text-red-500">*</span>
                 </label>
-                <select
-                    value={tipoDocumento}
-                    onChange={(e) => setTipoDocumento(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
-                >
-                    <option value="DNI">DNI</option>
-                    <option value="RUC">RUC</option>
-                    <option value="CEDULA">Cédula</option>
-                </select>
+                <div className="grid grid-cols-3 gap-3">
+                    {documentOptions.map((option) => (
+                        <motion.button
+                            key={option.value}
+                            type="button"
+                            whileHover="hover"
+                            whileTap="tap"
+                            variants={buttonVariants}
+                            onClick={() => setTipoDocumento(option.value)}
+                            className={`
+                                cursor-pointer flex flex-col items-center justify-center p-3 rounded-lg border-2
+                                transition-all ${tipoDocumento === option.value
+                                    ? 'bg-blue-50 border-blue-500 text-blue-600'
+                                    : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                                }
+                            `}
+                        >
+                            <div className="text-xl mb-1">{option.icon}</div>
+                            <span className="text-sm font-medium">{option.label}</span>
+                        </motion.button>
+                    ))}
+                </div>
             </motion.div>
 
             {/* Campos según tipo de documento */}
@@ -81,25 +97,32 @@ export default function StepDenunciante({ onNext, onPrev }) {
                         initial="hidden"
                         animate="visible"
                         exit="exit"
-                        className="space-y-4"
+                        className=" grid grid-cols-1 md:grid-cols-2 gap-4"
                     >
-                        <motion.div variants={itemVariants}>
-                            <label className="block mb-2 text-sm font-medium text-gray-700">
+                        <motion.div variants={itemVariants} className="space-y-1">
+                            <label className="block text-sm font-medium text-gray-700">
                                 {tipoDocumento === "DNI" ? "DNI" : "Cédula"} <span className="text-red-500">*</span>
                             </label>
-                            <input
-                                type="text"
-                                name="dni"
-                                value={denunciante.dni}
-                                onChange={handleDenuncianteDigits("dni", 8)}
-                                inputMode="numeric"
-                                placeholder={`Ingrese el ${tipoDocumento === "DNI" ? "DNI" : "número de cédula"}`}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
-                            />
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    name="dni"
+                                    value={denunciante.dni}
+                                    onChange={handleDenuncianteDigits("dni", 8)}
+                                    inputMode="numeric"
+                                    placeholder={`Ingrese ${tipoDocumento === "DNI" ? "DNI" : "cédula"}`}
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                />
+                                <div className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs ${
+                                    denunciante.dni?.length === 8 ? 'text-gray-500' : 'text-gray-400'
+                                }`}>
+                                    {denunciante.dni?.length || 0}/8
+                                </div>
+                            </div>
                         </motion.div>
 
-                        <motion.div variants={itemVariants}>
-                            <label className="block mb-2 text-sm font-medium text-gray-700">
+                        <motion.div variants={itemVariants} className="space-y-1">
+                            <label className="block text-sm font-medium text-gray-700">
                                 Nombres <span className="text-red-500">*</span>
                             </label>
                             <input
@@ -107,13 +130,13 @@ export default function StepDenunciante({ onNext, onPrev }) {
                                 name="nombres"
                                 value={denunciante.nombres}
                                 onChange={handleDenuncianteChange}
-                                placeholder="Ingrese los nombres"
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
+                                placeholder="Nombres completos"
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
                             />
                         </motion.div>
 
-                        <motion.div variants={itemVariants}>
-                            <label className="block mb-2 text-sm font-medium text-gray-700">
+                        <motion.div variants={itemVariants} className="space-y-1 md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700">
                                 Apellidos <span className="text-red-500">*</span>
                             </label>
                             <input
@@ -121,8 +144,8 @@ export default function StepDenunciante({ onNext, onPrev }) {
                                 name="apellidos"
                                 value={denunciante.apellidos}
                                 onChange={handleDenuncianteChange}
-                                placeholder="Ingrese los apellidos"
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
+                                placeholder="Apellidos completos"
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
                             />
                         </motion.div>
                     </motion.div>
@@ -137,48 +160,55 @@ export default function StepDenunciante({ onNext, onPrev }) {
                         initial="hidden"
                         animate="visible"
                         exit="exit"
-                        className="space-y-4"
+                        className="grid grid-cols-1 md:grid-cols-2 gap-4"
                     >
-                        <motion.div variants={itemVariants}>
-                            <label className="block mb-2 text-sm font-medium text-gray-700">
+                        <motion.div variants={itemVariants} className="space-y-1">
+                            <label className="block text-sm font-medium text-gray-700">
                                 RUC <span className="text-red-500">*</span>
                             </label>
-                            <input
-                                type="text"
-                                name="ruc"
-                                value={denunciante.ruc}
-                                onChange={handleDenuncianteDigits("ruc", 11)}
-                                inputMode="numeric"
-                                placeholder="Ingrese el RUC"
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
-                            />
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    name="ruc"
+                                    value={denunciante.ruc}
+                                    onChange={handleDenuncianteDigits("ruc", 11)}
+                                    inputMode="numeric"
+                                    placeholder="Ingrese RUC"
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                />
+                                <div className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs ${
+                                    denunciante.ruc?.length === 11 ? 'text-gray-500' : 'text-gray-400'
+                                }`}>
+                                    {denunciante.ruc?.length || 0}/11
+                                </div>
+                            </div>
                         </motion.div>
 
-                        <motion.div variants={itemVariants}>
-                            <label className="block mb-2 text-sm font-medium text-gray-700">
-                                Representante legal <span className="text-red-500">*</span>
+                        <motion.div variants={itemVariants} className="space-y-1">
+                            <label className="block text-sm font-medium text-gray-700">
+                                Representante Legal <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
                                 name="representante"
                                 value={denunciante.representante}
                                 onChange={handleDenuncianteChange}
-                                placeholder="Ingrese el representante legal"
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
+                                placeholder="Nombre completo"
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
                             />
                         </motion.div>
 
-                        <motion.div variants={itemVariants}>
-                            <label className="block mb-2 text-sm font-medium text-gray-700">
-                                Razón social <span className="text-red-500">*</span>
+                        <motion.div variants={itemVariants} className="space-y-1 md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700">
+                                Razón Social <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
                                 name="razonSocial"
                                 value={denunciante.razonSocial}
                                 onChange={handleDenuncianteChange}
-                                placeholder="Ingrese la razón social"
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
+                                placeholder="Razón social completa"
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
                             />
                         </motion.div>
                     </motion.div>
@@ -186,8 +216,8 @@ export default function StepDenunciante({ onNext, onPrev }) {
             </AnimatePresence>
 
             {/* Campos comunes */}
-            <motion.div variants={itemVariants}>
-                <label className="block mb-2 text-sm font-medium text-gray-700">
+            <motion.div variants={itemVariants} className="space-y-1">
+                <label className="block text-sm font-medium text-gray-700">
                     Domicilio <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -195,14 +225,14 @@ export default function StepDenunciante({ onNext, onPrev }) {
                     name="domicilio"
                     value={denunciante.domicilio}
                     onChange={handleDenuncianteChange}
-                    placeholder="Ingrese el domicilio"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
+                    placeholder="Dirección completa"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
                 />
             </motion.div>
 
             <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                <div className="space-y-1">
+                    <label className="block text-sm font-medium text-gray-700">
                         Departamento <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -211,11 +241,11 @@ export default function StepDenunciante({ onNext, onPrev }) {
                         value={denunciante.departamento}
                         onChange={handleDenuncianteChange}
                         placeholder="Departamento"
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
                     />
                 </div>
-                <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                <div className="space-y-1">
+                    <label className="block text-sm font-medium text-gray-700">
                         Provincia <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -224,11 +254,11 @@ export default function StepDenunciante({ onNext, onPrev }) {
                         value={denunciante.provincia}
                         onChange={handleDenuncianteChange}
                         placeholder="Provincia"
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
                     />
                 </div>
-                <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                <div className="space-y-1">
+                    <label className="block text-sm font-medium text-gray-700">
                         Distrito <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -237,28 +267,36 @@ export default function StepDenunciante({ onNext, onPrev }) {
                         value={denunciante.distrito}
                         onChange={handleDenuncianteChange}
                         placeholder="Distrito"
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
                     />
                 </div>
             </motion.div>
 
-            <motion.div variants={itemVariants}>
-                <label className="block mb-2 text-sm font-medium text-gray-700">
+            <motion.div variants={itemVariants} className="space-y-1">
+                <label className="block text-sm font-medium text-gray-700">
                     Celular <span className="text-red-500">*</span>
                 </label>
-                <input
-                    type="tel"
-                    name="celular"
-                    value={denunciante.celular}
-                    onChange={handleDenuncianteDigits("celular", 9)}
-                    inputMode="numeric"
-                    placeholder="Número de celular"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
-                />
+                <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">+51</span>
+                    <input
+                        type="tel"
+                        name="celular"
+                        value={denunciante.celular}
+                        onChange={handleDenuncianteDigits("celular", 9)}
+                        inputMode="numeric"
+                        placeholder="987654321"
+                        className="w-full p-3 pl-12 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                    />
+                    <div className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs ${
+                        denunciante.celular?.length === 9 ? 'text-gray-500' : 'text-gray-400'
+                    }`}>
+                        {denunciante.celular?.length || 0}/9
+                    </div>
+                </div>
             </motion.div>
 
-            <motion.div variants={itemVariants}>
-                <label className="block mb-2 text-sm font-medium text-gray-700">
+            <motion.div variants={itemVariants} className="space-y-1">
+                <label className="block text-sm font-medium text-gray-700">
                     Correo electrónico <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -266,8 +304,8 @@ export default function StepDenunciante({ onNext, onPrev }) {
                     name="correo"
                     value={denunciante.correo}
                     onChange={handleDenuncianteChange}
-                    placeholder="correo@ejemplo.com"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
+                    placeholder="correo@gmail.com"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
                 />
             </motion.div>
 
@@ -282,42 +320,32 @@ export default function StepDenunciante({ onNext, onPrev }) {
                     whileTap="tap"
                     type="button"
                     onClick={onPrev}
-                    className="cursor-pointer px-6 py-3 rounded-lg font-semibold bg-gray-200 text-gray-800 hover:bg-gray-300 transition duration-200"
+                    className="cursor-pointer flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition"
                 >
-                    Atrás
+                    <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
+                    </svg>
+                    <span>Atrás</span>
                 </motion.button>
 
                 <motion.button
-                    type="submit" 
-                    disabled={!isStepDenuncianteValid}
-                    whileHover={isStepDenuncianteValid ? { scale: 1.05 } : {}}
-                    whileTap={isStepDenuncianteValid ? { scale: 0.95 } : {}}
+                    variants={buttonVariants}
+                    whileHover={isStepDenuncianteValid ? "hover" : {}}
+                    whileTap={isStepDenuncianteValid ? "tap" : {}}
+                    type="button"
                     onClick={onNext}
-                    className={`cursor-pointer flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-white transition-all duration-300
-                            ${!isStepDenuncianteValid
-                            ? "bg-gray-400 cursor-not-allowed opacity-70"
-                            : "bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200"
-                        }`}
+                    disabled={!isStepDenuncianteValid}
+                    className={`cursor-pointer flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition ${
+                        !isStepDenuncianteValid
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "bg-blue-600 text-white hover:bg-blue-700"
+                    }`}
                 >
-                    Enviar denuncia
-                    <motion.svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        animate={isStepDenuncianteValid ? { x: 0 } : {}}
-                        whileHover={isStepDenuncianteValid ? { x: 4 } : {}}
-                        transition={{ type: "spring", stiffness: 300 }}
-                    >
-                        <path
-                            fillRule="evenodd"
-                            d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
-                            clipRule="evenodd"
-                        />
-                    </motion.svg>
+                    <span>Enviar denuncia</span>
+                    <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
                 </motion.button>
-
-                
             </motion.div>
         </motion.div>
     );
