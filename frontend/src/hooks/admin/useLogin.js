@@ -24,7 +24,7 @@ export const useLogin = () => {
 		setPassword(passwordVal);
 	};
 	const handleSubmit = async (e) => {
-		e.prevent.default();
+		e.preventDefault();
 		if (isSubmitting || !isFormValid) return;
 		setIsSubmitting(true);
 		setError(null);
