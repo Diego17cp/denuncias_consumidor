@@ -304,21 +304,64 @@ class AdminsController extends ResourceController
     // =========================
     // 📧 Función auxiliar
     // =========================
+    // private function enviarCorreo($correo, $code, $estado, $comentario)
+    // {
+    //     $this->email->setFrom('munijloenlinea@gmail.com', 'Municipalidad Distrital de José Leonardo Ortiz');
+    //     $this->email->setTo($correo);
+    //     $this->email->setSubject('Código de Seguimiento de Denuncia');
+    //     $this->email->setMessage("
+    //         <html><body>
+    //         <p>Estimado usuario,</p>
+    //         <p>Estado actual de su denuncia:</p>
+    //         <p><strong>Código:</strong> $code</p>
+    //         <p><strong>Estado:</strong> $estado</p>
+    //         <p><strong>Comentario:</strong> $comentario</p>
+    //         <p><a href='http://localhost:5173/tracking-denuncia?codigo=$code'>Ver seguimiento</a></p>
+    //         </body></html>
+    //     ");
+    //     return $this->email->send();
+    // }
+
+
+    // Método temporal para probar correo
+    public function probarCorreo()
+    {
+        $correo = 'usuario@dominio.com';
+        $code = 'ABC123';
+        $estado = 'Recibida';
+        $comentario = 'Tu denuncia fue recibida correctamente';
+
+        $resultado = $this->enviarCorreo($correo, $code, $estado, $comentario);
+
+        return $this->respond(['resultado' => $resultado]);
+    }
+
+    // Tu método privado de enviar correo
     private function enviarCorreo($correo, $code, $estado, $comentario)
     {
-        $this->email->setFrom('munijloenlinea@gmail.com', 'Municipalidad Distrital de José Leonardo Ortiz');
-        $this->email->setTo($correo);
-        $this->email->setSubject('Código de Seguimiento de Denuncia');
-        $this->email->setMessage("
+        $email = \Config\Services::email();
+
+        $email->setFrom('anaga123op@gmail.com', 'AÑA');
+        $email->setTo($correo);
+        $email->setSubject('Código de Seguimiento de Denuncia');
+
+        $mensaje = "
             <html><body>
             <p>Estimado usuario,</p>
-            <p>Estado actual de su denuncia:</p>
+            <p>Estado actual de su denuncia: $estado</p>
             <p><strong>Código:</strong> $code</p>
             <p><strong>Estado:</strong> $estado</p>
             <p><strong>Comentario:</strong> $comentario</p>
             <p><a href='http://localhost:5173/tracking-denuncia?codigo=$code'>Ver seguimiento</a></p>
             </body></html>
-        ");
-        return $this->email->send();
+        ";
+
+        $email->setMessage($mensaje);
+
+        if($email->send()){
+            return true;
+        } else {
+            return $email->printDebugger(['headers']);
+        }
     }
 }
