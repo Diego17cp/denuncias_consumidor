@@ -1,7 +1,7 @@
 import { FaClipboardCheck, FaTrash, FaUpload } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDenuncias } from "../../context/DenunciasContext";
-import { MdDescription } from "react-icons/md";
+import { useFileProgress } from "../../hooks/useFileProgress";
 
 export default function StepDetalles({ onNext }) {
     const {
@@ -17,6 +17,15 @@ export default function StepDetalles({ onNext }) {
         handleFileChange,
         isStepDetailsValid,
     } = useDenuncias();
+
+    // hook para manejar el progreso de archivos
+    const { 
+        totalSize, 
+        usedPercentage, 
+        isLimitReached, 
+        getProgressColor, 
+        maxSizeMB 
+    } = useFileProgress(files);
 
     // Animaciones
     const containerVariants = {
@@ -97,28 +106,54 @@ export default function StepDetalles({ onNext }) {
                 />
             </motion.div>
 
-            {/* Subir fotos */}
+            {/* Subir fotos con barra de progreso */}
             <motion.div variants={itemVariants}>
-                <label className="block mb-2 text-sm font-medium text-gray-700">
-                    Evidencia fotográfica (opcional)
-                </label>
+                <div className="flex justify-between items-center mb-2">
+                    <label className="text-sm font-medium text-gray-700">
+                        Evidencia fotográfica (opcional)
+                    </label>
+                    <span className="text-sm text-gray-500">
+                        {totalSize.toFixed(2)} / {maxSizeMB} MB
+                    </span>
+                </div>
+
+                {/* Barra de progreso */}
+                <div className="h-2 bg-gray-100 rounded-full mb-4 overflow-hidden">
+                    <motion.div
+                        className={`h-full transition-all duration-300 rounded-full ${getProgressColor()}`}
+                        initial={{ width: "0%" }}
+                        animate={{ width: `${usedPercentage}%` }}
+                        transition={{ duration: 0.5 }}
+                    />
+                </div>
 
                 <motion.label
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
-                    className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 p-8 rounded-xl cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition duration-200"
+                    className={`flex flex-col items-center justify-center border-2 border-dashed p-8 rounded-xl cursor-pointer transition duration-200 ${
+                        isLimitReached
+                            ? 'border-red-300 bg-red-50 cursor-not-allowed'
+                            : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
+                    }`}
                 >
                     <motion.div
                         animate={{ y: [0, -5, 0] }}
                         transition={{ repeat: Infinity, duration: 2 }}
                     >
-                        <FaUpload className="text-blue-500 text-3xl mb-3" />
+                        <FaUpload className={`text-3xl mb-3 ${
+                            isLimitReached ? 'text-red-500' : 'text-blue-500'
+                        }`} />
                     </motion.div>
-                    <p className="text-gray-600 font-medium mb-1">
-                        Arrastra tus fotos aquí o haz clic para seleccionar
+                    <p className={`font-medium mb-1 ${
+                        isLimitReached ? 'text-red-600' : 'text-gray-600'
+                    }`}>
+                        {isLimitReached 
+                            ? 'Límite de 20MB alcanzado'
+                            : 'Arrastra tus fotos aquí o haz clic para seleccionar'
+                        }
                     </p>
                     <p className="text-gray-400 text-sm">
-                        Formatos aceptados: JPG, PNG (máx. 10MB cada una)
+                        Formatos aceptados: JPG, PNG (máx. 20MB en total)
                     </p>
                     <input
                         type="file"
@@ -126,6 +161,7 @@ export default function StepDetalles({ onNext }) {
                         multiple
                         onChange={handleFileChange}
                         className="hidden"
+                        disabled={isLimitReached}
                     />
                 </motion.label>
 

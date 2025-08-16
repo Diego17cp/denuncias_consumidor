@@ -1,136 +1,166 @@
 import { defineStepper } from "@stepperize/react";
 import { FaRegFileAlt, FaUserTimes, FaClipboardCheck } from "react-icons/fa";
 import { BsPersonVcardFill } from "react-icons/bs";
-import { DropZone, InputField } from "dialca-ui";
 import StepDetalles from "../../../components/form/StepDetails";
 import StepDatosDenunciado from "../../../components/form/StepDenunciado";
 import StepDatosDenunciante from "../../../components/form/StepDenunciante";
 import { useDenuncias } from "../../../context/DenunciasContext";
 import TrackingCodeScreen from "../../../components/form/StepTracking";
+import { motion } from "framer-motion";
 
 export const FormDenuncia = () => {
     const { useStepper, steps } = defineStepper(
-        { id: "details", title: "Detalles", icon: <FaRegFileAlt /> },
-        { id: "denounced-data", title: "Denunciado", icon: <FaUserTimes /> },
-        {
-            id: "complainant-data",
-            title: "Denunciante",
-            icon: <BsPersonVcardFill />,
-        },
-        { id: "summary", title: "Resumen", icon: <FaClipboardCheck /> }
+        { id: "details", title: "Detalles", icon: <FaRegFileAlt className="text-lg" /> },
+        { id: "denounced-data", title: "Denunciado", icon: <FaUserTimes className="text-lg" /> },
+        { id: "complainant-data", title: "Denunciante", icon: <BsPersonVcardFill className="text-lg" /> },
+        { id: "summary", title: "Resumen", icon: <FaClipboardCheck className="text-lg" /> }
     );
+    
     const stepper = useStepper();
-    const { isStepDetailsValid, isStepDenunciadoValid, isStepDenuncianteValid } =
-        useDenuncias();
+    const { isStepDetailsValid, isStepDenunciadoValid, isStepDenuncianteValid } = useDenuncias();
 
-    // Controla si el paso está habilitado
     const isStepEnabled = (stepId) => {
-        const order = steps.map((s) => s.id);
+        const order = steps.map(s => s.id);
         const currentIdx = order.indexOf(stepper.current.id);
         const stepIdx = order.indexOf(stepId);
-
-        if (stepIdx < currentIdx) return true; // Permite ir atras
-        if (stepIdx === currentIdx) return true; // actual
-
-        // Permite avanzar solo si los pasos anteriores están completos
+        
+        if (stepIdx < currentIdx) return true;
+        if (stepIdx === currentIdx) return true;
         if (stepId === "denounced-data") return isStepDetailsValid;
-        if (stepId === "complainant-data")
-            return isStepDetailsValid && isStepDenunciadoValid;
-        if (stepId === "summary")
-            return (
-                isStepDetailsValid && isStepDenunciadoValid && isStepDenuncianteValid
-            );
+        if (stepId === "complainant-data") return isStepDetailsValid && isStepDenunciadoValid;
+        if (stepId === "summary") return isStepDetailsValid && isStepDenunciadoValid && isStepDenuncianteValid;
         return false;
     };
 
+    // const progress = ((steps.findIndex(s => s.id === stepper.current.id) + 1) / steps.length) * 100;
+
     return (
-        <div className="mx-auto p-2 md:p-6! max-w-4xl bg-white rounded-md mt-5">
-            <form>
-                {/* STEPPER */}
-                <div className="flex top-0 z-10 w-full">
-                    <div className="flex items-end gap-0 w-full">
-                        {steps.map((step) => (
-                            <div
+        <div className="mx-auto max-w-4xl mt-8">
+            {/* Stepper Mejorado */}
+            <div className=" p-4 mb-8">
+                {/* Barra de Progreso Superior */}
+                {/* <div className="flex items-center justify-between mb-8">
+                    <span className="text-blue-600 font-medium">Paso {steps.findIndex(s => s.id === stepper.current.id) + 1} de {steps.length}</span>
+                    <div className="flex-1 mx-4 h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <motion.div 
+                            className="h-full bg-gradient-to-r from-blue-500 to-blue-600"
+                            initial={{ width: "0%" }}
+                            animate={{ width: `${progress}%` }}
+                            transition={{ duration: 0.5 }}
+                        />
+                    </div>
+                    <span className="text-gray-500 font-medium">{Math.round(progress)}%</span>
+                </div> */}
+
+                {/* Pasos con Iconos */}
+                <div className="grid grid-cols-4 gap-4">
+                    {steps.map((step, index) => {
+                        const isActive = stepper.current.id === step.id;
+                        const isCompleted = steps.findIndex(s => s.id === stepper.current.id) > index;
+                        const enabled = isStepEnabled(step.id);
+                        
+                        return (
+                            <motion.div
                                 key={step.id}
                                 className={`
-                                    flex-1 flex flex-col items-center py-4
-                                    ${stepper.current.id === step.id
-                                        ? "bg-muni-secondary hover:bg-muni-secondary/85"
-                                        : "bg-gray-200 hover:bg-gray-300"
-                                    }
-                                    transition-colors duration-300
-                                    ${isStepEnabled(step.id)
-                                        ? "cursor-pointer"
-                                        : "cursor-not-allowed opacity-50"
-                                    }
+                                    relative flex flex-col items-center
+                                    ${enabled ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}
                                 `}
-                                onClick={() => {
-                                    if (isStepEnabled(step.id)) stepper.goTo(step.id);
-                                }}
+                                whileHover={enabled ? { scale: 1.02 } : {}}
+                                onClick={() => enabled && stepper.goTo(step.id)}
                             >
-                                <div
-                                    className={`
-                                        size-12 flex items-center justify-center rounded-full shadow
-                                        ${stepper.current.id === step.id
-                                            ? "bg-white text-muni-primary border-4 border-muni-primary"
-                                            : "bg-gray-100 text-gray-400 border-4 border-gray-200"
-                                        }
-                                        text-2xl mb-2
-                                    `}
-                                >
-                                    {step.icon}
-                                </div>
-                                <div
-                                    className={`
-                                        text-center text-sm font-semibold
-                                        ${stepper.current.id === step.id
-                                            ? "text-white"
-                                            : "text-gray-500"
-                                        }
-                                        mt-1
-                                    `}
-                                >
-                                    {step.title}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                                {/* Línea conectora */}
+                                {index < steps.length - 1 && (
+                                    <div className={`
+                                        absolute top-7 left-1/2 w-full h-[2px]
+                                        ${isCompleted ? 'bg-blue-500' : 'bg-gray-200'}
+                                    `} />
+                                )}
 
-                {/* Contenido de cada step */}
-                <div className="flex flex-col gap-6 bg-white p-3">
-                    {stepper.switch({
-                        details: () => (
-                            <div className="p-4">
-                                <StepDetalles
-                                    onNext={() => isStepDetailsValid && stepper.next()}
-                                />
-                            </div>
-                        ),
-                        "denounced-data": () => (
-                            <div className="p-4">
-                                <StepDatosDenunciado
-                                    onPrev={stepper.prev}
-                                    onNext={() => isStepDenunciadoValid && stepper.next()}
-                                />
-                            </div>
-                        ),
-                        "complainant-data": () => (
-                            <div className="p-4">
-                                <StepDatosDenunciante
-                                    onPrev={stepper.prev}
-                                    onNext={() => isStepDenuncianteValid && stepper.next()}
-                                />
-                            </div>
-                        ),
-                        summary: () => (
-                            <div className="p-4">
-                                < TrackingCodeScreen />
-                            </div>
-                        ),
+                                {/* Círculo del paso */}
+                                <div className={`
+                                    w-16 h-16 rounded-full flex items-center justify-center
+                                    relative z-10 transition-all duration-300
+                                    ${isActive 
+                                        ? 'bg-blue-600 text-white ring-4 ring-blue-100' 
+                                        : isCompleted
+                                            ? 'bg-blue-500 text-white'
+                                            : 'bg-white text-gray-400 border-2 border-gray-200'}
+                                `}>
+                                    {isCompleted ? (
+                                        <motion.svg 
+                                            className="w-8 h-8"
+                                            initial={{ scale: 0 }}
+                                            animate={{ scale: 1 }}
+                                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                                            fill="none" 
+                                            stroke="currentColor" 
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path 
+                                                strokeLinecap="round" 
+                                                strokeLinejoin="round" 
+                                                strokeWidth={2} 
+                                                d="M5 13l4 4L19 7"
+                                            />
+                                        </motion.svg>
+                                    ) : (
+                                        <div className="text-2xl">{step.icon}</div>
+                                    )}
+                                </div>
+
+                                {/* Título del paso */}
+                                <motion.div 
+                                    className="mt-4 text-center"
+                                    animate={{
+                                        scale: isActive ? 1.05 : 1,
+                                        fontWeight: isActive ? "600" : "normal"
+                                    }}
+                                >
+                                    <h3 className={`
+                                        text-sm font-medium mb-1
+                                        ${isActive ? 'text-blue-600' : 'text-gray-600'}
+                                    `}>
+                                        {step.title}
+                                    </h3>
+                                </motion.div>
+                            </motion.div>
+                        );
                     })}
                 </div>
-            </form>
+            </div>
+
+            {/* Contenido del formulario */}
+            <motion.div 
+                key={stepper.current.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                className=""
+            >
+                {stepper.switch({
+                    "details": () => (
+                        <StepDetalles
+                            onNext={() => isStepDetailsValid && stepper.next()}
+                        />
+                    ),
+                    "denounced-data": () => (
+                        <StepDatosDenunciado
+                            onPrev={stepper.prev}
+                            onNext={() => isStepDenunciadoValid && stepper.next()}
+                        />
+                    ),
+                    "complainant-data": () => (
+                        <StepDatosDenunciante
+                            onPrev={stepper.prev}
+                            onNext={() => isStepDenuncianteValid && stepper.next()}
+                        />
+                    ),
+                    "summary": () => (
+                        <TrackingCodeScreen onPrev={stepper.prev} />
+                    ),
+                })}
+            </motion.div>
         </div>
     );
 };

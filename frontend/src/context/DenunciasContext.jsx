@@ -12,7 +12,7 @@ export function DenunciasProvider({ children }) {
 
     const handleFileChange = (e) => {
         const newFiles = e.target.files ? Array.from(e.target.files) : [];
-        const validFiles = newFiles.filter((file) => file.size <= 10 * 1024 * 1024);
+        const validFiles = newFiles.filter((file) => file.size <= 20 * 1024 * 1024);
         if (validFiles.length !== newFiles.length) {
             setError("Algunos archivos superan los 10MB y no se han añadido.");
         } else {
@@ -64,6 +64,12 @@ export function DenunciasProvider({ children }) {
     const isStepDenunciadoValid =
         tipoDocumento === "DNI"
             ? dniDenunciado.trim().length === 8 &&
+            nombreDenunciado.trim() !== "" &&
+            apellidosDenunciado.trim() !== "" &&
+            direccionDenunciado.trim() !== "" &&
+            celularDenunciado.trim().length === 9
+            : tipoDocumento === "CEDULA"
+            ? dniDenunciado.trim() !== "" && // longitud minima 
             nombreDenunciado.trim() !== "" &&
             apellidosDenunciado.trim() !== "" &&
             direccionDenunciado.trim() !== "" &&
