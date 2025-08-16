@@ -34,6 +34,7 @@ class DenunciadoController extends ResourceController
         $denunciadoData = [
             'nombre'         => $input['nombre'] ?? null,
             'tipo_documento' => $input['tipo_documento'] ?? null,
+            'documento'     => $input['documento'] ?? null,
             'direccion'      => $input['direccion'] ?? null,
             'telefono'       => $input['telefono'] ?? null
         ];

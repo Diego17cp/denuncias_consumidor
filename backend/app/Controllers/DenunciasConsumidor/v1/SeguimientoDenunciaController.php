@@ -24,7 +24,7 @@ class SeguimientoDenunciaController extends ResourceController
         $seguimientoData = [
             'denuncia_id'     => $input['denuncia_id'] ?? null,
             //'estado'          => $input['estado'] ?? null,
-            'comentario'      => $input['comentario'] ?? null,
+            'comentario'      => $input['comentario'] ?? '',
             'administrador_id'=> $input['administrador_id'] ?? null
         ];
 

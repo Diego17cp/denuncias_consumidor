@@ -18,6 +18,50 @@ class AuthController extends ResourceController
     {
         return $this->response->setJSON(['message' => 'Filter valid']);
     }
+    // public function login()
+    // {
+    //     $json = $this->request->getJSON();
+    //     $dni = $json->dni ?? null;
+    //     $password = $json->password ?? null;
+
+    //     $user = $this->adminModel->getByDNI($dni);
+    //     if (!$user || !password_verify($password, $user['password'])) {
+    //         return service("response")
+    //             ->setStatusCode(401)
+    //             ->setJSON(['error' => 'Credenciales inválidas']);
+    //     }
+    //     $jwt = createJWT([
+    //         "id" => $user['id'],
+    //         "dni" => $dni,
+    //         "rol" => $user['rol'],
+    //         "estado" => $user['estado']
+    //     ]);
+    //     $cookie = new Cookie(
+    //         "access_token",
+    //         $jwt,
+    //         [
+    //             "expires" => time() + 3600,
+    //             "path" => "/",
+    //             "secure" => false,
+    //             "httponly" => true,
+    //             "samesite" => Cookie::SAMESITE_LAX,
+    //             "domain" => ""
+    //         ]
+    //     );
+    //     $response = service("response");
+    //     $response->setCookie($cookie);
+    //     return $response->setJSON([
+    //         "role_changed" => false,
+    //         "user" => [
+    //             "id" => $user['id'],
+    //             "dni" => $dni,
+    //             "estado" => $user['estado'],
+    //             "rol" => $user['rol'],
+    //             "nombre" => $user['nombre'] ?? 'Administrador',
+    //         ]
+    //     ])->setStatusCode(200);
+    // }
+
     public function login()
     {
         $json = $this->request->getJSON();
@@ -25,17 +69,20 @@ class AuthController extends ResourceController
         $password = $json->password ?? null;
 
         $user = $this->adminModel->getByDNI($dni);
-        if (!$user || !password_verify($password, $user['password'])) {
+
+        if (!$user || $password !== $user['password']) {
             return service("response")
                 ->setStatusCode(401)
                 ->setJSON(['error' => 'Credenciales inválidas']);
         }
+
         $jwt = createJWT([
             "id" => $user['id'],
             "dni" => $dni,
             "rol" => $user['rol'],
             "estado" => $user['estado']
         ]);
+
         $cookie = new Cookie(
             "access_token",
             $jwt,
@@ -48,8 +95,10 @@ class AuthController extends ResourceController
                 "domain" => ""
             ]
         );
+
         $response = service("response");
         $response->setCookie($cookie);
+
         return $response->setJSON([
             "role_changed" => false,
             "user" => [
@@ -61,6 +110,7 @@ class AuthController extends ResourceController
             ]
         ])->setStatusCode(200);
     }
+
     public function logout()
     {
         $cookie = new Cookie(

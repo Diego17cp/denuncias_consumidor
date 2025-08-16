@@ -273,8 +273,6 @@ class AdminsController extends ResourceController
                 return $this->response->setJSON(['error' => 'Acción no válida'])->setStatusCode(400);
         }
 
-        $this->historialModel->registrarAccion($solicitadoPor, $dniAdmin, $accion, $motivo);
-
         return $this->response->setJSON(['message' => 'Administrador actualizado correctamente']);
     }
 
@@ -292,14 +290,6 @@ class AdminsController extends ResourceController
         return $this->response->setJSON($admin);
     }
 
-    // public function historyAdmin()
-    // {
-    //     $history = $this->historialModel->obtenerHistorialCompleto();
-    //     if (!$history) {
-    //         return $this->response->setJSON(['error' => 'No se encontraron registros de historial'])->setStatusCode(404);
-    //     }
-    //     return $this->response->setJSON($history);
-    // }
 
     // =========================
     // 📧 Función auxiliar

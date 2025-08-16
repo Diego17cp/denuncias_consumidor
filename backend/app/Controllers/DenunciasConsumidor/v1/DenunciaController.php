@@ -67,7 +67,6 @@ class DenunciaController extends ResourceController
             'tracking_code'   => $code,
             'es_anonimo'      => $input['es_anonimo'] ?? 0,
             'denunciante_id'  => $input['denunciante_id'] ?? null,
-            'motivo_otro'     => $input['motivo_otro'] ?? null,
             'descripcion'     => $input['descripcion'] ?? null,
             'fecha_incidente' => $input['fecha_incidente'] ?? null,
             'denunciado_id'   => $input['denunciado_id'] ?? null,
@@ -120,13 +119,13 @@ class DenunciaController extends ResourceController
     /**
      * Simulación de envío de correo (aquí iría tu lógica real con email)
      */
-    public function correo($correo, $code)
+    public function enviarCorreoTracking($correo, $code)
     {
         // Cargar la librería Email de CI4
         $emailService = \Config\Services::email();
 
         // Configuración del remitente y destinatario
-        $emailService->setFrom('munijloenlinea@gmail.com', 'Municipalidad Distrital de José Leonardo Ortiz');
+        $emailService->setFrom('anaga123op@gmail.com', 'AÑA');
         $emailService->setTo($correo);
         $emailService->setSubject('Código de Seguimiento de Denuncia');
 

@@ -21,7 +21,8 @@ class SeguimientoDenunciaModel extends Model
     protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
-    protected $updatedField  = null; 
+    protected $updatedField  = 'updated_at';
+    protected $deletedField = 'deleted_at';
 
     // Validaciones
     protected $validationRules = [

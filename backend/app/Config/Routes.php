@@ -71,7 +71,7 @@ $routes->group('/', [
         // Crear seguimiento
         $routes->post('crear', 'SeguimientoDenunciaController::create');
         // Mostrar un denunciante por ID
-        $routes->get('(:num)', 'SeguimientoDenunciaController::getByDenunciaId/$1');
+        $routes->get('show/(:num)', 'SeguimientoDenunciaController::getByDenunciaId/$1');
     });
 
     $routes->group('api', function ($routes) {
