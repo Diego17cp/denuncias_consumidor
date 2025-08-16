@@ -7,7 +7,6 @@ use App\Models\DenunciasConsumidor\v1\DenuncianteModel;
 use App\Models\DenunciasConsumidor\v1\DenunciaModel;
 use App\Models\DenunciasConsumidor\v1\SeguimientoDenunciaModel;
 use App\Models\DenunciasConsumidor\v1\AdministradorModel;
-//use App\Models\DenunciasConsumidor\v1\HistorialAdminModel;
 use App\Controllers\DenunciasConsumidor\v1\AuthController;
 use CodeIgniter\Config\Services;
 
@@ -149,37 +148,25 @@ class AdminsController extends ResourceController
         return $this->respond(['success' => true, 'message' => 'Denuncia actualizada']);
     }
 
-    // public function searchDenuncias()
-    // {
-    //     $dni_admin = $this->authAdmin();
-    //     if (is_object($dni_admin)) return $dni_admin;
-
-    //     $dni = $this->request->getVar('numero_documento');
-    //     $denuncias = $this->denunciaModel->searchByDocumento($dni);
-
-    //     if (empty($denuncias)) {
-    //         return $this->fail(['message' => 'No se encontraron denuncias']);
-    //     }
-
-    //     return $this->respond(['success' => true, 'data' => $denuncias]);
-    // }
-
-    public function searchDenuncias()
+    public function searchDenuncias($documento = null)
     {
         $dni_admin = $this->authAdmin();
         if (is_object($dni_admin)) return $dni_admin;
 
-        $documento = $this->request->getVar('documento');
+        if (empty($documento)) {
+            return $this->fail(['message' => 'Falta el parámetro documento']);
+        }
+
         $denuncias = $this->denunciaModel->searchByDocumento($documento);
 
         if (empty($denuncias)) {
-            return $this->fail(['message' => 'No se encontraron denuncias']);
+            return $this->fail(['message' => 'No se encontraron denuncias con este documento']);
         }
 
         return $this->respond(['success' => true, 'data' => $denuncias]);
     }
 
-    public function searchDenunciasByDenuncianteId($denuncianteId)
+    public function searchDenunciasByDenuncianteId($denuncianteId = null)
     {
         $dni_admin = $this->authAdmin();
         if (is_object($dni_admin)) return $dni_admin;
@@ -210,75 +197,126 @@ class AdminsController extends ResourceController
         return $this->response->setJSON($admins);
     }
 
+    // 
+    
     public function createAdministrador()
     {
-        $data = $this->request->getJSON(true);
+        $input = $this->request->getJSON(true);
 
-        if ($this->adminModel->getByDNI($data['dni'])) {
-            return $this->response->setJSON(['error' => 'Ya existe un administrador con ese DNI'])->setStatusCode(400);
+        $adminData = [
+            'dni'      => $input['dni'] ?? null,
+            'nombre'   => $input['nombre'] ?? null,
+            'password' => isset($input['password']) ? password_hash($input['password'], PASSWORD_DEFAULT) : null,
+            'rol'      => $input['rol'] ?? null,
+            'estado'   => $input['estado'] ?? null,
+        ];
+
+        // Verificar si ya existe un administrador con ese DNI
+        if (!empty($adminData['dni']) && $this->adminModel->getByDNI($adminData['dni'])) {
+            return $this->fail([
+                'error' => 'Ya existe un administrador con ese DNI'
+            ], 400);
         }
 
-        $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-
-        if ($this->adminModel->insert($data)) {
-            return $this->response->setJSON(['message' => 'Administrador creado correctamente'])->setStatusCode(201);
+        if ($this->adminModel->insert($adminData)) {
+            return $this->respondCreated([
+                'message' => 'Administrador registrado correctamente',
+                'id'      => $this->adminModel->getInsertID()
+            ]);
         }
-        return $this->response->setJSON(['error' => 'Error al crear el administrador'])->setStatusCode(500);
+
+        return $this->fail([
+            'error' => 'Error al crear el administrador',
+            'details' => $this->adminModel->errors()
+        ], 500);
     }
 
-    public function updateAdministrador()
+
+    public function updateAdministrador($dni = null)
     {
-        $data = $this->request->getJSON(true);
+        $input = $this->request->getJSON(true);
 
-        $accion        = $data['accion'] ?? null;
-        $dniAdmin      = $data['dni'] ?? null;
-        $solicitadoPor = $data['solicitado_por'] ?? null;
-        $motivo        = $data['motivo'] ?? null;
-
-        if (!$accion || !$dniAdmin || !$solicitadoPor || !$motivo) {
-            return $this->response->setJSON(['error' => 'Faltan parámetros obligatorios'])->setStatusCode(400);
-        }
-
-        $admin = $this->adminModel->getByDNI($dniAdmin);
+        // Verificar si el admin existe por DNI
+        $admin = $this->adminModel->getByDNI($dni);
         if (!$admin) {
-            return $this->response->setJSON(['error' => 'Administrador no encontrado'])->setStatusCode(404);
+            return $this->failNotFound("Administrador con DNI {$dni} no encontrado");
         }
 
-        switch ($accion) {
-            case 'estado':
-                $estado = $data['estado'] ?? null;
-                if (!in_array($estado, ['activo', 'inactivo'])) {
-                    return $this->response->setJSON(['error' => 'Estado inválido'])->setStatusCode(400);
-                }
-                $this->adminModel->where('dni', $dniAdmin)->set(['estado' => $estado])->update();
-                break;
+        // Filtramos solo los campos permitidos en el modelo
+        $data = array_intersect_key($input, array_flip($this->adminModel->allowedFields));
 
-            case 'rol':
-                $rol = $data['rol'] ?? null;
-                if (!$rol) {
-                    return $this->response->setJSON(['error' => 'Falta el rol'])->setStatusCode(400);
-                }
-                $this->adminModel->where('dni', $dniAdmin)->set(['rol' => $rol])->update();
-                break;
-
-            case 'password':
-                $password = $data['password'] ?? null;
-                if (!$password) {
-                    return $this->response->setJSON(['error' => 'Falta la contraseña'])->setStatusCode(400);
-                }
-                $this->adminModel->where('dni', $dniAdmin)->set(['password' => password_hash($password, PASSWORD_DEFAULT)])->update();
-                break;
-
-            default:
-                return $this->response->setJSON(['error' => 'Acción no válida'])->setStatusCode(400);
+        if (empty($data)) {
+            return $this->failValidationErrors("No se enviaron campos válidos para actualizar");
         }
 
-        return $this->response->setJSON(['message' => 'Administrador actualizado correctamente']);
+        // Hashear la contraseña si viene en el payload
+        if (isset($data['password'])) {
+            $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+        }
+
+        // Ejecutamos el update usando el DNI
+        if ($this->adminModel->where('dni', $dni)->set($data)->update()) {
+            return $this->respondUpdated([
+                'success' => true,
+                'message' => "Administrador actualizado correctamente",
+                'data'    => $this->adminModel->getByDNI($dni)
+            ]);
+        }
+
+        return $this->fail("No se pudo actualizar el administrador");
     }
 
-    public function searchAdmin()
+
+    public function deleteAdministrador($dni)
     {
-        $dni = $this->request->getGet('dni');
+        if (!$dni) {
+            return $this->fail(['error' => 'Debe proporcionar un DNI'], 400);
+        }
+
+        $admin = $this->adminModel->getByDNI($dni);
+        if (!$admin) {
+            return $this->fail(['error' => 'Administrador no encontrado'], 404);
+        }
+
+        if ($this->adminModel->where('dni', $dni)->delete()) {
+            return $this->respondDeleted([
+                'message' => 'Administrador eliminado correctamente',
+                'dni'     => $dni
+            ]);
+        }
+
+        return $this->fail([
+            'error' => 'No se pudo eliminar el administrador'
+        ], 500);
+    }
+
+    public function deleteAdministradorById($id)
+{
+    if (!$id) {
+        return $this->fail(['error' => 'Debe proporcionar un ID'], 400);
+    }
+
+    $admin = $this->adminModel->find($id);
+    if (!$admin) {
+        return $this->fail(['error' => 'Administrador no encontrado'], 404);
+    }
+
+    if ($this->adminModel->delete($id)) {
+        return $this->respondDeleted([
+            'message' => 'Administrador eliminado correctamente',
+            'id'      => $id
+        ]);
+    }
+
+    return $this->fail([
+        'error' => 'No se pudo eliminar el administrador'
+    ], 500);
+}
+
+
+
+    public function searchAdminByDNI($dni = null)
+    {
         if (!$dni) {
             return $this->response->setJSON(['error' => 'DNI no proporcionado'])->setStatusCode(400);
         }
@@ -287,6 +325,17 @@ class AdminsController extends ResourceController
         if (!$admin) {
             return $this->response->setJSON(['error' => 'Administrador no encontrado'])->setStatusCode(404);
         }
+        return $this->response->setJSON($admin);
+    }
+
+    public function searchAdminById($id)
+    {
+        $admin = $this->adminModel->find($id);
+
+        if (!$admin) {
+            return $this->response->setJSON(['error' => 'Administrador no encontrado'])->setStatusCode(404);
+        }
+
         return $this->response->setJSON($admin);
     }
 

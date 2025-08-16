@@ -32,7 +32,7 @@ class DenunciaModel extends Model
     protected $validationRules = [
         'tracking_code'   => 'required|string|max_length[50]',
         'es_anonimo'      => 'required|in_list[0,1]',
-        'denunciante_id'  => 'permit_empty|integer',
+        'denunciante_id'  => 'required|integer',
         'descripcion'     => 'required|string',
         'fecha_incidente' => 'required|valid_date',
         'denunciado_id'   => 'required|integer',
@@ -58,6 +58,10 @@ class DenunciaModel extends Model
         ],
         'denunciado_id' => [
             'required' => 'Debe especificar la persona denunciada.',
+            'integer'  => 'El ID del denunciado debe ser un número entero.'
+        ],
+        'denunciante_id' => [
+            'required' => 'Debe especificar la persona denunciante.',
             'integer'  => 'El ID del denunciado debe ser un número entero.'
         ]
     ];
@@ -107,11 +111,11 @@ class DenunciaModel extends Model
     }
 
     public function searchByDenuncianteId($denuncianteId)
-{
-    return $this->select('denuncia.*')
-                ->where('denuncia.denunciante_id', $denuncianteId)
-                ->where('denuncia.deleted_at', null)
-                ->findAll();
-}
+    {
+        return $this->select('denuncia.*')
+                    ->where('denuncia.denunciante_id', $denuncianteId)
+                    ->where('denuncia.deleted_at', null)
+                    ->findAll();
+    }
 }
 

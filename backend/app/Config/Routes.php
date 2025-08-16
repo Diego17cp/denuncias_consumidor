@@ -69,8 +69,8 @@ $routes->group('/', [
 
     $routes->group('seguimiento', function ($routes) {
         // Crear seguimiento
-        $routes->post('crear', 'SeguimientoDenunciaController::create');
-        // Mostrar un denunciante por ID
+        $routes->post('/', 'SeguimientoDenunciaController::create');
+        // Buscar seguimientos por ID de denuncia
         $routes->get('show/(:num)', 'SeguimientoDenunciaController::getByDenunciaId/$1');
     });
 
@@ -87,16 +87,22 @@ $routes->group('/', [
         //$routes->get('dashboard', 'AdminsController::dashboard');
         $routes->post('recibir', 'AdminsController::receiveAdmin');
         $routes->post('procesos-denuncia', 'AdminsController::procesosDenuncia');
-        $routes->get('buscar-denuncias', 'AdminsController::searchDenuncias');
 
         // Gestión de administradores
-        $routes->get('/', 'AdminsController::getAdministradores');
+        $routes->get('/', 'AdminsController::getAdministradores'); 
         $routes->post('/', 'AdminsController::createAdministrador');
-        $routes->put('update', 'AdminsController::updateAdministrador');
-        $routes->get('buscar', 'AdminsController::searchAdmin');
-        $routes->get('buscar/(:num)', 'AdminsController::searchDenunciasByDenuncianteId/$1');
+        $routes->put('update/(:num)', 'AdminsController::updateAdministrador/$1');
+        // eliminar administrador por dni o id del administrador
+        $routes->delete('delete-dni/(:num)', 'AdminsController::deleteAdministrador/$1');
+        $routes->delete('delete-id/(:num)', 'AdminsController::deleteAdministradorById/$1');
+        // Buscar Admins por dni o ids
+        $routes->get('dni/(:num)', 'AdminsController::searchAdminByDni/$1');
+        $routes->get('id/(:num)', 'AdminsController::searchAdminById/$1');
+        // Buscar denuncias por dni o id del denunciante
+        $routes->get('buscar-dni/(:num)', 'AdminsController::searchDenuncias/$1');
+        $routes->get('buscar-id/(:num)', 'AdminsController::searchDenunciasByDenuncianteId/$1');
+        
         $routes->get('probar-correo', 'AdminsController::probarCorreo');
-        //$routes->get('history', 'AdminsController::historyAdmin');
 
     });
 });
