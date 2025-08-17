@@ -12,7 +12,6 @@ class SeguimientoDenunciaModel extends Model
 
     protected $allowedFields    = [
         'denuncia_id',
-        // 'estado',
         'comentario',
         'administrador_id'
     ];
@@ -27,7 +26,6 @@ class SeguimientoDenunciaModel extends Model
     // Validaciones
     protected $validationRules = [
         'denuncia_id'     => 'required|integer',
-        // 'estado'          => 'required|string|max_length[50]',
         'comentario'      => 'permit_empty|string|max_length[500]',
         'administrador_id'=> 'required|integer'
     ];
@@ -37,10 +35,6 @@ class SeguimientoDenunciaModel extends Model
             'required' => 'El ID de la denuncia es obligatorio',
             'integer'  => 'El ID de la denuncia debe ser un número entero'
         ],
-        // 'estado' => [
-        //     'required'   => 'El estado es obligatorio',
-        //     'max_length' => 'El estado no puede exceder los 50 caracteres'
-        // ],
         'comentario' => [
             'max_length' => 'El comentario no puede exceder los 500 caracteres'
         ],

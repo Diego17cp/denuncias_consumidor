@@ -89,17 +89,28 @@ class DenunciaModel extends Model
     }
 
     
-    public function receiveDenuncia($trackingCode, $dniAdmin, $estado, $comentario, $extraData = [])
+    public function receiveDenuncia($trackingCode, $estado, $comentario, $seguimientoData)
     {
-        return $this->where('tracking_code', $trackingCode)
-                    ->set([
-                        'estado'             => $estado,
-                        'comentario'         => $comentario,
-                        'fecha_actualizacion'=> date('Y-m-d H:i:s'),
-                        'dni_admin'          => $dniAdmin
-                    ])
-                    ->update();
+        $denuncia = $this->where('tracking_code', $trackingCode)->first();
+
+        if (!$denuncia) {
+            return false;
+        }
+        
+        $this->where('id', $denuncia['id'])
+            ->set(
+                ['estado' => $estado],
+                ['comentario' => $comentario]
+                )
+            ->update();
+
+        $seguimientoModel = new \App\Models\DenunciasConsumidor\v1\SeguimientoDenunciaModel();
+        $seguimientoData['denuncia_id'] = $denuncia['id'];
+        $seguimientoModel->insert($seguimientoData);
+
+        return true; 
     }
+
 
     public function searchByDocumento($documento)
     {

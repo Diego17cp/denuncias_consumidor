@@ -55,65 +55,91 @@ class AdminsController extends ResourceController
             return $this->respond(['error' => 'Token inválido'], 401);
         }
 
-        return $decoded->data->dni;
+        // Buscar el admin en la BD
+        $adminModel = new \App\Models\DenunciasConsumidor\v1\AdministradorModel();
+        $admin = $adminModel->where('dni', $decoded->data->dni)->first();
+
+        if (!$admin) {
+            return $this->respond(['error' => 'Admin no encontrado'], 404);
+        }
+
+        return $admin; // ahora regresas todo el registro
+
 
     } catch (\Throwable $e) {
         return $this->respond(['error' => 'Token inválido: ' . $e->getMessage()], 401);
     }
 }
     // =========================
-    // 📌 Funciones de denuncias
+    //  Funciones de denuncias
     // =========================
 
     public function receiveAdmin()
-{
-    $dni_admin = $this->authAdmin();
-    if (!is_string($dni_admin)) {
-        // authAdmin ya devuelve la respuesta de error si falla
-        return $dni_admin;
-    }
+    {
+        //$dni_admin = $this->authAdmin();
+        $admin = $this->authAdmin();
+        // if (!is_string($dni_admin)) {
+        //     return $dni_admin;
+        // }
+        if (is_object($admin)) return $admin;
 
-    $code       = $this->request->getVar('tracking_code');
-    $estado     = 'recibida';
-    $comentario = 'La denuncia ha sido recibida por el administrador';
+        $input = $this->request->getJSON(true); // <-- leer JSON
 
-    $seguimientoData = [
-        'estado'             => $estado,
-        'comentario'         => $comentario,
-        'fecha_actualizacion'=> date('Y-m-d H:i:s'),
-        'dni'                => $dni_admin
-    ];
+        $code       = $input['tracking_code'] ?? null;
+        $estado     = 'recibida'; 
+        $comentario = 'La denuncia ha sido recibida por el administrador'; 
 
-    $denuncia = $this->denunciaModel->receiveDenuncia(
-        $code,
-        $dni_admin,
-        $estado,
-        $comentario,
-        $seguimientoData
-    );
+        if (empty($code)) {
+            return $this->fail(['message' => 'Faltan parámetros requeridos']);
+        }
 
-    if (!$denuncia) {
+        $seguimientoData = [
+            'administrador_id' => $admin['id'],
+            'estado'             => $estado,
+            'comentario'         => $comentario,
+        ];
+
+        $denuncia = $this->denunciaModel->receiveDenuncia(
+            $code,
+            $estado,
+            $comentario,
+            $seguimientoData
+        );
+
+        if (!$denuncia) {
+            return $this->respond([
+                'success' => false,
+                'message' => 'No se encontró la denuncia con el código ingresado.'
+            ], 404);
+        }
+
         return $this->respond([
-            'success' => false,
-            'message' => 'No se encontró la denuncia con el código ingresado.'
-        ], 404);
+            'success' => true,
+            'message' => 'Denuncia recibida correctamente',
+            'denuncia'=> $denuncia
+        ]);
     }
-
-    return $this->respond([
-        'success' => true,
-        'message' => 'Denuncia recibida correctamente',
-        'denuncia'=> $denuncia
-    ]);
-}
 
     public function procesosDenuncia()
     {
-        $dni_admin = $this->authAdmin();
-        if (is_object($dni_admin)) return $dni_admin;
+        //$dni_admin = $this->authAdmin();
+        $admin = $this->authAdmin();
+        //if (is_object($dni_admin)) return $dni_admin;
+        if (is_object($admin)) return $admin;
 
-        $code       = $this->request->getVar('tracking_code');
-        $estado     = $this->request->getVar('estado');
-        $comentario = $this->request->getVar('comentario');
+        $input = $this->request->getJSON(true); // <-- leer JSON
+
+        $code       = $input['tracking_code'] ?? null;
+        $estado     = $input['estado'] ?? null;
+        $comentario = $input['comentario'] ?? null;
+
+        if (empty($code) || empty($estado) || empty($comentario)) {
+            return $this->fail(['message' => 'Faltan parámetros requeridos']);
+        }
+
+        if (!$code) {
+            return $this->fail(['message' => 'Falta el tracking_code en el request']);
+        }
 
         $denuncia = $this->denunciaModel
             ->where('tracking_code', $code)
@@ -124,11 +150,9 @@ class AdminsController extends ResourceController
         }
 
         $this->seguimientoDenunciaModel->insert([
-            'denuncia_id'        => $denuncia['id'],
-            'estado'             => $estado,
-            'comentario'         => $comentario,
-            'fecha_actualizacion'=> date('Y-m-d H:i:s'),
-            'dni'                => $dni_admin
+            'denuncia_id'     => $denuncia['id'],
+            'administrador_id' => $admin['id'],  // el admin que hizo la acción
+            'comentario'      => $comentario
         ]);
 
         $this->denunciaModel
@@ -186,7 +210,7 @@ class AdminsController extends ResourceController
 
 
     // =========================
-    // 👑 Funciones de SuperAdmin
+    // Funciones de ADMINS
     // =========================
     public function getAdministradores()
     {
@@ -360,20 +384,6 @@ class AdminsController extends ResourceController
     //     ");
     //     return $this->email->send();
     // }
-
-
-    // Método temporal para probar correo
-    public function probarCorreo()
-    {
-        $correo = 'usuario@dominio.com';
-        $code = 'ABC123';
-        $estado = 'Recibida';
-        $comentario = 'Tu denuncia fue recibida correctamente';
-
-        $resultado = $this->enviarCorreo($correo, $code, $estado, $comentario);
-
-        return $this->respond(['resultado' => $resultado]);
-    }
 
     // Tu método privado de enviar correo
     private function enviarCorreo($correo, $code, $estado, $comentario)
