@@ -66,18 +66,33 @@ export default function StepDetalles({ onNext }) {
                 <label className="block mb-2 text-sm font-medium text-gray-700">
                     Descripción <span className="text-red-500">*</span>
                 </label>
-                <textarea
-                
-                    value={descripcion}
-                    onChange={(e) => setDescripcion(e.target.value)}
-                    placeholder="Describe detalladamente lo ocurrido..."
-                    className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
-                    rows={5}
-                />
+                <div className="relative">
+                    <textarea
+                        value={descripcion}
+                        onChange={(e) => {
+                            if (e.target.value.length <= 200) {
+                                setDescripcion(e.target.value);
+                            }
+                        }}
+                        placeholder="Describe detalladamente lo ocurrido..."
+                        className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
+                        rows={5}
+                    />
+                    {/* Contador de caracteres */}
+                    <div
+                        className={`absolute right-3 bottom-3 text-xs ${descripcion.length >= 50 && descripcion.length <= 200
+                                ? "text-red-500"
+                                : "text-gray-500"
+                            }`}
+                    >
+                        {descripcion.length}/200
+                    </div>
+                </div>
                 <p className="mt-1 text-xs text-gray-500">
-                    Incluye todos los detalles relevantes.
+                    Mínimo 50 caracteres, máximo 200.
                 </p>
             </motion.div>
+
 
             {/* Lugar */}
             <motion.div variants={itemVariants}>
