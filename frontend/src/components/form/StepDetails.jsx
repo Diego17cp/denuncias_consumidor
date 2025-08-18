@@ -1,7 +1,6 @@
 import { FaClipboardCheck, FaTrash, FaUpload } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDenuncias } from "../../context/DenunciasContext";
-import { useFileProgress } from "../../hooks/useFileProgress";
 
 export default function StepDetalles({ onNext }) {
     const {
@@ -12,20 +11,16 @@ export default function StepDetalles({ onNext }) {
         fecha,
         setFecha,
         files,
-        setFiles,
         error,
         handleFileChange,
+        removeFile,
+        totalSize,
         isStepDetailsValid,
+        MAX_FILES,
+        MAX_SIZE_MB,
     } = useDenuncias();
 
-    // hook para manejar el progreso de archivos
-    const { 
-        totalSize, 
-        usedPercentage, 
-        isLimitReached, 
-        getProgressColor, 
-        maxSizeMB 
-    } = useFileProgress(files);
+    const canProceed = isStepDetailsValid;
 
     // Animaciones
     const containerVariants = {
@@ -80,10 +75,11 @@ export default function StepDetalles({ onNext }) {
                     />
                     {/* Contador de caracteres */}
                     <div
-                        className={`absolute right-3 bottom-3 text-xs ${descripcion.length >= 50 && descripcion.length <= 200
-                                ? "text-red-500"
-                                : "text-gray-500"
-                            }`}
+                        className={`absolute right-3 bottom-3 text-xs ${
+                            descripcion.length >= 50 && descripcion.length <= 200
+                                ? "text-gray-500"
+                                : "text-red-500"
+                        }`}
                     >
                         {descripcion.length}/200
                     </div>
@@ -121,23 +117,26 @@ export default function StepDetalles({ onNext }) {
                 />
             </motion.div>
 
-            {/* Subir fotos con barra de progreso */}
+            {/* Subir archivos con barra de progreso */}
             <motion.div variants={itemVariants}>
                 <div className="flex justify-between items-center mb-2">
                     <label className="text-sm font-medium text-gray-700">
-                        Evidencia fotográfica (opcional)
+                        Adjuntar archivos (opcional)
                     </label>
                     <span className="text-sm text-gray-500">
-                        {totalSize.toFixed(2)} / {maxSizeMB} MB
+                        {files.length}/{MAX_FILES} archivos &nbsp;|&nbsp; {totalSize.toFixed(2)} / {MAX_SIZE_MB} MB
                     </span>
                 </div>
 
                 {/* Barra de progreso */}
                 <div className="h-2 bg-gray-100 rounded-full mb-4 overflow-hidden">
                     <motion.div
-                        className={`h-full transition-all duration-300 rounded-full ${getProgressColor()}`}
+                        className={`h-full transition-all duration-300 rounded-full ${
+                            totalSize > MAX_SIZE_MB ? "bg-red-500" :
+                            totalSize > MAX_SIZE_MB * 0.7 ? "bg-yellow-500" : "bg-blue-500"
+                        }`}
                         initial={{ width: "0%" }}
-                        animate={{ width: `${usedPercentage}%` }}
+                        animate={{ width: `${(totalSize / MAX_SIZE_MB) * 100}%` }}
                         transition={{ duration: 0.5 }}
                     />
                 </div>
@@ -146,7 +145,7 @@ export default function StepDetalles({ onNext }) {
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                     className={`flex flex-col items-center justify-center border-2 border-dashed p-8 rounded-xl cursor-pointer transition duration-200 ${
-                        isLimitReached
+                        totalSize > MAX_SIZE_MB || files.length >= MAX_FILES
                             ? 'border-red-300 bg-red-50 cursor-not-allowed'
                             : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
                     }`}
@@ -156,27 +155,28 @@ export default function StepDetalles({ onNext }) {
                         transition={{ repeat: Infinity, duration: 2 }}
                     >
                         <FaUpload className={`text-3xl mb-3 ${
-                            isLimitReached ? 'text-red-500' : 'text-blue-500'
+                            totalSize > MAX_SIZE_MB || files.length >= MAX_FILES ? 'text-red-500' : 'text-blue-500'
                         }`} />
                     </motion.div>
                     <p className={`font-medium mb-1 ${
-                        isLimitReached ? 'text-red-600' : 'text-gray-600'
+                        totalSize > MAX_SIZE_MB || files.length >= MAX_FILES ? 'text-red-600' : 'text-gray-600'
                     }`}>
-                        {isLimitReached 
+                        {totalSize > MAX_SIZE_MB
                             ? 'Límite de 20MB alcanzado'
-                            : 'Arrastra tus fotos aquí o haz clic para seleccionar'
+                            : files.length >= MAX_FILES
+                                ? 'Límite de 10 archivos alcanzado'
+                                : 'Arrastra tus archivos aquí o haz clic para seleccionar'
                         }
                     </p>
                     <p className="text-gray-400 text-sm">
-                        Formatos aceptados: JPG, PNG (máx. 20MB en total)
+                        Puedes subir cualquier tipo de archivo (máx. 10 archivos, 20MB en total)
                     </p>
                     <input
                         type="file"
-                        accept="image/*"
                         multiple
                         onChange={handleFileChange}
                         className="hidden"
-                        disabled={isLimitReached}
+                        disabled={totalSize > MAX_SIZE_MB || files.length >= MAX_FILES}
                     />
                 </motion.label>
 
@@ -229,9 +229,8 @@ export default function StepDetalles({ onNext }) {
                                             whileHover={{ scale: 1.1 }}
                                             whileTap={{ scale: 0.9 }}
                                             onClick={(e) => {
-                                                e.preventDefault(); // para q no se actualice la pagina 
-                                                const updatedFiles = files.filter((_, i) => i !== index);
-                                                setFiles(updatedFiles);
+                                                e.preventDefault();
+                                                removeFile(index);
                                             }}
                                             className="cursor-pointer text-red-500 hover:text-red-700 p-1"
                                             aria-label="Eliminar archivo"
@@ -253,12 +252,12 @@ export default function StepDetalles({ onNext }) {
             >
                 <motion.button
                     variants={buttonVariants}
-                    whileHover={isStepDetailsValid ? "hover" : {}}
-                    whileTap={isStepDetailsValid ? "tap" : {}}
+                    whileHover={canProceed ? "hover" : {}}
+                    whileTap={canProceed ? "tap" : {}}
                     type="button"
                     onClick={onNext}
-                    disabled={!isStepDetailsValid}
-                    className={`cursor-pointer px-8 py-3 rounded-xl font-semibold text-white transition duration-200 flex items-center ${!isStepDetailsValid
+                    disabled={!canProceed}
+                    className={`cursor-pointer px-8 py-3 rounded-xl font-semibold text-white transition duration-200 flex items-center ${!canProceed
                             ? "bg-gray-400 cursor-not-allowed"
                             : "bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-lg"
                         }`}

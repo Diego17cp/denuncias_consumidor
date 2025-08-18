@@ -1,5 +1,8 @@
 import { createContext, useContext, useState } from "react";
 
+const MAX_FILES = 10;
+const MAX_SIZE_MB = 20;
+
 const DenunciasContext = createContext();
 
 export function DenunciasProvider({ children }) {
@@ -10,15 +13,32 @@ export function DenunciasProvider({ children }) {
     const [files, setFiles] = useState([]);
     const [error, setError] = useState("");
 
+    // Lógica de archivos
+    const totalSize = files.reduce((acc, file) => acc + file.size / (1024 * 1024), 0);
+    const isFilesLimitReached = files.length > MAX_FILES || totalSize > MAX_SIZE_MB;
+
     const handleFileChange = (e) => {
-        const newFiles = e.target.files ? Array.from(e.target.files) : [];
-        const validFiles = newFiles.filter((file) => file.size <= 20 * 1024 * 1024);
-        if (validFiles.length !== newFiles.length) {
-            setError("Algunos archivos superan los 10MB y no se han añadido.");
-        } else {
-            setError("");
+        setError("");
+        const selectedFiles = Array.from(e.target.files);
+        const totalFiles = files.length + selectedFiles.length;
+
+        if (totalFiles > MAX_FILES) {
+            setError("Solo puedes subir 10 archivos.");
+            return;
         }
-        setFiles((prev) => [...prev, ...validFiles]);
+
+        const newFiles = [...files, ...selectedFiles];
+        const totalSizeMB = newFiles.reduce((acc, file) => acc + file.size / (1024 * 1024), 0);
+        if (totalSizeMB > MAX_SIZE_MB) {
+            setError("El tamaño total de los archivos no debe superar los 20MB.");
+            return;
+        }
+
+        setFiles(newFiles);
+    };
+
+    const removeFile = (index) => {
+        setFiles((prev) => prev.filter((_, i) => i !== index));
     };
 
     // Estado para StepDenunciado
@@ -55,12 +75,16 @@ export function DenunciasProvider({ children }) {
         setDenunciante((p) => ({ ...p, [name]: only }));
     };
 
+    // Validaciones
     const isStepDetailsValid =
-        descripcion.trim() !== "" &&
+        descripcion.trim().length >= 50 &&
+        descripcion.trim().length <= 200 &&
         lugar.trim() !== "" &&
         fecha.trim() !== "" &&
-        files.length > 0;
-    
+        files.length > 0 &&
+        files.length <= MAX_FILES &&
+        totalSize <= MAX_SIZE_MB;
+
     const isStepDenunciadoValid =
         tipoDocumento === "DNI"
             ? dniDenunciado.trim().length === 8 &&
@@ -116,6 +140,11 @@ export function DenunciasProvider({ children }) {
                 error,
                 setError,
                 handleFileChange,
+                removeFile,
+                totalSize,
+                isFilesLimitReached,
+                MAX_FILES,
+                MAX_SIZE_MB,
                 // StepDenunciado
                 nombreDenunciado,
                 setNombreDenunciado,
