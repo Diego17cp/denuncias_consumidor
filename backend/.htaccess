@@ -1,0 +1,19 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # No reescribir si ya apunta a /public/ o si es un archivo/dir existente
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin "http://localhost:5173"
+    Header always set Access-Control-Allow-Credentials "true"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+</IfModule>
