@@ -83,7 +83,7 @@ class AdminsController extends ResourceController
         // }
         if (is_object($admin)) return $admin;
 
-        $input = $this->request->getJSON(true); // <-- leer JSON
+        $input = $this->request->getJSON(true); 
 
         $code       = $input['tracking_code'] ?? null;
         $estado     = 'recibida'; 

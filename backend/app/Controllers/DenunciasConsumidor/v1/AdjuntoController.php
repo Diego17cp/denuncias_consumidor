@@ -1,75 +1,116 @@
 <?php 
 
 namespace App\Controllers\DenunciasConsumidor\v1;
-
+use App\Controllers\BaseController;
+use CodeIgniter\API\ResponseTrait;
+use App\Models\DenunciasConsumidor\v1\DenunciaModel;
 use App\Models\DenunciasConsumidor\v1\AdjuntoModel;
-use CodeIgniter\RESTful\ResourceController;
 
 
-class AdjuntoController extends ResourceController
+class AdjuntoController extends BaseController
 {
-    protected $modelName = AdjuntoModel::class;
-    protected $format    = 'json';
+    use ResponseTrait;
 
-    /**
-     * Subir uno o varios adjuntos para una denuncia
-     */
-    public function subir($id_denuncia = null)
+    protected $denunciaModel;
+    protected $adjuntoModel;
+
+    public function __construct()
     {
-        if (!$id_denuncia) {
-            return $this->failValidationErrors('El ID de la denuncia es obligatorio.');
+        $this->denunciaModel = new DenunciaModel();
+        $this->adjuntoModel  = new AdjuntoModel();
+    }
+
+    
+     // Subir uno o varios adjuntos para una denuncia
+    
+    public function subirAdjuntos($denunciaId)
+    {
+        $denunciaId = $this->request->getPost('denuncia_id');
+        $savedFiles = [];
+
+        if (!$denunciaId) {
+            return $this->failValidationErrors('denuncia_id es obligatorio');
         }
 
-        $files = $this->request->getFiles();
+        $uploadPath = FCPATH . 'denuncias/' . $denunciaId;
 
-        if (empty($files['adjuntos'])) {
-            return $this->failValidationErrors('No se enviaron archivos.');
-        }
-
-        $uploadPath = FCPATH . 'uploads/' . $id_denuncia;
         if (!is_dir($uploadPath)) {
             mkdir($uploadPath, 0777, true);
         }
 
-        $insertados = [];
-        foreach ($files['adjuntos'] as $file) {
-            if ($file->isValid() && !$file->hasMoved()) {
-                $newName  = $file->getRandomName();
-                $fileType = $file->getClientMimeType();
-                $file->move($uploadPath, $newName);
+        // Procesar múltiples archivos adjuntos (campo "adjuntos[]")
+        $files = $this->request->getFiles();
 
-                $data = [
-                    'denuncia_id' => $id_denuncia,
-                    'file_path'   => 'uploads/' . $id_denuncia . '/' . $newName,
-                    'file_name'   => $file->getClientName(),
-                    'file_type'   => $fileType,
-                ];
+        if (isset($files['adjuntos'])) {
+            foreach ($files['adjuntos'] as $file) {
+                if ($file->isValid() && !$file->hasMoved()) {
 
-                $this->model->insertAdjunto($data);
-                $insertados[] = $data;
+                    //  Seguridad: restringir MIME types
+                    if (!in_array($file->getClientMimeType(), ['image/jpeg','image/png','application/pdf'])) {
+                        return $this->fail('Tipo de archivo no permitido');
+                    }
+
+                    $newName = $file->getRandomName();
+                    $file->move($uploadPath, $newName);
+
+                    $filePath = 'denuncias/' . $denunciaId . '/' . $newName;
+                    $savedFiles[] = $filePath;
+
+                    // Insertar registro en la tabla adjunto
+                    $this->adjuntoModel->insert([
+                        'denuncia_id' => $denunciaId,
+                        'file_path'   => 'denuncias/' . $denunciaId . '/' . $newName
+                    ]);
+                }
             }
         }
 
         return $this->respondCreated([
-            'message' => 'Archivos subidos correctamente',
-            'data'    => $insertados
+            'success'     => true,
+            'message'     => 'Denuncia y adjuntos creados con éxito',
+            'denuncia_id' => $denunciaId,
+            'files'       => $savedFiles
         ]);
     }
 
-    /**
-     * Listar adjuntos de una denuncia
-     */
-    public function listar($id_denuncia = null)
+        public function descargarAdjuntos($denunciaId)
     {
-        if (!$id_denuncia) {
-            return $this->failValidationErrors('El ID de la denuncia es obligatorio.');
+        $adjuntos = $this->adjuntoModel->where('denuncia_id', $denunciaId)->findAll();
+
+        if (empty($adjuntos)) {
+            return $this->failNotFound('No hay adjuntos para esta denuncia');
         }
 
-        $adjuntos = $this->model->getByDenunciaId((int)$id_denuncia);
+        $zip = new \ZipArchive();
+        $zipFile = WRITEPATH . 'denuncia_' . $denunciaId . '.zip';
 
-        return $this->respond([
-            'message' => 'Lista de adjuntos obtenida correctamente',
-            'data'    => $adjuntos
-        ]);
+        
+
+        if ($zip->open($zipFile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+            return $this->failServerError('No se pudo crear el ZIP');
+        }
+
+        foreach ($adjuntos as $adjunto) {
+            $filePath = FCPATH . $adjunto['file_path'];
+            if (file_exists($filePath)) {
+                $zip->addFile($filePath, basename($filePath));
+            }
+        }
+
+        $zip->close();
+
+        //  Descargar y borrar archivo temporal después
+        $response = $this->response->download($zipFile, null)
+            ->setFileName('denuncia_' . $denunciaId . '.zip')
+            ->setContentType('application/zip');
+
+        // eliminar ZIP después de enviarlo
+        register_shutdown_function(function () use ($zipFile) {
+            if (file_exists($zipFile)) {
+                unlink($zipFile);
+            }
+        });
+
+        return $response;
     }
 }

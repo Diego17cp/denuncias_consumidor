@@ -23,7 +23,6 @@ class SeguimientoDenunciaController extends ResourceController
         // Mapear explícitamente a los campos permitidos
         $seguimientoData = [
             'denuncia_id'     => $input['denuncia_id'] ?? null,
-            //'estado'          => $input['estado'] ?? null,
             'comentario'      => $input['comentario'] ?? '',
             'administrador_id'=> $input['administrador_id'] ?? null
         ];

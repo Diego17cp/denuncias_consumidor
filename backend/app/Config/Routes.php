@@ -13,21 +13,10 @@ $routes->group('/', [
     $routes->options('(:any)', static function () {});
 
     /*---- RUTAS DE AUTENTICACION ----*/
-    $routes->post('login', 'AuthController::login');
+    $routes->post('login', 'AuthController::login');    
     $routes->post('logout', 'AuthController::logout');
     $routes->get('refresh', 'AuthController::refresh');
     
-    /*---- GRUPO DE USUARIOS ----*/
-    $routes->group('user', function ($routes) {
-
-        /*---- ADJUNTOS ----*/
-        $routes->group('adjunto', function ($routes) {
-            // Subir uno o varios archivos a una denuncia
-            $routes->post('subir/(:num)', 'AdjuntoController::subir/$1');
-            // Listar todos los archivos de una denuncia
-            $routes->get('listar/(:num)', 'AdjuntoController::listar/$1');
-        });
-
         /*---- DENUNCIANTES ----*/
         $routes->group('denunciante', function ($routes) {
             // Listar todos los denunciantes
@@ -64,8 +53,15 @@ $routes->group('/', [
             // Listar todas las denuncias
             $routes->get('/', 'DenunciaController::index');
             $routes->post('/', 'DenunciaController::create');
+
+            /*---- ADJUNTOS ----*/
+            $routes->group('adjunto', function ($routes) {
+                // Subir adjuntos junto con la denuncia (form-data)
+                $routes->post('subir/(:num)', 'AdjuntoController::subirAdjuntos/$1');
+                // Descargar todos los adjuntos en ZIP
+                $routes->get('descargar/(:num)', 'AdjuntoController::descargarAdjuntos/$1');
+            });
         });
-    });
 
     $routes->group('seguimiento', function ($routes) {
         // Crear seguimiento
@@ -74,10 +70,8 @@ $routes->group('/', [
         $routes->get('show/(:num)', 'SeguimientoDenunciaController::getByDenunciaId/$1');
     });
 
-    $routes->group('api', function ($routes) {
-        $routes->get('dni/(:num)', 'Api::buscarDNI/$1');
-        $routes->get('ruc/(:num)', 'Api::buscarRUC/$1');
-    });
+    $routes->get('dni/(:num)', 'Api::buscarDNI/$1');
+    $routes->get('ruc/(:num)', 'Api::buscarRUC/$1');
 
     /*---- GRUPO DE ADMINISTRADORES ----*/
 
@@ -100,9 +94,6 @@ $routes->group('/', [
         $routes->get('id/(:num)', 'AdminsController::searchAdminById/$1');
         // Buscar denuncias por dni o id del denunciante
         $routes->get('buscar-dni/(:num)', 'AdminsController::searchDenuncias/$1');
-        $routes->get('buscar-id/(:num)', 'AdminsController::searchDenunciasByDenuncianteId/$1');
-        
-        $routes->get('probar-correo', 'AdminsController::probarCorreo');
-
+        $routes->get('buscar-id/(:num)', 'AdminsController::searchDenunciasByDenuncianteId/$1');  
     });
 });
