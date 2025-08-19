@@ -153,19 +153,20 @@ export default function StepDenunciante({ onNext, onPrev }) {
 
                                 <motion.div variants={itemVariants} className="space-y-1">
                                     <label className="block text-sm font-medium text-gray-700">
-                                        Nombres <span className="text-red-500">*</span>
+                                        Nombre completo <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
                                         name="nombres"
                                         value={denunciante.nombres}
-                                        onChange={handleDenuncianteChange}
+                                        readOnly
                                         placeholder="Nombres completos"
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
                                     />
                                 </motion.div>
 
-                                <motion.div variants={itemVariants} className="space-y-1 md:col-span-2">
+
+                                {/* <motion.div variants={itemVariants} className="space-y-1 md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700">
                                         Apellidos <span className="text-red-500">*</span>
                                     </label>
@@ -177,7 +178,7 @@ export default function StepDenunciante({ onNext, onPrev }) {
                                         placeholder="Apellidos completos"
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
                                     />
-                                </motion.div>
+                                </motion.div> */}
                             </motion.div>
                         )}
                     </AnimatePresence>
