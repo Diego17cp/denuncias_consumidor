@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getServiceData } from "../services/documentService";
 import axios from "axios";
+import { toast } from "sonner";
 
 const MAX_FILES = 10;
 const MAX_SIZE_MB = 20;
@@ -283,26 +284,35 @@ export function DenunciasProvider({ children }) {
 			provincia: denunciante.provincia,
 			departamento: denunciante.departamento,
 			email: denunciante.correo,
-			telefono:
-				denunciante.telefono.length === 9 ? denunciante.telefono : null,
 			sexo: denunciante.sexo,
 		};
 		formData.append(
 			"denunciante",
 			!anonimo ? JSON.stringify(denuncianteData) : null
 		);
-
 		// Enviar la denuncia
 		try {
+			setIsSubmitting(true);
 			const response = await axios.post(
 				`${API_BASE_URL}/denuncias`,
 				formData
 			);
 			if (response.data.success || response.status === 200) {
-				// Manejar éxito
+				const data = response.data
+				setTrackingCode(data.tracking_code)
+				toast.success(data.message || "Denuncia enviada exitosamente");
+				return true
 			}
+			return false
 		} catch (error) {
+			if (axios.isAxiosError(error)) {
+				console.error("Error al enviar la denuncia:", error);
+			}
 			console.error("Error al enviar la denuncia:", error);
+			toast.error("Error al enviar la denuncia");
+			return false
+		} finally {
+			setIsSubmitting(false);
 		}
 	};
 
