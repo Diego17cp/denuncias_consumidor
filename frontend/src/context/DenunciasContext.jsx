@@ -82,13 +82,13 @@ export function DenunciasProvider({ children }) {
 		const fetchDniData = async () => {
 			if (denunciado.tipoDocumento !== "DNI" || denunciado.dni.trim().length !== 8) return;
 			const data = await getServiceData("dni", denunciado.dni);
-			if (data) setDenunciado((prev) => ({ ...prev, nombres: data.nombres }));
+			if (data) setDenunciado((prev) => ({ ...prev, nombres: data }));
 		};
 
 		const getRucData = async () => {
 			if (denunciado.tipoDocumento !== "RUC" || denunciado.ruc.trim().length !== 11) return;
 			const data = await getServiceData("ruc", denunciado.ruc);
-			if (data) setDenunciado((prev) => ({ ...prev, razonSocial: data.razonSocial, representante: data.representante }));
+			if (data) setDenunciado((prev) => ({ ...prev, razonSocial: data }));
 		};
 
 		if (denunciado.tipoDocumento === "DNI" && denunciado.dni.trim().length === 8) {
@@ -112,7 +112,25 @@ export function DenunciasProvider({ children }) {
 		razonSocial: "",
 		sexo: "",
 	});
+	useEffect(() => {
+		const fetchDniData = async () => {
+			if (tipoDocumento !== "DNI" || denunciante.dni.trim().length !== 8) return;
+			const data = await getServiceData("dni", denunciante.dni);
+			if (data) setDenunciante((prev) => ({ ...prev, nombres: data }));
+		};
 
+		const getRucData = async () => {
+			if (tipoDocumento !== "RUC" || denunciante.ruc.trim().length !== 11) return;
+			const data = await getServiceData("ruc", denunciante.ruc);
+			if (data) setDenunciante((prev) => ({ ...prev, razonSocial: data }));
+		};
+
+		if (tipoDocumento === "DNI" && denunciante.dni.trim().length === 8) {
+			fetchDniData();
+		} else if (tipoDocumento === "RUC" && denunciante.ruc.trim().length === 11) {
+			getRucData();
+		}
+	}, [tipoDocumento, denunciante.dni, denunciante.ruc]);
 	const handleDenuncianteChange = (e) => {
 		const { name, value } = e.target;
 		setDenunciante((prev) => ({ ...prev, [name]: value }));

@@ -104,7 +104,7 @@ export default function StepDatosDenunciado({ onNext, onPrev }) {
                             </label>
                             <input
                                 type="text"
-                                readOnly
+                                readOnly={ denunciado.tipoDocumento === "RUC" || denunciado.tipoDocumento === "DNI" }
                                 name="nombres"
                                 value={denunciado.nombres}
                                 onChange={handleDenunciadoChange}
