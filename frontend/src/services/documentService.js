@@ -6,9 +6,15 @@ const API_BASE_URL = import.meta.env.VITE_CI_API_BASE_URL
 const getDniData = async (dni) => {
     const response = await axios.get(`${API_BASE_URL}/dni/${dni}`)
     if (response.data.success) {
-        const data = response.data.data;
-        const nombre = getFormattedNameDNI(data.apellido_paterno, data.apellido_materno, data.nombres);
-        return nombre
+        const allData = response.data.data;
+        const data = {
+            nombre: getFormattedNameDNI(allData.apellido_paterno, allData.apellido_materno, allData.nombres),
+            direccion: allData.direccion,
+            distrito: allData.distrito,
+            provincia: allData.provincia,
+            departamento: allData.departamento
+        }
+        return data
     }
     return null
 }

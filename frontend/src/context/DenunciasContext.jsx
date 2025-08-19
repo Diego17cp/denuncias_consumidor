@@ -80,20 +80,35 @@ export function DenunciasProvider({ children }) {
 	// Autocompletar nombre o razon social dependiendo el tipo de documento
 	useEffect(() => {
 		const fetchDniData = async () => {
-			if (denunciado.tipoDocumento !== "DNI" || denunciado.dni.trim().length !== 8) return;
+			if (
+				denunciado.tipoDocumento !== "DNI" ||
+				denunciado.dni.trim().length !== 8
+			)
+				return;
 			const data = await getServiceData("dni", denunciado.dni);
-			if (data) setDenunciado((prev) => ({ ...prev, nombres: data }));
+			if (data)
+				setDenunciado((prev) => ({ ...prev, nombres: data.nombre }));
 		};
 
 		const getRucData = async () => {
-			if (denunciado.tipoDocumento !== "RUC" || denunciado.ruc.trim().length !== 11) return;
+			if (
+				denunciado.tipoDocumento !== "RUC" ||
+				denunciado.ruc.trim().length !== 11
+			)
+				return;
 			const data = await getServiceData("ruc", denunciado.ruc);
 			if (data) setDenunciado((prev) => ({ ...prev, razonSocial: data }));
 		};
 
-		if (denunciado.tipoDocumento === "DNI" && denunciado.dni.trim().length === 8) {
+		if (
+			denunciado.tipoDocumento === "DNI" &&
+			denunciado.dni.trim().length === 8
+		) {
 			fetchDniData();
-		} else if (denunciado.tipoDocumento === "RUC" && denunciado.ruc.trim().length === 11) {
+		} else if (
+			denunciado.tipoDocumento === "RUC" &&
+			denunciado.ruc.trim().length === 11
+		) {
 			getRucData();
 		}
 	}, [denunciado.tipoDocumento, denunciado.dni, denunciado.ruc]);
@@ -114,20 +129,34 @@ export function DenunciasProvider({ children }) {
 	});
 	useEffect(() => {
 		const fetchDniData = async () => {
-			if (tipoDocumento !== "DNI" || denunciante.dni.trim().length !== 8) return;
+			if (tipoDocumento !== "DNI" || denunciante.dni.trim().length !== 8)
+				return;
 			const data = await getServiceData("dni", denunciante.dni);
-			if (data) setDenunciante((prev) => ({ ...prev, nombres: data }));
+			if (data)
+				setDenunciante((prev) => ({
+					...prev,
+					nombres: data.nombre,
+					domicilio: data.direccion,
+					distrito: data.distrito,
+					provincia: data.provincia,
+					departamento: data.departamento,
+				}));
 		};
 
 		const getRucData = async () => {
-			if (tipoDocumento !== "RUC" || denunciante.ruc.trim().length !== 11) return;
+			if (tipoDocumento !== "RUC" || denunciante.ruc.trim().length !== 11)
+				return;
 			const data = await getServiceData("ruc", denunciante.ruc);
-			if (data) setDenunciante((prev) => ({ ...prev, razonSocial: data }));
+			if (data)
+				setDenunciante((prev) => ({ ...prev, razonSocial: data }));
 		};
 
 		if (tipoDocumento === "DNI" && denunciante.dni.trim().length === 8) {
 			fetchDniData();
-		} else if (tipoDocumento === "RUC" && denunciante.ruc.trim().length === 11) {
+		} else if (
+			tipoDocumento === "RUC" &&
+			denunciante.ruc.trim().length === 11
+		) {
 			getRucData();
 		}
 	}, [tipoDocumento, denunciante.dni, denunciante.ruc]);
@@ -157,40 +186,43 @@ export function DenunciasProvider({ children }) {
 	const isStepDenunciadoValid =
 		denunciado.tipoDocumento === "DNI"
 			? denunciado.dni.trim().length === 8 &&
-			denunciado.nombres.trim() !== "" &&
-			denunciado.direccion.trim() !== "" &&
-			(denunciado.celular.trim().length === 9 || denunciado.celular.trim() === "")
+			  denunciado.nombres.trim() !== "" &&
+			  denunciado.direccion.trim() !== "" &&
+			  (denunciado.celular.trim().length === 9 ||
+					denunciado.celular.trim() === "")
 			: denunciado.tipoDocumento === "CEDULA"
-				? denunciado.dni.trim() !== "" &&
-				denunciado.nombres.trim() !== "" &&
-				denunciado.direccion.trim() !== "" &&
-				(denunciado.celular.trim().length === 9 || denunciado.celular.trim() === "")
-				: denunciado.ruc.trim().length === 11 &&
-				denunciado.representante.trim() !== "" &&
-				denunciado.razonSocial.trim() !== "" &&
-				denunciado.direccion.trim() !== "" &&
-				(denunciado.celular.trim().length === 9 || denunciado.celular.trim() === "");
+			? denunciado.dni.trim() !== "" &&
+			  denunciado.nombres.trim() !== "" &&
+			  denunciado.direccion.trim() !== "" &&
+			  (denunciado.celular.trim().length === 9 ||
+					denunciado.celular.trim() === "")
+			: denunciado.ruc.trim().length === 11 &&
+			  denunciado.representante.trim() !== "" &&
+			  denunciado.razonSocial.trim() !== "" &&
+			  denunciado.direccion.trim() !== "" &&
+			  (denunciado.celular.trim().length === 9 ||
+					denunciado.celular.trim() === "");
 
 	const isStepDenuncianteValid = anonimo
 		? true
 		: tipoDocumento === "DNI"
-			? denunciante.dni.trim().length === 8 &&
-			denunciante.nombres.trim() !== "" &&
-			denunciante.domicilio.trim() !== "" &&
-			denunciante.departamento.trim() !== "" &&
-			denunciante.provincia.trim() !== "" &&
-			denunciante.distrito.trim() !== "" &&
-			denunciante.celular.trim().length === 9 &&
-			denunciante.correo.trim() !== ""
-			: denunciante.ruc.trim().length === 11 &&
-			denunciante.razonSocial.trim() !== "" &&
-			denunciante.representante.trim() !== "" &&
-			denunciante.domicilio.trim() !== "" &&
-			denunciante.departamento.trim() !== "" &&
-			denunciante.provincia.trim() !== "" &&
-			denunciante.distrito.trim() !== "" &&
-			denunciante.celular.trim().length === 9 &&
-			denunciante.correo.trim() !== "";
+		? denunciante.dni.trim().length === 8 &&
+		  denunciante.nombres.trim() !== "" &&
+		  denunciante.domicilio.trim() !== "" &&
+		  denunciante.departamento.trim() !== "" &&
+		  denunciante.provincia.trim() !== "" &&
+		  denunciante.distrito.trim() !== "" &&
+		  denunciante.celular.trim().length === 9 &&
+		  denunciante.correo.trim() !== ""
+		: denunciante.ruc.trim().length === 11 &&
+		  denunciante.razonSocial.trim() !== "" &&
+		  denunciante.representante.trim() !== "" &&
+		  denunciante.domicilio.trim() !== "" &&
+		  denunciante.departamento.trim() !== "" &&
+		  denunciante.provincia.trim() !== "" &&
+		  denunciante.distrito.trim() !== "" &&
+		  denunciante.celular.trim().length === 9 &&
+		  denunciante.correo.trim() !== "";
 
 	const API_BASE_URL = import.meta.env.VITE_CI_API_BASE_URL;
 
@@ -209,19 +241,26 @@ export function DenunciasProvider({ children }) {
 		// Data del denunciado
 		const denunciadoData = {
 			nombre: denunciado.nombres,
-			razon_social: denunciado.ruc.length > 0 && denunciado.razonSocial ? denunciado.razonSocial : null,
-			representante_legal: denunciado.tipoDocumento === "RUC" && denunciado.representante ? denunciado.representante : null,
+			razon_social:
+				denunciado.ruc.length > 0 && denunciado.razonSocial
+					? denunciado.razonSocial
+					: null,
+			representante_legal:
+				denunciado.tipoDocumento === "RUC" && denunciado.representante
+					? denunciado.representante
+					: null,
 			tipo_documento: denunciado.tipoDocumento,
 			documento:
 				denunciado.tipoDocumento === "DNI"
 					? denunciado.dni
 					: denunciado.tipoDocumento === "RUC"
-						? denunciado.ruc
-						: denunciado.tipoDocumento === "CEDULA"
-							? denunciado.dni
-							: null,
+					? denunciado.ruc
+					: denunciado.tipoDocumento === "CEDULA"
+					? denunciado.dni
+					: null,
 			direccion: denunciado.direccion,
-			celular: denunciado.celular.length === 9 ? denunciado.celular : null,
+			celular:
+				denunciado.celular.length === 9 ? denunciado.celular : null,
 		};
 		formData.append("denunciado", JSON.stringify(denunciadoData));
 
@@ -232,25 +271,33 @@ export function DenunciasProvider({ children }) {
 				tipoDocumento === "DNI"
 					? denunciante.dni
 					: tipoDocumento === "RUC"
-						? denunciante.ruc
-						: tipoDocumento === "CEDULA"
-							? denunciante.dni
-							: null,
+					? denunciante.ruc
+					: tipoDocumento === "CEDULA"
+					? denunciante.dni
+					: null,
 			tipo_documento: tipoDocumento,
 			direccion: denunciante.direccion,
-			celular: denunciante.celular.length === 9 ? denunciante.celular : null,
+			celular:
+				denunciante.celular.length === 9 ? denunciante.celular : null,
 			distrito: denunciante.distrito,
 			provincia: denunciante.provincia,
 			departamento: denunciante.departamento,
 			email: denunciante.correo,
-			telefono: denunciante.telefono.length === 9 ? denunciante.telefono : null,
+			telefono:
+				denunciante.telefono.length === 9 ? denunciante.telefono : null,
 			sexo: denunciante.sexo,
 		};
-		formData.append("denunciante", !anonimo ? JSON.stringify(denuncianteData) : null);
+		formData.append(
+			"denunciante",
+			!anonimo ? JSON.stringify(denuncianteData) : null
+		);
 
 		// Enviar la denuncia
 		try {
-			const response = await axios.post(`${API_BASE_URL}/denuncias`, formData);
+			const response = await axios.post(
+				`${API_BASE_URL}/denuncias`,
+				formData
+			);
 			if (response.data.success || response.status === 200) {
 				// Manejar éxito
 			}
@@ -296,7 +343,7 @@ export function DenunciasProvider({ children }) {
 				isStepDetailsValid,
 				isStepDenunciadoValid,
 				isStepDenuncianteValid,
-				handleSubmit
+				handleSubmit,
 			}}
 		>
 			{children}
