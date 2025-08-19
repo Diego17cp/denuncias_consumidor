@@ -185,6 +185,11 @@ class CreateTables extends Migration
                 'constraint' => '20',
                 'null' => false
             ],
+            'lugar' => [
+                'type' => 'VARCHAR',
+                'constraint' => '100',
+                'null' => true
+            ],
             'fecha_incidente' => [
                 'type' => 'DATE',
                 'null' => false
