@@ -33,7 +33,7 @@ export const Login = () => {
                     <img
                         src={logo}
                         alt="Logo Municipal"
-                        className="h-12 object-contain"
+                        className="h-18 object-contain"
                     />
                     <span className="ml-2 text-lg font-semibold text-gray-700">Municipalidad JLO</span>
                 </Link>
@@ -89,10 +89,6 @@ export const Login = () => {
                                 )}
                             </button>
                         </form>
-                        
-                        <div className="mt-6 text-center text-sm text-gray-500">
-                            <p>¿Necesitas ayuda? <a href="#" className="text-muni-primary hover:underline">Contactar soporte</a></p>
-                        </div>
                     </div>
                 </div>
             </div>
