@@ -59,6 +59,8 @@ export function DenunciasProvider({ children }) {
 	const [direccionDenunciado, setDireccionDenunciado] = useState("");
 	const [celularDenunciado, setCelularDenunciado] = useState("");
 	const [rucDenunciado, setRucDenunciado] = useState("");
+	const [representanteDenunciado, setRepresentanteDenunciado] = useState("");
+	const [razonSocialDenunciado, setRazonSocialDenunciado] = useState("");
 
 	// Estado para StepDenunciante
 	const [tipoDocumento, setTipoDocumento] = useState("DNI");
@@ -73,7 +75,7 @@ export function DenunciasProvider({ children }) {
         const getRucData = async () => {
             if (!tipoDocumento === "RUC" && !rucDenunciado.trim().length === 11) return;
             const data = await getServiceData("ruc", rucDenunciado);
-            if (data) setDenunciadoRazonSocial(data);
+            if (data) setRazonSocialDenunciado(data);
         }
 
         if (tipoDocumento === "DNI" && dniDenunciado.trim().length === 8) {
@@ -128,21 +130,18 @@ export function DenunciasProvider({ children }) {
 			  nombreDenunciado.trim() !== "" &&
 			  apellidosDenunciado.trim() !== "" &&
 			  direccionDenunciado.trim() !== "" &&
-			  (celularDenunciado.trim().length === 9 ||
-					celularDenunciado.trim() === "")
+			  (celularDenunciado.trim().length === 9 || celularDenunciado.trim() === "")
 			: tipoDocumento === "CEDULA"
-			? dniDenunciado.trim() !== "" && // longitud minima
+			? dniDenunciado.trim() !== "" &&
 			  nombreDenunciado.trim() !== "" &&
 			  apellidosDenunciado.trim() !== "" &&
 			  direccionDenunciado.trim() !== "" &&
-			  (celularDenunciado.trim().length === 9 ||
-					celularDenunciado.trim() === "")
-			: denunciante.ruc.trim().length === 11 &&
-			  denunciante.representante.trim() !== "" &&
-			  denunciante.razonSocial.trim() !== "" &&
+			  (celularDenunciado.trim().length === 9 || celularDenunciado.trim() === "")
+			: rucDenunciado.trim().length === 11 &&
+			  representanteDenunciado.trim() !== "" &&
+			  razonSocialDenunciado.trim() !== "" &&
 			  direccionDenunciado.trim() !== "" &&
-			  (celularDenunciado.trim().length === 9 ||
-					celularDenunciado.trim() === "");
+			  (celularDenunciado.trim().length === 9 || celularDenunciado.trim() === "");
 
 	const isStepDenuncianteValid = anonimo
 		? true
@@ -283,6 +282,10 @@ export function DenunciasProvider({ children }) {
 				setCelularDenunciado,
 				rucDenunciado,
 				setRucDenunciado,
+				representanteDenunciado,
+				setRepresentanteDenunciado,
+				razonSocialDenunciado,
+				setRazonSocialDenunciado,
 				// StepDenunciante
 				tipoDocumento,
 				setTipoDocumento,
