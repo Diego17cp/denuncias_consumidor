@@ -75,6 +75,9 @@ export function DenunciasProvider({ children }) {
         setDenunciante((p) => ({ ...p, [name]: only }));
     };
 
+    // Estado para denuncia anónima
+    const [anonimo, setAnonimo] = useState(false);
+
     // Validaciones
     const isStepDetailsValid =
         descripcion.trim().length >= 50 &&
@@ -104,26 +107,27 @@ export function DenunciasProvider({ children }) {
             direccionDenunciado.trim() !== "" &&
             celularDenunciado.trim().length === 9;
 
-    const isStepDenuncianteValid =
-        tipoDocumento === "DNI"
+    const isStepDenuncianteValid = anonimo
+        ? true
+        : tipoDocumento === "DNI"
             ? denunciante.dni.trim().length === 8 &&
-            denunciante.nombres.trim() !== "" &&
-            denunciante.apellidos.trim() !== "" &&
-            denunciante.domicilio.trim() !== "" &&
-            denunciante.departamento.trim() !== "" &&
-            denunciante.provincia.trim() !== "" &&
-            denunciante.distrito.trim() !== "" &&
-            denunciante.celular.trim().length === 9 &&
-            denunciante.correo.trim() !== ""
+              denunciante.nombres.trim() !== "" &&
+              denunciante.apellidos.trim() !== "" &&
+              denunciante.domicilio.trim() !== "" &&
+              denunciante.departamento.trim() !== "" &&
+              denunciante.provincia.trim() !== "" &&
+              denunciante.distrito.trim() !== "" &&
+              denunciante.celular.trim().length === 9 &&
+              denunciante.correo.trim() !== ""
             : denunciante.ruc.trim().length === 11 &&
-            denunciante.razonSocial.trim() !== "" &&
-            denunciante.representante.trim() !== "" &&
-            denunciante.domicilio.trim() !== "" &&
-            denunciante.departamento.trim() !== "" &&
-            denunciante.provincia.trim() !== "" &&
-            denunciante.distrito.trim() !== "" &&
-            denunciante.celular.trim().length === 9 &&
-            denunciante.correo.trim() !== "";
+              denunciante.razonSocial.trim() !== "" &&
+              denunciante.representante.trim() !== "" &&
+              denunciante.domicilio.trim() !== "" &&
+              denunciante.departamento.trim() !== "" &&
+              denunciante.provincia.trim() !== "" &&
+              denunciante.distrito.trim() !== "" &&
+              denunciante.celular.trim().length === 9 &&
+              denunciante.correo.trim() !== "";
 
     return (
         <DenunciasContext.Provider
@@ -163,6 +167,8 @@ export function DenunciasProvider({ children }) {
                 setDenunciante,
                 handleDenuncianteChange,
                 handleDenuncianteDigits,
+                anonimo,
+                setAnonimo,
                 isStepDetailsValid,
                 isStepDenunciadoValid,
                 isStepDenuncianteValid,
