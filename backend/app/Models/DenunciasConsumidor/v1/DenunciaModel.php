@@ -18,6 +18,7 @@ class DenunciaModel extends Model
         'descripcion',  
         'estado',
         'fecha_incidente',
+        'lugar',
     ];
 
     // Fechas
@@ -35,6 +36,7 @@ class DenunciaModel extends Model
         'fecha_incidente' => 'required|valid_date',
         'denunciado_id'   => 'required|integer',
         'estado'          => 'required|string|max_length[20]',
+        'lugar'           => 'permit_empty|string|max_length[50]',
     ];
 
     protected $validationMessages = [
@@ -60,6 +62,9 @@ class DenunciaModel extends Model
         'denunciante_id' => [
             'required' => 'Debe especificar la persona denunciante.',
             'integer'  => 'El ID del denunciado debe ser un número entero.'
+        ],
+        'lugar' => [
+            'max_length' => 'El campo lugar no puede exceder los 50 caracteres.'
         ]
     ];
 
