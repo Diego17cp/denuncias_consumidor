@@ -38,17 +38,17 @@ class DenuncianteModel extends Model
 
     // Validaciones
     protected $validationRules = [
-        'nombre'           => 'required|min_length[3]|max_length[100]',
+        'nombre'           => 'required|min_length[3]|max_length[255]',
         'razon_social'     => 'permit_empty|max_length[150]',
-        'documento'        => 'required|numeric|max_length[15]',
+        'documento'        => 'required|min_length[8]|max_length[20]',
         'tipo_documento'   => 'required|in_list[DNI,CE,RUC]',
-        'direccion'        => 'required|max_length[255]',
-        'distrito'         => 'required|max_length[100]',
-        'provincia'        => 'required|max_length[100]',
-        'departamento'     => 'required|max_length[100]',
+        'direccion'        => 'permit_empty|max_length[255]',
+        'distrito'         => 'permit_empty|max_length[100]',
+        'provincia'        => 'permit_empty|max_length[100]',
+        'departamento'     => 'permit_empty|max_length[100]',
         'email'            => 'required|valid_email|max_length[150]',
-        'telefono'         => 'required|numeric|max_length[15]|min_length[7]',
-        'celular'          => 'required|numeric|max_length[15]|min_length[7]',
+        'telefono'         => 'permit_empty|max_length[15]|min_length[7]',
+        'celular'          => 'required|max_length[15]|min_length[7]',
         'sexo'             => 'required|in_list[M,F,O]',
     ];
 
@@ -65,7 +65,7 @@ class DenuncianteModel extends Model
             'max_length'  => 'El correo no puede superar los 150 caracteres'
         ],
         'telefono' => [
-            'required'    => 'El teléfono es obligatorio',
+            //'required'    => 'El teléfono es obligatorio',
             'numeric'     => 'El teléfono debe contener solo números',
             'max_length'  => 'El teléfono no puede superar los 15 dígitos',
             'min_length'  => 'El teléfono debe tener al menos 7 dígitos'
@@ -93,19 +93,19 @@ class DenuncianteModel extends Model
             'in_list'  => 'El sexo debe ser M (Masculino), F (Femenino) o O (Otro)'
         ],
         'distrito' => [
-            'required'   => 'El distrito es obligatorio',
+            //'required'   => 'El distrito es obligatorio',
             'max_length' => 'El distrito no puede superar los 100 caracteres'
         ],
         'provincia' => [
-            'required'   => 'La provincia es obligatoria',
+            //'required'   => 'La provincia es obligatoria',
             'max_length' => 'La provincia no puede superar los 100 caracteres'
         ],
         'departamento' => [
-            'required'   => 'El departamento es obligatorio',
+            //'required'   => 'El departamento es obligatorio',
             'max_length' => 'El departamento no puede superar los 100 caracteres'
         ],
         'direccion' => [
-            'required'   => 'La dirección es obligatoria',
+            //'required'   => 'La dirección es obligatoria',
             'max_length' => 'La dirección no puede superar los 255 caracteres'
         ]
     ];

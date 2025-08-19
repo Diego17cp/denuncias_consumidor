@@ -97,13 +97,13 @@ class DenunciaController extends ResourceController
 
     public function create()
     {
-        $input = $this->request->getPost(); // 📌 form-data (para manejar adjuntos)
+        $input = $this->request->getPost(); 
 
         $db = \Config\Database::connect();
-        $db->transBegin(); // Iniciamos transacción
+        $db->transBegin(); 
 
         try {
-            // 📌 1. Insertar Denunciado
+            
             $denunciadoId = null;
             if (!empty($input['d1nombre'])) {
                 $this->denunciadosModel->insert([
@@ -117,9 +117,17 @@ class DenunciaController extends ResourceController
                 $denunciadoId = $this->denunciadosModel->getInsertID();
             }
 
-            // 📌 2. Insertar Denunciante (si no es anónimo)
             $denuncianteId = null;
-            if ((int)($input['es_anonimo'] ?? 0) === 0) {
+
+            if ((int)($input['es_anonimo'] ?? 0) === 1) {
+                $this->denunciantesModel->skipValidation(true)->insert([
+                    'nombre' => 'ANONIMO'
+                ]);
+
+                $denuncianteId = $this->denunciantesModel->getInsertID();
+
+            } else {
+                
                 if (!empty($input['documento'])) {
                     $denunciante = $this->denunciantesModel
                         ->where('documento', $input['documento'])
@@ -129,26 +137,28 @@ class DenunciaController extends ResourceController
                         $denuncianteId = $denunciante['id'];
                     } else {
                         $this->denunciantesModel->insert([
-                            'nombre'        => $input['d2nombre'] ?? null,
-                            'email'         => $input['d2email'] ?? null,
-                            'telefono'      => $input['d2telefono'] ?? null,
-                            'celular'       => $input['d2celular'] ?? null,
-                            'documento'     => $input['d2documento'] ?? null,
-                            'tipo_documento'=> $input['d2tipo_documento'] ?? null,
-                            'razon_social'  => $input['d2razon_social'] ?? null,
-                            'sexo'          => $input['d2sexo'] ?? null,
-                            'distrito'      => $input['d2distrito'] ?? null,
-                            'provincia'     => $input['d2provincia'] ?? null,
-                            'departamento'  => $input['d2departamento'] ?? null,
-                            'direccion'     => $input['d2direccion'] ?? null  
-                        ]);
+                            'nombre'        => $input['nombre'] ?? null,
+                            'email'         => $input['email'] ?? null,
+                            'telefono'      => $input['telefono'] ?? null,
+                            'celular'       => $input['celular'] ?? null,
+                            'documento'     => $input['documento'] ?? null,
+                            'tipo_documento'=> $input['tipo_documento'] ?? null,
+                            'razon_social'  => $input['razon_social'] ?? null,
+                            'sexo'          => $input['sexo'] ?? null,
+                            'distrito'      => $input['distrito'] ?? null,
+                            'provincia'     => $input['provincia'] ?? null,
+                            'departamento'  => $input['departamento'] ?? null,
+                            'direccion'     => $input['direccion'] ?? null  
+                        ], true);
+
+                        
 
                         $denuncianteId = $this->denunciantesModel->getInsertID();
                     }
                 }
             }
 
-            // 📌 3. Insertar Denuncia con IDs
+            
             $tracking = $this->generateTrackingCode();
             $denunciaId = $this->denunciasModel->insert([
                 'tracking_code'   => $tracking,
@@ -189,13 +199,13 @@ class DenunciaController extends ResourceController
                 }
             }
 
-            // 📌 5. Insertar Seguimiento inicial
+
             $this->seguimientoDenunciasModel->insert([
                 'denuncia_id' => $denunciaId,
                 'comentario'     => 'Denuncia registrada en el sistema',
             ]);
 
-            // 📌 6. Enviar correo al denunciante (si aplica)
+
             if (!empty($denuncianteId)) {
                 $denunciante = $this->denunciantesModel->find($denuncianteId);
                 if ($denunciante && !empty($denunciante['email'])) {
@@ -205,7 +215,6 @@ class DenunciaController extends ResourceController
 
             $db->transCommit();
 
-            // 📌 7. Respuesta final
             return $this->respondCreated([
                 'success'       => true,
                 'message'       => 'Denuncia registrada con éxito',

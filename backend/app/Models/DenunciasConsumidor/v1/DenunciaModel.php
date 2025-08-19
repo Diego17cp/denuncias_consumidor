@@ -30,7 +30,7 @@ class DenunciaModel extends Model
     protected $validationRules = [
         'tracking_code'   => 'required|string|max_length[20]',
         'es_anonimo'      => 'required|in_list[0,1]',
-        'denunciante_id'  => 'permit_empty|integer',
+        'denunciante_id'  => 'required|integer',
         'descripcion'     => 'required|string',
         'fecha_incidente' => 'required|valid_date',
         'denunciado_id'   => 'required|integer',
