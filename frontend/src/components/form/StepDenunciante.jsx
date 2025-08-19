@@ -12,6 +12,7 @@ export default function StepDenunciante({ onNext, onPrev }) {
         isStepDenuncianteValid,
         anonimo,
         setAnonimo,
+        handleSubmit
     } = useDenuncias();
 
     // Animaciones optimizadas
@@ -396,7 +397,10 @@ export default function StepDenunciante({ onNext, onPrev }) {
                     whileHover={isStepDenuncianteValid ? "hover" : {}}
                     whileTap={isStepDenuncianteValid ? "tap" : {}}
                     type="button"
-                    onClick={onNext}
+                    onClick={() => {
+                        handleSubmit();
+                        onNext();
+                    }}
                     disabled={!isStepDenuncianteValid}
                     className={`cursor-pointer flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition ${
                         !isStepDenuncianteValid

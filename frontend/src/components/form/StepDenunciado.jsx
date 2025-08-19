@@ -20,6 +20,8 @@ export default function StepDatosDenunciado({ onNext, onPrev }) {
         handleDenuncianteChange,
         handleDenuncianteDigits,
         isStepDenunciadoValid,
+        rucDenunciado,
+        setRucDenunciado
     } = useDenuncias();
 
     // Animaciones simplificadas
@@ -220,7 +222,7 @@ export default function StepDatosDenunciado({ onNext, onPrev }) {
 
                     <motion.div variants={itemVariants} className="space-y-1 md">
                         <label className="block text-sm font-medium text-gray-700">
-                            Celular <span className="text-red-500">*</span>
+                            Celular
                         </label>
                         <div className="relative">
                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
