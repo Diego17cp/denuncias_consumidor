@@ -47,7 +47,7 @@ $routes->group('/', [
         });
 
         /*---- DENUNCIAS ----*/
-        $routes->group('denuncia', function ($routes) {
+        $routes->group('denuncias', function ($routes) {
             // Buscar denuncia por tracking_code
             $routes->get('codigo/(:alphanum)', 'DenunciaController::query/$1');
             // Listar todas las denuncias
