@@ -46,55 +46,7 @@ class DenunciaController extends ResourceController
         return $this->respond($denuncias);
     }
 
-    
-    // public function create()
-    // {
-    //     $input = $this->request->getJSON(true);
-
-    //     // Generar tracking code único
-    //     $code = $this->generateTrackingCode();
-
-    //     // Evitar registrar una denuncia con el mismo tracking code
-    //     if ($this->denunciasModel->where('tracking_code', $code)->first()) {
-    //         return $this->respond([
-    //             'success' => false,
-    //             'message' => 'Denuncia ya registrada previamente',
-    //             'tracking_code' => $code
-    //         ]);
-    //     }
-
-    //     // Construir los datos para insertar
-    //     $denunciaData = [
-    //         'tracking_code'   => $code,
-    //         'es_anonimo'      => $input['es_anonimo'] ?? 0,
-    //         'denunciante_id'  => $input['denunciante_id'] ?? null,
-    //         'descripcion'     => $input['descripcion'] ?? null,
-    //         'fecha_incidente' => $input['fecha_incidente'] ?? null,
-    //         'denunciado_id'   => $input['denunciado_id'] ?? null,
-    //         'fecha_registro'  => date('Y-m-d H:i:s'),
-    //         'estado'          => 'registrado',
-    //     ];
-
-    //     if ($this->denunciasModel->insert($denunciaData)) {
-    //         // Enviar correo si no es anónima
-    //         if (!$denunciaData['es_anonimo'] && !empty($denunciaData['denunciante_id'])) {
-    //             $denunciante = $this->denunciantesModel->find($denunciaData['denunciante_id']);
-    //             if ($denunciante && isset($denunciante['email'])) {
-    //                 $this->enviarCorreoTracking($denunciante['email'], $code);
-    //             }
-    //         }
-
-    //         return $this->respondCreated([
-    //             'success'       => true,
-    //             'message'       => 'Denuncia registrada correctamente',
-    //             'tracking_code' => $code
-    //         ]);
-    //     }
-
-    //     return $this->failValidationErrors($this->denunciasModel->errors());
-    // }
-
-
+    // CREAR NUEVA DENUNCIA
     public function create()
     {
         $input = $this->request->getPost(); 
@@ -112,7 +64,6 @@ class DenunciaController extends ResourceController
                     ->first();
 
                 if($denunciado){
-                    //Si ya existe, usar su ID
                     $denunciadoId = $denunciado['id'];
                 } else {
                     $this->denunciadosModel->insert([
@@ -175,8 +126,6 @@ class DenunciaController extends ResourceController
                 'estado'          => 'registrado'
             ], true);
 
-            //$denunciaId = $this->denunciasModel->getInsertID();
-
             if (!$denunciaId) {
                 log_message('error', 'Errores de validación: ' . json_encode($this->denunciasModel->errors()));
                 throw new \Exception("Error en validación");
@@ -193,18 +142,18 @@ class DenunciaController extends ResourceController
                 $uploadPath = FCPATH . 'denuncias/' . $denunciaId;
                 if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
 
-                // Tipos permitidos
+                
                 $allowedTypes = [
-                    // imágenes
+                    
                     'image/jpeg', 'image/png', 'image/webp', 'image/avif',
-                    // documentos
+                    
                     'application/pdf',
-                    'application/msword', // .doc
+                    'application/msword', 
                     'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
                     'text/plain',
-                    // audio
+                    
                     'audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/x-m4a',
-                    // video
+                    
                     'video/mp4', 'video/x-msvideo', 'video/avi', 'video/mpeg', 'video/ogg', 'video/webm',
                     'application/zip', 'application/x-zip-compressed'
                 ];
