@@ -97,10 +97,6 @@ export const Login = () => {
                 </div>
             </div>
             
-            {/* Footer */}
-            <footer className="py-4 text-center text-sm text-gray-500 bg-white border-t">
-                <p>© {new Date().getFullYear()} Municipalidad. Todos los derechos reservados.</p>
-            </footer>
         </main>
     );
 }
