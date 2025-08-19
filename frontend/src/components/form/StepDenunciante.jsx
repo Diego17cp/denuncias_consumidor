@@ -399,8 +399,7 @@ export default function StepDenunciante({ onNext, onPrev }) {
                     whileTap={isStepDenuncianteValid ? "tap" : {}}
                     type="button"
                     onClick={() => {
-                        handleSubmit();
-                        onNext();
+                        if (handleSubmit()) onNext();
                     }}
                     disabled={!isStepDenuncianteValid}
                     className={`cursor-pointer flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition ${
