@@ -11,15 +11,13 @@ class DenunciaModel extends Model
     protected $useSoftDeletes   = true;
 
     protected $allowedFields    = [
-        'id',
         'tracking_code',
         'denunciante_id',
         'es_anonimo',
         'denunciado_id',
-        'descripcion',
+        'descripcion',  
         'estado',
         'fecha_incidente',
-        // 'pdf_path'
     ];
 
     // Fechas
@@ -30,14 +28,13 @@ class DenunciaModel extends Model
 
     // Validaciones
     protected $validationRules = [
-        'tracking_code'   => 'required|string|max_length[50]',
+        'tracking_code'   => 'required|string|max_length[20]',
         'es_anonimo'      => 'required|in_list[0,1]',
-        'denunciante_id'  => 'required|integer',
+        'denunciante_id'  => 'permit_empty|integer',
         'descripcion'     => 'required|string',
         'fecha_incidente' => 'required|valid_date',
         'denunciado_id'   => 'required|integer',
-        'estado'          => 'required|string|max_length[50]',
-        // 'pdf_path'       => 'permit_empty|string|max_length[255]',
+        'estado'          => 'required|string|max_length[20]',
     ];
 
     protected $validationMessages = [
