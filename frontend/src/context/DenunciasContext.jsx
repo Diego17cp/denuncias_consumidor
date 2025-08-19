@@ -88,7 +88,7 @@ export function DenunciasProvider({ children }) {
 				return;
 			const data = await getServiceData("dni", denunciado.dni);
 			if (data)
-				setDenunciado((prev) => ({ ...prev, nombres: data.nombre }));
+				setDenunciado((prev) => ({ ...prev, nombres: data.nombre, direccion: data.direccion }));
 		};
 
 		const getRucData = async () => {
