@@ -78,7 +78,7 @@ export default function StepDatosDenunciado({ onNext, onPrev }) {
                                     cursor-pointer flex flex-col items-center justify-center p-4 rounded-lg border-2
                                     transition-all duration-200
                                     ${tipoDocumento === option.value
-                                        ? 'bg-blue-50 border-blue-500 text-blue-600'
+                                        ? 'bg-blue-50 border-muni-primary text-muni-primary'
                                         : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
                                     }
                                 `}
@@ -111,7 +111,7 @@ export default function StepDatosDenunciado({ onNext, onPrev }) {
                                     onChange={(e) => setDniDenunciado(e.target.value.replace(/\D/g, "").slice(0, 8))}
                                     placeholder={`Ingrese ${tipoDocumento === "DNI" ? "DNI" : "cédula"}`}
                                     maxLength={8}
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
                                     
                                 />
                                 
@@ -126,7 +126,7 @@ export default function StepDatosDenunciado({ onNext, onPrev }) {
                                     value={nombreDenunciado}
                                     onChange={(e) => setNombreDenunciado(e.target.value)}
                                     placeholder="Nombre completo"
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
                                 />
                             </motion.div>
 
@@ -139,7 +139,7 @@ export default function StepDatosDenunciado({ onNext, onPrev }) {
                                     value={apellidosDenunciado}
                                     onChange={(e) => setApellidosDenunciado(e.target.value)}
                                     placeholder="Apellidos completos"
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
                                 />
                             </motion.div>
                         </motion.div>
@@ -167,7 +167,7 @@ export default function StepDatosDenunciado({ onNext, onPrev }) {
                                     onChange={handleDenuncianteDigits("ruc", 11)}
                                     placeholder="Ingrese RUC"
                                     maxLength={11}
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
                                 />
 
                             </motion.div>
@@ -182,7 +182,7 @@ export default function StepDatosDenunciado({ onNext, onPrev }) {
                                     value={denunciante.representante}
                                     onChange={handleDenuncianteChange}
                                     placeholder="Nombre completo"
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
                                 />
                             </motion.div>
 
@@ -194,9 +194,9 @@ export default function StepDatosDenunciado({ onNext, onPrev }) {
                                     type="text"
                                     name="razonSocial"
                                     value={denunciante.razonSocial}
-                                    onChange={handleDenuncianteChange}
+                                        onChange={handleDenuncianteChange}
                                     placeholder="Razón social completa"
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
                                 />
                             </motion.div>
                         </motion.div>
@@ -214,7 +214,7 @@ export default function StepDatosDenunciado({ onNext, onPrev }) {
                             value={direccionDenunciado}
                             onChange={(e) => setDireccionDenunciado(e.target.value)}
                             placeholder="Dirección completa"
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
                         />
                     </motion.div>
 
@@ -232,7 +232,7 @@ export default function StepDatosDenunciado({ onNext, onPrev }) {
                                 onChange={(e) => setCelularDenunciado(e.target.value.replace(/\D/g, "").slice(0, 9))}
                                 placeholder="987654321"
                                 maxLength={9}
-                                className="w-full p-3 pl-12 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                className="w-full p-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
                             />
                         </div>
 
@@ -270,7 +270,7 @@ export default function StepDatosDenunciado({ onNext, onPrev }) {
                         cursor-pointer flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium
                         transition ${!isStepDenunciadoValid
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                            : "bg-blue-600 text-white hover:bg-blue-700"
+                            : "bg-muni-secondary text-white hover:bg-muni-primary"
                         }
                     `}
                 >

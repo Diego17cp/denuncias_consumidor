@@ -81,7 +81,7 @@ export default function StepDenunciante({ onNext, onPrev }) {
                             className={`
                                 cursor-pointer flex flex-col items-center justify-center p-3 rounded-lg border-2
                                 transition-all ${tipoDocumento === option.value && !anonimo
-                                    ? 'bg-blue-50 border-blue-500 text-blue-600'
+                                    ? 'bg-blue-50 border-muni-primary text-muni-primary'
                                     : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
                                 }
                             `}
@@ -103,7 +103,7 @@ export default function StepDenunciante({ onNext, onPrev }) {
                         className={`
                             cursor-pointer flex flex-col items-center justify-center p-3 rounded-lg border-2
                             transition-all ${anonimo
-                                ? 'bg-blue-50 border-blue-500 text-blue-600'
+                                ? 'bg-blue-50 border-muni-primary text-muni-primary'
                                 : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
                             }
                         `}
@@ -140,7 +140,7 @@ export default function StepDenunciante({ onNext, onPrev }) {
                                             onChange={handleDenuncianteDigits("dni", 8)}
                                             inputMode="numeric"
                                             placeholder={`Ingrese ${tipoDocumento === "DNI" ? "DNI" : "cédula"}`}
-                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
                                         />
                                         <div className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs ${
                                             denunciante.dni?.length === 8 ? 'text-gray-500' : 'text-gray-400'
@@ -160,7 +160,7 @@ export default function StepDenunciante({ onNext, onPrev }) {
                                         value={denunciante.nombres}
                                         onChange={handleDenuncianteChange}
                                         placeholder="Nombres completos"
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
                                     />
                                 </motion.div>
 
@@ -174,7 +174,7 @@ export default function StepDenunciante({ onNext, onPrev }) {
                                         value={denunciante.apellidos}
                                         onChange={handleDenuncianteChange}
                                         placeholder="Apellidos completos"
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
                                     />
                                 </motion.div>
                             </motion.div>
@@ -203,7 +203,7 @@ export default function StepDenunciante({ onNext, onPrev }) {
                                             onChange={handleDenuncianteDigits("ruc", 11)}
                                             inputMode="numeric"
                                             placeholder="Ingrese RUC"
-                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
                                         />
                                         <div className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs ${
                                             denunciante.ruc?.length === 11 ? 'text-gray-500' : 'text-gray-400'
@@ -223,7 +223,7 @@ export default function StepDenunciante({ onNext, onPrev }) {
                                         value={denunciante.representante}
                                         onChange={handleDenuncianteChange}
                                         placeholder="Nombre completo"
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
                                     />
                                 </motion.div>
 
@@ -237,7 +237,7 @@ export default function StepDenunciante({ onNext, onPrev }) {
                                         value={denunciante.razonSocial}
                                         onChange={handleDenuncianteChange}
                                         placeholder="Razón social completa"
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
                                     />
                                 </motion.div>
                             </motion.div>
@@ -255,7 +255,7 @@ export default function StepDenunciante({ onNext, onPrev }) {
                             value={denunciante.domicilio}
                             onChange={handleDenuncianteChange}
                             placeholder="Dirección completa"
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
                         />
                     </motion.div>
 
@@ -270,7 +270,7 @@ export default function StepDenunciante({ onNext, onPrev }) {
                                 value={denunciante.departamento}
                                 onChange={handleDenuncianteChange}
                                 placeholder="Departamento"
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
                             />
                         </div>
                         <div className="space-y-1">
@@ -283,7 +283,7 @@ export default function StepDenunciante({ onNext, onPrev }) {
                                 value={denunciante.provincia}
                                 onChange={handleDenuncianteChange}
                                 placeholder="Provincia"
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
                             />
                         </div>
                         <div className="space-y-1">
@@ -296,7 +296,7 @@ export default function StepDenunciante({ onNext, onPrev }) {
                                 value={denunciante.distrito}
                                 onChange={handleDenuncianteChange}
                                 placeholder="Distrito"
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
                             />
                         </div>
                     </motion.div>
@@ -314,7 +314,7 @@ export default function StepDenunciante({ onNext, onPrev }) {
                                 onChange={handleDenuncianteDigits("celular", 9)}
                                 inputMode="numeric"
                                 placeholder="987654321"
-                                className="w-full p-3 pl-12 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                className="w-full p-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
                             />
                             <div className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs ${
                                 denunciante.celular?.length === 9 ? 'text-gray-500' : 'text-gray-400'
@@ -334,9 +334,41 @@ export default function StepDenunciante({ onNext, onPrev }) {
                             value={denunciante.correo}
                             onChange={handleDenuncianteChange}
                             placeholder="correo@gmail.com"
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
                         />
                     </motion.div>
+                    <div>
+                        <motion.div variants={itemVariants} className="space-y-1 md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700">
+                                Sexo <span className="text-red-500">*</span>
+                            </label>
+                            <div className="flex items-center gap-6">
+                                <label className={`inline-flex items-center cursor-pointer ${denunciante.sexo === 'M' ? 'text-muni-primary' : 'text-gray-700'}`}>
+                                    <input
+                                        type="radio"
+                                        name="sexo"
+                                        value="M"
+                                        checked={denunciante.sexo === 'M'}
+                                        onChange={handleDenuncianteChange}
+                                        className="form-radio h-4 w-4 text-muni-primary focus:ring-muni-primary"
+                                    />
+                                    <span className="ml-2">Masculino</span>
+                                </label>
+
+                                <label className={`inline-flex items-center cursor-pointer ${denunciante.sexo === 'F' ? 'text-muni-primary' : 'text-gray-700'}`}>
+                                    <input
+                                        type="radio"
+                                        name="sexo"
+                                        value="F"
+                                        checked={denunciante.sexo === 'F'}
+                                        onChange={handleDenuncianteChange}
+                                        className="form-radio h-4 w-4 text-muni-primary focus:ring-muni-primary"
+                                    />
+                                    <span className="ml-2">Femenino</span>
+                                </label>
+                            </div>
+                        </motion.div>
+                    </div>
                 </>
             )}
 
@@ -369,7 +401,7 @@ export default function StepDenunciante({ onNext, onPrev }) {
                     className={`cursor-pointer flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition ${
                         !isStepDenuncianteValid
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                            : "bg-blue-600 text-white hover:bg-blue-700"
+                            : "bg-muni-secondary text-white hover:bg-muni-primary"
                     }`}
                 >
                     <span>Enviar denuncia</span>

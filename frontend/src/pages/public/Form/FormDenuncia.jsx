@@ -73,7 +73,7 @@ export const FormDenuncia = () => {
                                 {index < steps.length - 1 && (
                                     <div className={`
                                         absolute top-7 left-1/2 w-full h-[2px]
-                                        ${isCompleted ? 'bg-blue-500' : 'bg-gray-200'}
+                                        ${isCompleted ? 'bg-muni-primary' : 'bg-gray-200'}
                                     `} />
                                 )}
 
@@ -82,9 +82,9 @@ export const FormDenuncia = () => {
                                     w-16 h-16 rounded-full flex items-center justify-center
                                     relative z-10 transition-all duration-300
                                     ${isActive 
-                                        ? 'bg-blue-600 text-white ring-4 ring-blue-100' 
+                                        ? 'bg-muni-primary text-white ring-4 ring-blue-100' 
                                         : isCompleted
-                                            ? 'bg-blue-500 text-white'
+                                            ? 'bg-muni-primary text-white'
                                             : 'bg-white text-gray-400 border-2 border-gray-200'}
                                 `}>
                                     {isCompleted ? (
@@ -119,7 +119,7 @@ export const FormDenuncia = () => {
                                 >
                                     <h3 className={`
                                         text-sm font-medium mb-1
-                                        ${isActive ? 'text-blue-600' : 'text-gray-600'}
+                                        ${isActive ? 'text-muni-primary' : 'text-gray-600'}
                                     `}>
                                         {step.title}
                                     </h3>
