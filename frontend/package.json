@@ -13,7 +13,7 @@
     "@stepperize/react": "5.1.6",
     "@tailwindcss/vite": "4.1.11",
     "axios": "1.11.0",
-    "dialca-ui": "1.1.0",
+    "dialca-ui": "1.1.1",
     "framer-motion": "12.23.12",
     "react": "19.1.1",
     "react-dom": "19.1.1",

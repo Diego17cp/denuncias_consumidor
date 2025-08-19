@@ -1,16 +1,22 @@
 import  logo  from "../assets/logo.jpeg"
 import { Link } from "react-router";
+import { Modal } from "dialca-ui"
 // import { ConfirmLogout } from "./Admin/ConfirmLogout";
 import { useHeader } from "../hooks/useHeader";
+import { useAuth } from "../hooks/admin/useAuth";
+
 
 const Header = () => {
 	const {
 		isFormPage,
 		isAdminSection,
-		// showLogoutModal,
+		showLogoutModal,
 		openLogoutModal,
-		// closeLogoutModal,
+		closeLogoutModal,
 	} = useHeader();
+	const {
+		confirmLogout
+	} = useAuth();
 
 	return (
 		<header className="header shadow-md w-full bg-white py-4 px-4">
@@ -53,11 +59,33 @@ const Header = () => {
 							Volver al Formulario
 						</Link>
 					)}
-					{/* {showLogoutModal && (
-						<ConfirmLogout
-							onCancel={closeLogoutModal}
-						/>
-					)} */}
+					{showLogoutModal && (
+					<Modal
+						title="Confirmar Cierre de Sesión"
+						isOpen={showLogoutModal}
+						onClose={closeLogoutModal}
+						size="xl"
+						classes={{
+							closeButton: "cursor-pointer"
+						}}
+					>
+						<p className="text-lg text-center text-gray-800 font-bold my-4">¿Estás seguro de que deseas cerrar sesión?</p>
+						<div className="flex justify-center mt-6 gap-3">
+							<button
+								onClick={closeLogoutModal}
+								className="px-4 py-2 bg-white border border-gray-200 text-sm rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 transition duration-300 ease-in-out cursor-pointer"
+							>
+								Cancelar
+							</button>
+							<button
+								onClick={() => confirmLogout("s")}
+								className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 transition duration-300 ease-in-out cursor-pointer"
+							>
+								Confirmar
+							</button>
+						</div>
+					</Modal>
+				)}
 				</div>
 			</nav>
 		</header>
