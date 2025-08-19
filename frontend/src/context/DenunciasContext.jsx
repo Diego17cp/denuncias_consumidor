@@ -234,7 +234,7 @@ export function DenunciasProvider({ children }) {
 			descripcion: descripcion,
 			lugar: lugar,
 			fecha_incidente: fecha,
-			es_anonimo: anonimo,
+			es_anonimo: anonimo ? "1" : "0",
 		};
 		formData.append("denuncia", JSON.stringify(denunciaData));
 		for (const file of files) formData.append("adjuntos[]", file);
@@ -277,7 +277,7 @@ export function DenunciasProvider({ children }) {
 					? denunciante.dni
 					: null,
 			tipo_documento: tipoDocumento,
-			direccion: denunciante.direccion,
+			direccion: denunciante.domicilio,
 			celular:
 				denunciante.celular.length === 9 ? denunciante.celular : null,
 			distrito: denunciante.distrito,
@@ -292,14 +292,14 @@ export function DenunciasProvider({ children }) {
 		);
 		// Enviar la denuncia
 		try {
-			setIsSubmitting(true);
+			// setIsSubmitting(true);
 			const response = await axios.post(
 				`${API_BASE_URL}/denuncias`,
 				formData
 			);
 			if (response.data.success || response.status === 200) {
 				const data = response.data
-				setTrackingCode(data.tracking_code)
+				// setTrackingCode(data.tracking_code)
 				toast.success(data.message || "Denuncia enviada exitosamente");
 				return true
 			}
@@ -312,7 +312,7 @@ export function DenunciasProvider({ children }) {
 			toast.error("Error al enviar la denuncia");
 			return false
 		} finally {
-			setIsSubmitting(false);
+			// setIsSubmitting(false);
 		}
 	};
 
