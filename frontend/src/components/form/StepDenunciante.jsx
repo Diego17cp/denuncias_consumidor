@@ -1,7 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useDenuncias } from "../../context/DenunciasContext";
 import { FaUser, FaBuilding, FaAddressCard, FaUserSecret } from "react-icons/fa"; // Icono para anónimo
-
+import { TbGenderDemigirl } from "react-icons/tb";
+import { TbGenderDemiboy } from "react-icons/tb";
 export default function StepDenunciante({ onNext, onPrev }) {
     const {
         tipoDocumento,
@@ -340,34 +341,90 @@ export default function StepDenunciante({ onNext, onPrev }) {
                         />
                     </motion.div>
                     <div>
-                        <motion.div variants={itemVariants} className="space-y-1 md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700">
+                        <motion.div variants={itemVariants} className="space-y-3 md:col-span-2">
+                            <label className="block text-sm font-semibold text-gray-800">
                                 Sexo <span className="text-red-500">*</span>
                             </label>
-                            <div className="flex items-center gap-6">
-                                <label className={`inline-flex items-center cursor-pointer ${denunciante.sexo === 'M' ? 'text-muni-primary' : 'text-gray-700'}`}>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {/* Opción Masculino */}
+                                <div
+                                    className={`relative rounded-xl p-4 border-2 cursor-pointer transition-all duration-300 ${denunciante.sexo === 'M'
+                                            ? 'border-muni-primary bg-muni-primary/5 shadow-md'
+                                            : 'border-gray-300 hover:border-gray-400'
+                                        }`}
+                                    onClick={() => handleDenuncianteChange({ target: { name: 'sexo', value: 'M' } })}
+                                >
+                                    <div className="flex items-center">
+                                        <div className={`flex-shrink-0 h-5 w-5 rounded-full border-2 flex items-center justify-center mr-3 ${denunciante.sexo === 'M'
+                                                ? 'border-muni-primary bg-muni-primary'
+                                                : 'border-gray-400'
+                                            }`}>
+                                            {denunciante.sexo === 'M' && (
+                                                <div className="h-2 w-2 rounded-full bg-white"></div>
+                                            )}
+                                        </div>
+
+                                        <div className="flex items-center">
+                                            <TbGenderDemiboy 
+                                            className={`h-6 w-6 mr-2 ${denunciante.sexo === 'M' ? 'text-muni-primary' : 'text-gray-500'
+                                                }`}
+                                            />
+                                            <span className={`font-medium ${denunciante.sexo === 'M' ? 'text-muni-primary' : 'text-gray-700'
+                                                }`}>
+                                                Masculino
+                                            </span>
+                                        </div>
+                                    </div>
+
                                     <input
                                         type="radio"
                                         name="sexo"
                                         value="M"
                                         checked={denunciante.sexo === 'M'}
                                         onChange={handleDenuncianteChange}
-                                        className="form-radio h-4 w-4 text-muni-primary focus:ring-muni-primary"
+                                        className="absolute opacity-0 h-0 w-0"
                                     />
-                                    <span className="ml-2">Masculino</span>
-                                </label>
+                                </div>
+                                {/* Opción Femenino */}
+                                <div
+                                    className={`relative rounded-xl p-4 border-2 cursor-pointer transition-all duration-300 ${denunciante.sexo === 'F'
+                                            ? 'border-muni-primary bg-muni-primary/5 shadow-md'
+                                            : 'border-gray-300 hover:border-gray-400'
+                                        }`}
+                                    onClick={() => handleDenuncianteChange({ target: { name: 'sexo', value: 'F' } })}
+                                >
+                                    <div className="flex items-center">
+                                        <div className={`flex-shrink-0 h-5 w-5 rounded-full border-2 flex items-center justify-center mr-3 ${denunciante.sexo === 'F'
+                                                ? 'border-muni-primary bg-muni-primary'
+                                                : 'border-gray-400'
+                                            }`}>
+                                            {denunciante.sexo === 'F' && (
+                                                <div className="h-2 w-2 rounded-full bg-white"></div>
+                                            )}
+                                        </div>
 
-                                <label className={`inline-flex items-center cursor-pointer ${denunciante.sexo === 'F' ? 'text-muni-primary' : 'text-gray-700'}`}>
+                                        <div className="flex items-center">
+                                            <TbGenderDemigirl 
+                                            className={`h-6 w-6 mr-2 ${denunciante.sexo === 'F' ? 'text-muni-primary' : 'text-gray-500'
+                                                }`}
+                                            />
+                                            <span className={`font-medium ${denunciante.sexo === 'F' ? 'text-muni-primary' : 'text-gray-700'
+                                                }`}>
+                                                Femenino
+                                            </span>
+                                        </div>
+                                    </div>
+
                                     <input
                                         type="radio"
                                         name="sexo"
                                         value="F"
                                         checked={denunciante.sexo === 'F'}
                                         onChange={handleDenuncianteChange}
-                                        className="form-radio h-4 w-4 text-muni-primary focus:ring-muni-primary"
+                                        className="absolute opacity-0 h-0 w-0"
                                     />
-                                    <span className="ml-2">Femenino</span>
-                                </label>
+                                </div>
                             </div>
                         </motion.div>
                     </div>
