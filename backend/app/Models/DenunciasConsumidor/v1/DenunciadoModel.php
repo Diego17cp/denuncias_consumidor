@@ -23,6 +23,7 @@ class DenunciadoModel extends Model
         'tipo_documento',
         'direccion',   
         'celular',
+        "lugar"
     ];
 
     // Fechas 
@@ -41,6 +42,7 @@ class DenunciadoModel extends Model
         'documento'      => 'required|min_length[8]|max_length[20]',
         'representante_legal' => 'permit_empty|max_length[255]',
         'razon_social'   => 'permit_empty|max_length[255]',
+        //'lugar'          => 'permit_empty|max_length[50]'
     ];
 
     protected $validationMessages = [
@@ -70,6 +72,9 @@ class DenunciadoModel extends Model
         'razon_social' => [
             'max_length' => 'El campo {field} no puede exceder {param} caracteres.'
         ]
+        // 'lugar' => [
+        //     'max_length' => 'El campo {field} no puede exceder {param} caracteres.'
+        // ]
     ];
 
     protected $skipValidation       = false;

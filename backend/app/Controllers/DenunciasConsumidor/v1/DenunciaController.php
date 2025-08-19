@@ -106,26 +106,30 @@ class DenunciaController extends ResourceController
             
             $denunciadoId = null;
             if (!empty($input['d1nombre'])) {
-                $this->denunciadosModel->insert([
-                    'nombre'         => $input['d1nombre'],
-                    'tipo_documento' => $input['d1tipo_documento'] ?? null,
-                    'documento'      => $input['d1documento'] ?? null,
-                    'direccion'      => $input['d1direccion'] ?? null,
-                    'telefono'       => $input['d1telefono'] ?? null
-                ]);
 
-                $denunciadoId = $this->denunciadosModel->getInsertID();
+                $denunciado = $this->denunciadosModel
+                    ->where('documento', $input['d1documento'])
+                    ->first();
+
+                if($denunciado){
+                    //Si ya existe, usar su ID
+                    $denunciadoId = $denunciado['id'];
+                } else {
+                    $this->denunciadosModel->insert([
+                        'nombre'         => $input['d1nombre'],
+                        'tipo_documento' => $input['d1tipo_documento'] ?? null,
+                        'documento'      => $input['d1documento'] ?? null,
+                        'direccion'      => $input['d1direccion'] ?? null,
+                        'telefono'       => $input['d1telefono'] ?? null
+                    ]);
+
+                    $denunciadoId = $this->denunciadosModel->getInsertID();
+                }                   
             }
 
             $denuncianteId = null;
-
             if ((int)($input['es_anonimo'] ?? 0) === 1) {
-                $this->denunciantesModel->skipValidation(true)->insert([
-                    'nombre' => 'ANONIMO'
-                ]);
-
-                $denuncianteId = $this->denunciantesModel->getInsertID();
-
+                $denuncianteId = null;
             } else {
                 
                 if (!empty($input['documento'])) {
@@ -148,7 +152,8 @@ class DenunciaController extends ResourceController
                             'distrito'      => $input['distrito'] ?? null,
                             'provincia'     => $input['provincia'] ?? null,
                             'departamento'  => $input['departamento'] ?? null,
-                            'direccion'     => $input['direccion'] ?? null  
+                            'direccion'     => $input['direccion'] ?? null, 
+                            //'lugar'          => $input['lugar'] ?? null
                         ], true);
 
                         
@@ -177,17 +182,46 @@ class DenunciaController extends ResourceController
                 throw new \Exception("Error en validación");
             }
 
-            // 📌 4. Guardar adjuntos (si los hay)
             $files = $this->request->getFiles();
+
             if (isset($files['adjuntos'])) {
+                // Validar máximo 10 archivos
+                if (count($files['adjuntos']) > 10) {
+                    throw new \Exception("No se permiten más de 10 archivos adjuntos");
+                }
+
                 $uploadPath = FCPATH . 'denuncias/' . $denunciaId;
                 if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
 
+                // Tipos permitidos
+                $allowedTypes = [
+                    // imágenes
+                    'image/jpeg', 'image/png', 'image/webp', 'image/avif',
+                    // documentos
+                    'application/pdf',
+                    'application/msword', // .doc
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+                    'text/plain',
+                    // audio
+                    'audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/x-m4a',
+                    // video
+                    'video/mp4', 'video/x-msvideo', 'video/avi', 'video/mpeg', 'video/ogg', 'video/webm',
+                    'application/zip', 'application/x-zip-compressed'
+                ];
+
                 foreach ($files['adjuntos'] as $file) {
                     if ($file->isValid() && !$file->hasMoved()) {
-                        if (!in_array($file->getClientMimeType(), ['image/jpeg','image/png','application/pdf'])) {
-                            throw new \Exception("Tipo de archivo no permitido");
+
+                        // Validar tamaño máximo 20MB
+                        if ($file->getSize() > 20 * 1024 * 1024) {
+                            throw new \Exception("El archivo {$file->getClientName()} excede el límite de 20MB");
                         }
+
+                        // Validar tipo de archivo
+                        if (!in_array($file->getClientMimeType(), $allowedTypes)) {
+                            throw new \Exception("Tipo de archivo no permitido: {$file->getClientMimeType()}");
+                        }
+
                         $newName = $file->getRandomName();
                         $file->move($uploadPath, $newName);
 
@@ -228,9 +262,8 @@ class DenunciaController extends ResourceController
         }
     }
 
-    /**
-     * Consultar seguimientos por código de tracking
-     */
+    
+     //Consultar seguimientos por código de tracking
     public function query($code)
     {
         $denuncia = $this->denunciasModel->where('tracking_code', $code)->first();
