@@ -28,18 +28,6 @@ class DenunciaController extends ResourceController
         $this->adjuntoModel = new AdjuntoModel();
     }
 
-    /**
-     * Genera un código de seguimiento único
-     */
-    private function generateTrackingCode()
-    {
-        do {
-            $trackingCode = 'TD' . strtoupper(bin2hex(random_bytes(4))); // 8 caracteres hexadecimales
-        } while ($this->denunciasModel->where('tracking_code', $trackingCode)->first());
-
-        return $trackingCode;
-    }
-
     public function index()
     {
         $denuncias = $this->denunciasModel->findAll();
