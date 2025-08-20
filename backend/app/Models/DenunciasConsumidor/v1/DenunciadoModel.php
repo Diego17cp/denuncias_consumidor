@@ -74,4 +74,8 @@ class DenunciadoModel extends Model
 
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;
+    public function getByDocument(string $doc)
+    {
+        return $this->where('documento', $doc)->first();
+    }
 }
