@@ -15,6 +15,8 @@ export function DenunciasProvider({ children }) {
 	const [fecha, setFecha] = useState("");
 	const [files, setFiles] = useState([]);
 	const [error, setError] = useState("");
+	const [trackingCode, setTrackingCode] = useState("");
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	// Lógica de archivos
 	const totalSize = files.reduce(
@@ -299,7 +301,7 @@ export function DenunciasProvider({ children }) {
 			);
 			if (response.data.success || response.status === 200) {
 				const data = response.data
-				// setTrackingCode(data.tracking_code)
+				setTrackingCode(data.tracking_code)
 				toast.success(data.message || "Denuncia enviada exitosamente");
 				return true
 			}
@@ -312,7 +314,7 @@ export function DenunciasProvider({ children }) {
 			toast.error("Error al enviar la denuncia");
 			return false
 		} finally {
-			// setIsSubmitting(false);
+			setIsSubmitting(false);
 		}
 	};
 
@@ -354,6 +356,8 @@ export function DenunciasProvider({ children }) {
 				isStepDenunciadoValid,
 				isStepDenuncianteValid,
 				handleSubmit,
+				isSubmitting,
+				trackingCode
 			}}
 		>
 			{children}
