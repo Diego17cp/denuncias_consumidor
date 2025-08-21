@@ -12,7 +12,17 @@ const getFormattedNameDNI = (apellidoPaterno, apellidoMaterno, nombres) => {
     const sep = maternalInitial ? `${maternalInitial}, ` : ''
     return `${apellidoPaterno} ${sep}${namePart}`
 }
+const formatDate = (date) => {
+	if (!date) return "";
+
+	const day = date.getDate().toString().padStart(2, "0");
+	const month = (date.getMonth() + 1).toString().padStart(2, "0");
+	const year = date.getFullYear();
+
+	return `${day}/${month}/${year}`;
+};
 
 export {
-    getFormattedNameDNI
+    getFormattedNameDNI,
+    formatDate
 }
