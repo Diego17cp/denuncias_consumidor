@@ -13,6 +13,9 @@ import { DenunciasProvider } from "./context/DenunciasContext";
 import { AuthProvider } from "./context/AuthContext";
 import { Dashboard } from "./pages/admin/Dashboard";
 import { ProtectedRoute } from "./components/admin/ProtectedRoute";
+import { Usuarios } from "./pages/admin/Usuarios";
+import { AdminsHistorial } from "./pages/admin/AdminsHistorial";
+import { Denuncias } from "./pages/admin/denucias/Denuncias";
 
 // Paginas Admin
 const Login = lazy(() => import("./pages/admin/Login"));
@@ -75,6 +78,9 @@ function App() {
 										path="dashboard"
 										element={<Dashboard />}
 									/>
+									<Route path="usuarios" element={<Usuarios />} />
+									<Route path="historial" element={<AdminsHistorial />} /> 
+									<Route path="denuncias" element={<Denuncias />} />
 								</Route>
 							</Route>
 							<Route path="/admin/login" element={<Login />} />
