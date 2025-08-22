@@ -174,7 +174,7 @@ class DenunciaModel extends Model
             ], true);
             if (!$denunciaID) {
                 $db->transRollback();
-                log_message('ERROR', 'Error de validación al registrar denuncia: ' . json_encode($this->errors()));
+                log_message('error', 'Error de validación al registrar denuncia: ' . json_encode($this->errors()));
                 return ['success' => false, 'errors' => $this->errors()];
             }
             if (isset($files['adjuntos'])) {
@@ -233,7 +233,7 @@ class DenunciaModel extends Model
             ];
         } catch (\Throwable $e) {
             $db->transRollback();
-            log_message('ERROR', 'Error al crear denuncia: ' . $e->getMessage());
+            log_message('error', 'Error al crear denuncia: ' . $e->getMessage());
             return [
                 'success' => false,
                 'message' => 'Error al procesar la denuncia: ' . $e->getMessage(),
