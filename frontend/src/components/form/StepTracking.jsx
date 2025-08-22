@@ -8,7 +8,6 @@ import { toast } from "sonner";
 import { Loader } from "dialca-ui"
 
 const TrackingCodeScreen = () => {
-  // const { trackingCode } = useTrackingCode();
   const {
     trackingCode,
     descripcion,
@@ -49,7 +48,6 @@ const TrackingCodeScreen = () => {
   }
   const handleDownload = () => {
 		setIsDownloading(true);
-
 		try {
 			generarDenunciaPDF(formData);
 
@@ -63,7 +61,9 @@ const TrackingCodeScreen = () => {
 			toast.error("Ocurrió un error al generar PDF");
 			setIsDownloading(false);
 		} finally {
-			setIsDownloading(false);
+      setTimeout(() => {
+        setIsDownloading(false);
+      }, 3000);
 		}
 	};
   
@@ -95,24 +95,19 @@ const TrackingCodeScreen = () => {
           </div>
           <button
             onClick={handleCopy}
-            className="cursor-pointer flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 border border-blue-600 dark:border-blue-400 rounded-md transition duration-150 ease-in-out mx-auto mb-2 w-full"
+            className={`cursor-pointer flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium  rounded-md transition duration-300 ease-in-out mx-auto mb-2 w-full
+              ${copied ? "bg-green-300 text-green-900" : "text-blue-600 hover:text-blue-800 border border-blue-600"}`}
             title="Copiar código"
           >
             <HiOutlineClipboardCheck className="text-lg" />
-            <span>Copiar código</span>
+            <span>{copied ? "¡Código copiado en el portapapeles!" : "Copiar código"}</span>
           </button>
-
-          {/* notificación de copiado */}
-          {copied && (
-            <p className="text-green-600 pb-2 dark:text-green-400 text-sm mt-2">
-              ¡Código copiado en el portapapeles!
-            </p>
-          )}
         </div>
 
         <button
           type="button"
-          className="cursor-pointer flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold bg-blue-600 text-white shadow hover:bg-blue-700 transition w-full"
+          disabled={isDownloading}
+          className="cursor-pointer flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold bg-blue-600 text-white shadow hover:bg-blue-700 transition w-full disabled:cursor-not-allowed disabled:bg-blue-200"
           onClick={handleDownload}
         >
           {isDownloading ? (
