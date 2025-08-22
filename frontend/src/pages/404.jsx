@@ -19,7 +19,7 @@ export default function NotFound() {
                 </p>
 
 
-                <div className="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">
+                <div className="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center grid grid-cols-1 sm:grid-cols-2">
                     <button
                         onClick={() => window.history.back()}
                         className="cursor-pointer px-6 py-3 bg-[#002f59] text-white font-semibold rounded-lg shadow-lg hover:bg-[#002f59] transition-all transform hover:-translate-y-1 flex items-center justify-center"
