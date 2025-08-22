@@ -39,48 +39,57 @@ class AdminsController extends ResourceController
         $this->AuthController = new AuthController();
     }
 
-
     private function authAdmin()
-{
-    $token = get_cookie('access_token');
+    {
+        $token = get_cookie('access_token');
 
-    if (!$token) {
-        return $this->respond(['error' => 'No autenticado'], 401);
-    }
-
-    try {
-        $decoded = verifyJWT($token);
-
-        if (!isset($decoded->data->dni)) {
-            return $this->respond(['error' => 'Token inválido'], 401);
+        if (!$token) {
+            return $this->respond(['error' => 'No autenticado'], 401);
         }
 
-        // Buscar el admin en la BD
-        $adminModel = new \App\Models\DenunciasConsumidor\v1\AdministradorModel();
-        $admin = $adminModel->where('dni', $decoded->data->dni)->first();
+        try {
+            $decoded = verifyJWT($token);
 
-        if (!$admin) {
-            return $this->respond(['error' => 'Admin no encontrado'], 404);
+            if (!isset($decoded->data->dni)) {
+                return $this->respond(['error' => 'Token inválido'], 401);
+            }
+
+            // Buscar el admin en la BD
+            $adminModel = new \App\Models\DenunciasConsumidor\v1\AdministradorModel();
+            $admin = $adminModel->where('dni', $decoded->data->dni)->first();
+
+            if (!$admin) {
+                return $this->respond(['error' => 'Admin no encontrado'], 404);
+            }
+
+            return $admin; 
+
+
+        } catch (\Throwable $e) {
+            return $this->respond(['error' => 'Token inválido: ' . $e->getMessage()], 401);
         }
-
-        return $admin; // ahora regresas todo el registro
-
-
-    } catch (\Throwable $e) {
-        return $this->respond(['error' => 'Token inválido: ' . $e->getMessage()], 401);
     }
-}
-    // =========================
-    //  Funciones de denuncias
-    // =========================
 
+    
+    private function isSuperAdmin($admin)
+    {
+        return isset($admin['rol']) && $admin['rol'] === 'super_admin';
+    }
+
+    private function isAdmin($admin)
+    {
+        return isset($admin['rol']) && $admin['rol'] === 'admin';
+    }
+
+
+    //==========================
+    // Funciones de ADMINs
+    //==========================
+    
     public function receiveAdmin()
     {
-        //$dni_admin = $this->authAdmin();
+        
         $admin = $this->authAdmin();
-        // if (!is_string($dni_admin)) {
-        //     return $dni_admin;
-        // }
         if (is_object($admin)) return $admin;
 
         $input = $this->request->getJSON(true); 
@@ -122,9 +131,8 @@ class AdminsController extends ResourceController
 
     public function procesosDenuncia()
     {
-        //$dni_admin = $this->authAdmin();
+
         $admin = $this->authAdmin();
-        //if (is_object($dni_admin)) return $dni_admin;
         if (is_object($admin)) return $admin;
 
         $input = $this->request->getJSON(true); // <-- leer JSON
@@ -174,8 +182,8 @@ class AdminsController extends ResourceController
 
     public function searchDenuncias($documento = null)
     {
-        $dni_admin = $this->authAdmin();
-        if (is_object($dni_admin)) return $dni_admin;
+        $admin = $this->authAdmin();
+        if (is_object($admin)) return $admin;
 
         if (empty($documento)) {
             return $this->fail(['message' => 'Falta el parámetro documento']);
@@ -192,8 +200,8 @@ class AdminsController extends ResourceController
 
     public function searchDenunciasByDenuncianteId($denuncianteId = null)
     {
-        $dni_admin = $this->authAdmin();
-        if (is_object($dni_admin)) return $dni_admin;
+        $admin = $this->authAdmin();
+        if (is_object($admin)) return $admin;
 
         if (empty($denuncianteId)) {
             return $this->fail(['message' => 'Falta el parámetro denunciante_id']);
@@ -210,7 +218,7 @@ class AdminsController extends ResourceController
 
 
     // =========================
-    // Funciones de ADMINS
+    // Funciones de SUPER ADMINS
     // =========================
     public function getAdministradores()
     {
@@ -225,6 +233,13 @@ class AdminsController extends ResourceController
     
     public function createAdministrador()
     {
+        $admin = $this->authAdmin();
+        if (is_object($admin)) return $admin; 
+
+        if (!$this->isSuperAdmin($admin)) {
+            return $this->fail(['error' => 'No tienes permisos para crear administradores'], 403);
+        }
+
         $input = $this->request->getJSON(true);
 
         $adminData = [
@@ -258,6 +273,13 @@ class AdminsController extends ResourceController
 
     public function updateAdministrador($dni = null)
     {
+        $admin = $this->authAdmin();
+        if (is_object($admin)) return $admin; 
+
+        if (!$this->isSuperAdmin($admin)) {
+            return $this->fail(['error' => 'No tienes permisos para actualizar administradores'], 403);
+        }
+
         $input = $this->request->getJSON(true);
 
         // Verificar si el admin existe por DNI
@@ -293,6 +315,13 @@ class AdminsController extends ResourceController
 
     public function deleteAdministrador($dni)
     {
+        $admin = $this->authAdmin();
+        if (is_object($admin)) return $admin; 
+
+        if (!$this->isSuperAdmin($admin)) {
+            return $this->fail(['error' => 'No tienes permisos para eliminar administradores'], 403);
+        }
+
         if (!$dni) {
             return $this->fail(['error' => 'Debe proporcionar un DNI'], 400);
         }
@@ -315,32 +344,46 @@ class AdminsController extends ResourceController
     }
 
     public function deleteAdministradorById($id)
-{
-    if (!$id) {
-        return $this->fail(['error' => 'Debe proporcionar un ID'], 400);
-    }
+    {
+        $admin = $this->authAdmin();
+        if (is_object($admin)) return $admin; 
 
-    $admin = $this->adminModel->find($id);
-    if (!$admin) {
-        return $this->fail(['error' => 'Administrador no encontrado'], 404);
-    }
+        if (!$this->isSuperAdmin($admin)) {
+            return $this->fail(['error' => 'No tienes permisos para eliminar administradores'], 403);
+        }
 
-    if ($this->adminModel->delete($id)) {
-        return $this->respondDeleted([
-            'message' => 'Administrador eliminado correctamente',
-            'id'      => $id
-        ]);
-    }
+        if (!$id) {
+            return $this->fail(['error' => 'Debe proporcionar un ID'], 400);
+        }
 
-    return $this->fail([
-        'error' => 'No se pudo eliminar el administrador'
-    ], 500);
-}
+        $admin = $this->adminModel->find($id);
+        if (!$admin) {
+            return $this->fail(['error' => 'Administrador no encontrado'], 404);
+        }
+
+        if ($this->adminModel->delete($id)) {
+            return $this->respondDeleted([
+                'message' => 'Administrador eliminado correctamente',
+                'id'      => $id
+            ]);
+        }
+
+        return $this->fail([
+            'error' => 'No se pudo eliminar el administrador'
+        ], 500);
+    }
 
 
 
     public function searchAdminByDNI($dni = null)
     {
+        $admin = $this->authAdmin();
+        if (is_object($admin)) return $admin; 
+
+        if (!$this->isSuperAdmin($admin)) {
+            return $this->fail(['error' => 'No tienes permisos para buscar administradores'], 403);
+        }
+
         if (!$dni) {
             return $this->response->setJSON(['error' => 'DNI no proporcionado'])->setStatusCode(400);
         }
@@ -354,6 +397,18 @@ class AdminsController extends ResourceController
 
     public function searchAdminById($id)
     {
+        
+        $admin = $this->authAdmin();
+        if (is_object($admin)) return $admin;
+
+        if (!$this->isSuperAdmin($admin)) {
+            return $this->fail(['error' => 'No tienes permisos para buscar administradores'], 403);
+        }
+
+        if (!$id) {
+            return $this->response->setJSON(['error' => 'ID no proporcionado'])->setStatusCode(400);
+        }
+        
         $admin = $this->adminModel->find($id);
 
         if (!$admin) {
@@ -385,12 +440,14 @@ class AdminsController extends ResourceController
     //     return $this->email->send();
     // }
 
-    // Tu método privado de enviar correo
+    //====================================
+    // METODO PRIVADO PARA ENVIO DE CORREO
+    //==================================== 
     private function enviarCorreo($correo, $code, $estado, $comentario)
     {
         $email = \Config\Services::email();
 
-        $email->setFrom('anaga123op@gmail.com', 'AÑA');
+        $email->setFrom('anaga123op@gmail.com', 'Municipalidad Distrital de José Leonardo Ortiz');
         $email->setTo($correo);
         $email->setSubject('Código de Seguimiento de Denuncia');
 
