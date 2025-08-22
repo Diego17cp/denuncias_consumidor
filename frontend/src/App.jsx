@@ -16,6 +16,7 @@ import { ProtectedRoute } from "./components/admin/ProtectedRoute";
 import { Usuarios } from "./pages/admin/Usuarios";
 import { AdminsHistorial } from "./pages/admin/AdminsHistorial";
 import { Denuncias } from "./pages/admin/denucias/Denuncias";
+import NotFound from "./pages/404";
 
 // Paginas Admin
 const Login = lazy(() => import("./pages/admin/Login"));
@@ -84,6 +85,7 @@ function App() {
 								</Route>
 							</Route>
 							<Route path="/admin/login" element={<Login />} />
+							<Route path="*" element={<NotFound />} />
 						</Routes>
 					</Suspense>
 					<Toaster richColors closeButton />

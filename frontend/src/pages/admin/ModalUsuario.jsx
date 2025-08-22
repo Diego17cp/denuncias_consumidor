@@ -28,7 +28,7 @@ export default function ModalUsuario({
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-300">
             <div 
-                className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 opacity-100 scale-100"
+                className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 transform transition-all duration-300 opacity-100 scale-100"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header del modal */}
@@ -51,7 +51,7 @@ export default function ModalUsuario({
                     </div>
                     <button
                         onClick={closeModal}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200 cursor-pointer"
                         aria-label="Cerrar modal"
                     >
                         <X className="h-5 w-5 text-gray-500 hover:text-gray-700" />
@@ -70,7 +70,7 @@ export default function ModalUsuario({
                                     value={formData.dni}
                                     onChange={handleInputChange}
                                     required
-                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none transition-all duration-200"
                                     placeholder="Ingrese el DNI"
                                 />
                             </div>
@@ -79,11 +79,11 @@ export default function ModalUsuario({
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Nombre Completo</label>
                                 <input
                                     type="text"
-                                    name="nombreCompleto"
-                                    value={formData.nombreCompleto}
+                                    name="nombre"
+                                    value={formData.nombre}
                                     onChange={handleInputChange}
                                     required
-                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none transition-all duration-200"
                                     placeholder="Nombre completo del usuario"
                                 />
                             </div>
@@ -97,7 +97,7 @@ export default function ModalUsuario({
                                         value={formData.password}
                                         onChange={handleInputChange}
                                         required
-                                        className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                        className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none transition-all duration-200"
                                         placeholder="Cree una contraseña segura"
                                     />
                                     <button
@@ -120,7 +120,7 @@ export default function ModalUsuario({
                                         value={formData.confirmPassword}
                                         onChange={handleInputChange}
                                         required
-                                        className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                        className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none transition-all duration-200"
                                         placeholder="Confirme la contraseña"
                                     />
                                     <button
@@ -140,7 +140,7 @@ export default function ModalUsuario({
                                     name="rol"
                                     value={formData.rol}
                                     onChange={handleInputChange}
-                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none transition-all duration-200 bg-white"
                                 >
                                     {roles.map(role => (
                                         <option key={role.value} value={role.value}>{role.label}</option>
