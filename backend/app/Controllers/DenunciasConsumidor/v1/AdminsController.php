@@ -253,18 +253,21 @@ class AdminsController extends ResourceController
         // Verificar si ya existe un administrador con ese DNI
         if (!empty($adminData['dni']) && $this->adminModel->getByDNI($adminData['dni'])) {
             return $this->fail([
+                'success' => false,
                 'error' => 'Ya existe un administrador con ese DNI'
             ], 400);
         }
 
         if ($this->adminModel->insert($adminData)) {
             return $this->respondCreated([
+                'success' => true,
                 'message' => 'Administrador registrado correctamente',
                 'id'      => $this->adminModel->getInsertID()
             ]);
         }
 
         return $this->fail([
+            'success' => false,
             'error' => 'Error al crear el administrador',
             'details' => $this->adminModel->errors()
         ], 500);
