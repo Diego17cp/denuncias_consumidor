@@ -39,7 +39,8 @@ class DenunciaController extends ResourceController
     {
         $data = $this->request->getPost();
         $files = $this->request->getFiles();
-        return $this->denunciasModel->createDenuncia($data, $files);
+        $result = $this->denunciasModel->createDenuncia($data, $files);
+        return $this->respond($result);
     }
 
 

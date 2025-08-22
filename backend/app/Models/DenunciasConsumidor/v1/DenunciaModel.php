@@ -233,7 +233,12 @@ class DenunciaModel extends Model
             ];
         } catch (\Throwable $e) {
             $db->transRollback();
-            return ['success' => false, 'errors' => $this->errors()];
+            log_message('ERROR', 'Error al crear denuncia: ' . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Error al procesar la denuncia: ' . $e->getMessage(),
+                'errors' => $this->errors()
+            ];
         }
     }
 
