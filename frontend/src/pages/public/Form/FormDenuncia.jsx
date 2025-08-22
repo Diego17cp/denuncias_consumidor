@@ -15,92 +15,88 @@ export const FormDenuncia = () => {
         { id: "complainant-data", title: "Denunciante", icon: <BsPersonVcardFill className="text-lg" /> },
         { id: "summary", title: "Resumen", icon: <FaClipboardCheck className="text-lg" /> }
     );
-    
+
     const stepper = useStepper();
-    const { isStepDetailsValid, isStepDenunciadoValid, isStepDenuncianteValid } = useDenuncias();
+    const {
+        isStepDetailsValid,
+        isStepDenunciadoValid,
+        isStepDenuncianteValid,
+        isDenunciaEnviada,
+        handleSubmit,
+        isSubmitting,
+    } = useDenuncias();
 
     const isStepEnabled = (stepId) => {
-        const order = steps.map(s => s.id);
+        const order = steps.map((s) => s.id);
         const currentIdx = order.indexOf(stepper.current.id);
         const stepIdx = order.indexOf(stepId);
-        
+
         if (stepIdx < currentIdx) return true;
         if (stepIdx === currentIdx) return true;
         if (stepId === "denounced-data") return isStepDetailsValid;
         if (stepId === "complainant-data") return isStepDetailsValid && isStepDenunciadoValid;
-        if (stepId === "summary") return isStepDetailsValid && isStepDenunciadoValid && isStepDenuncianteValid;
+        if (stepId === "summary") return isDenunciaEnviada; // Solo habilitar si la denuncia fue enviada
         return false;
     };
 
-    // const progress = ((steps.findIndex(s => s.id === stepper.current.id) + 1) / steps.length) * 100;
-
     return (
         <div className="mx-auto max-w-4xl mt-8">
-            {/* Stepper Mejorado */}
-            <div className=" p-4 mb-8">
-                {/* Barra de Progreso Superior */}
-                {/* <div className="flex items-center justify-between mb-8">
-                    <span className="text-blue-600 font-medium">Paso {steps.findIndex(s => s.id === stepper.current.id) + 1} de {steps.length}</span>
-                    <div className="flex-1 mx-4 h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <motion.div 
-                            className="h-full bg-gradient-to-r from-blue-500 to-blue-600"
-                            initial={{ width: "0%" }}
-                            animate={{ width: `${progress}%` }}
-                            transition={{ duration: 0.5 }}
-                        />
-                    </div>
-                    <span className="text-gray-500 font-medium">{Math.round(progress)}%</span>
-                </div> */}
-
-                {/* Pasos con Iconos */}
+            {/* Stepper */}
+            <div className="p-4 mb-8">
                 <div className="grid grid-cols-4 gap-4">
                     {steps.map((step, index) => {
                         const isActive = stepper.current.id === step.id;
-                        const isCompleted = steps.findIndex(s => s.id === stepper.current.id) > index;
+                        const isCompleted = steps.findIndex((s) => s.id === stepper.current.id) > index;
                         const enabled = isStepEnabled(step.id);
-                        
+
                         return (
                             <motion.div
                                 key={step.id}
                                 className={`
                                     relative flex flex-col items-center
-                                    ${enabled ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}
+                                    ${enabled ? "cursor-pointer" : "cursor-not-allowed opacity-60"}
                                 `}
                                 whileHover={enabled ? { scale: 1.02 } : {}}
                                 onClick={() => enabled && stepper.goTo(step.id)}
                             >
                                 {/* Línea conectora */}
                                 {index < steps.length - 1 && (
-                                    <div className={`
-                                        absolute top-7 left-1/2 w-full h-[2px]
-                                        ${isCompleted ? 'bg-muni-primary' : 'bg-gray-200'}
-                                    `} />
+                                    <div
+                                        className={`
+                                            absolute top-7 left-1/2 w-full h-[2px]
+                                            ${isCompleted ? "bg-muni-primary" : "bg-gray-200"}
+                                        `}
+                                    />
                                 )}
 
                                 {/* Círculo del paso */}
-                                <div className={`
-                                    w-16 h-16 rounded-full flex items-center justify-center
-                                    relative z-10 transition-all duration-300
-                                    ${isActive 
-                                        ? 'bg-muni-primary text-white ring-4 ring-blue-100' 
-                                        : isCompleted
-                                            ? 'bg-muni-primary text-white'
-                                            : 'bg-white text-gray-400 border-2 border-gray-200'}
-                                `}>
+                                <div
+                                    className={`
+                                        w-16 h-16 rounded-full flex items-center justify-center
+                                        relative z-10 transition-all duration-300
+                                        ${
+                                            isActive
+                                                ? "bg-muni-primary text-white ring-4 ring-blue-100"
+                                                : isCompleted
+                                                ? "bg-muni-primary text-white"
+                                                : "bg-white text-gray-400 border-2 border-gray-200"
+                                        }
+                                    `}
+                                >
                                     {isCompleted ? (
-                                        <motion.svg 
+                                        <motion.svg
                                             className="w-8 h-8"
                                             initial={{ scale: 0 }}
                                             animate={{ scale: 1 }}
                                             transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                                            fill="none" 
-                                            stroke="currentColor" 
+                                            fill="none"
+                                            stroke="currentColor"
                                             viewBox="0 0 24 24"
                                         >
-                                            <path 
-                                                strokeLinecap="round" 
-                                                strokeLinejoin="round" 
-                                                strokeWidth={2} 
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
                                                 d="M5 13l4 4L19 7"
                                             />
                                         </motion.svg>
@@ -110,17 +106,19 @@ export const FormDenuncia = () => {
                                 </div>
 
                                 {/* Título del paso */}
-                                <motion.div 
+                                <motion.div
                                     className="mt-4 text-center"
                                     animate={{
                                         scale: isActive ? 1.05 : 1,
-                                        fontWeight: isActive ? "600" : "normal"
+                                        fontWeight: isActive ? "600" : "normal",
                                     }}
                                 >
-                                    <h3 className={`
-                                        text-sm font-medium mb-1
-                                        ${isActive ? 'text-muni-primary' : 'text-gray-600'}
-                                    `}>
+                                    <h3
+                                        className={`
+                                            text-sm font-medium mb-1
+                                            ${isActive ? "text-muni-primary" : "text-gray-600"}
+                                        `}
+                                    >
                                         {step.title}
                                     </h3>
                                 </motion.div>
@@ -131,7 +129,7 @@ export const FormDenuncia = () => {
             </div>
 
             {/* Contenido del formulario */}
-            <motion.div 
+            <motion.div
                 key={stepper.current.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -139,7 +137,7 @@ export const FormDenuncia = () => {
                 className=""
             >
                 {stepper.switch({
-                    "details": () => (
+                    details: () => (
                         <StepDetalles
                             onNext={() => isStepDetailsValid && stepper.next()}
                         />
@@ -156,8 +154,14 @@ export const FormDenuncia = () => {
                             onNext={() => isStepDenuncianteValid && stepper.next()}
                         />
                     ),
-                    "summary": () => (
-                        <TrackingCodeScreen onPrev={stepper.prev} />
+                    summary: () => (
+                        <TrackingCodeScreen
+                            onPrev={stepper.prev}
+                            onSubmit={async () => {
+                                const success = await handleSubmit();
+                                if (success) stepper.next();
+                            }}
+                        />
                     ),
                 })}
             </motion.div>

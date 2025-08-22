@@ -17,6 +17,7 @@ export function DenunciasProvider({ children }) {
 	const [error, setError] = useState("");
 	const [trackingCode, setTrackingCode] = useState("");
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [isDenunciaEnviada, setIsDenunciaEnviada] = useState(false);
 
 	// Lógica de archivos
 	const totalSize = files.reduce(
@@ -292,27 +293,30 @@ export function DenunciasProvider({ children }) {
 			"denunciante",
 			!anonimo ? JSON.stringify(denuncianteData) : null
 		);
+
 		// Enviar la denuncia
 		try {
-			// setIsSubmitting(true);
+			setIsSubmitting(true);
 			const response = await axios.post(
 				`${API_BASE_URL}/denuncias`,
 				formData
 			);
 			if (response.data.success || response.status === 200) {
-				const data = response.data
-				setTrackingCode(data.tracking_code)
+				const data = response.data;
+				setTrackingCode(data.tracking_code);
+				setIsDenunciaEnviada(true); // Actualiza el estado a true
 				toast.success(data.message || "Denuncia enviada exitosamente");
-				return true
+				return true;
 			}
-			return false
+			return false;
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				console.error("Error al enviar la denuncia:", error);
 			}
 			console.error("Error al enviar la denuncia:", error);
 			toast.error("Error al enviar la denuncia");
-			return false
+			setIsDenunciaEnviada(false); // Asegúrate de que el estado sea false en caso de error
+			return false;
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -357,7 +361,8 @@ export function DenunciasProvider({ children }) {
 				isStepDenuncianteValid,
 				handleSubmit,
 				isSubmitting,
-				trackingCode
+				trackingCode,
+				isDenunciaEnviada
 			}}
 		>
 			{children}
