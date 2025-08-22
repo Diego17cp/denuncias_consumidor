@@ -86,7 +86,7 @@ class AdminsController extends ResourceController
     // Funciones de ADMINs
     //==========================
     
-    public function receiveAdmin()
+    public function recibirAdmin()
     {
         
         $admin = $this->authAdmin();
@@ -108,7 +108,7 @@ class AdminsController extends ResourceController
             'comentario'         => $comentario,
         ];
 
-        $denuncia = $this->denunciaModel->receiveDenuncia(
+        $denuncia = $this->denunciaModel->recibirDenuncia(
             $code,
             $estado,
             $comentario,
@@ -135,7 +135,7 @@ class AdminsController extends ResourceController
         $admin = $this->authAdmin();
         if (is_object($admin)) return $admin;
 
-        $input = $this->request->getJSON(true); // <-- leer JSON
+        $input = $this->request->getJSON(true); 
 
         $code       = $input['tracking_code'] ?? null;
         $estado     = $input['estado'] ?? null;
@@ -159,7 +159,7 @@ class AdminsController extends ResourceController
 
         $this->seguimientoDenunciaModel->insert([
             'denuncia_id'     => $denuncia['id'],
-            'administrador_id' => $admin['id'],  // el admin que hizo la acción
+            'administrador_id' => $admin['id'], 
             'comentario'      => $comentario
         ]);
 
@@ -216,6 +216,46 @@ class AdminsController extends ResourceController
         return $this->respond(['success' => true, 'data' => $denuncias]);
     }
 
+    public function getRegistradas(){
+        $admin = $this->authAdmin();
+        if (is_object($admin)) return $admin;
+
+        $perPage = $this->request->getGet('per_page') ?? 10;
+        $page = $this->request->getGet('page') ?? 1;
+
+        $denuncias = $this->denunciaModel->DenunciasRegistradas($perPage);
+
+        if (empty($denuncias)) {
+            return $this->fail(['message' => 'No hay denuncias registradas']);
+        }
+
+        return $this->response->setStatusCode(200)->setJSON([
+            'success' => true,
+            'data' => $denuncias,
+            'pager' => $this->denunciaModel->pager->getDetails() 
+        ]);
+    }
+
+    public function getdenunciasActivas()
+    {
+        $admin = $this->authAdmin();
+        if (is_object($admin)) return $admin;
+
+        $perPage = $this->request->getGet('per_page') ?? 10;
+        $page = $this->request->getGet('page') ?? 1;
+
+        $denuncias = $this->denunciaModel->DenunciasActivas($perPage);
+
+        if (empty($denuncias)) {
+            return $this->fail(['message' => 'No hay denuncias activas']);
+        }
+        return $this->response->setStatusCode(200)->setJSON([
+            'success' => true,
+            'data' => $denuncias,
+            'pager' => $this->denunciaModel->pager->getDetails()
+        ]);
+    }
+
 
     // =========================
     // Funciones de SUPER ADMINS
@@ -229,7 +269,6 @@ class AdminsController extends ResourceController
         return $this->response->setJSON($admins);
     }
 
-    // 
     
     public function createAdministrador()
     {
@@ -295,7 +334,7 @@ class AdminsController extends ResourceController
             return $this->failValidationErrors("No se enviaron campos válidos para actualizar");
         }
 
-        // Hashear la contraseña si viene en el payload
+        // Hashear la contraseña 
         if (isset($data['password'])) {
             $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
         }

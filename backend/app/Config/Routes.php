@@ -79,7 +79,9 @@ $routes->group('/', [
 
         // Dashboard y gestión de denuncias
         //$routes->get('dashboard', 'AdminsController::dashboard');
-        $routes->post('recibir', 'AdminsController::receiveAdmin');
+        $routes->post('recibir', 'AdminsController::recibirAdmin');
+        $routes->get('registradas', 'AdminsController::getRegistradas');
+        $routes->get('activas', 'AdminsController::getDenunciasActivas');
         $routes->post('procesos-denuncia', 'AdminsController::procesosDenuncia');
 
         // Gestión de administradores

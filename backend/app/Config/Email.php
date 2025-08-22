@@ -9,7 +9,7 @@ class Email extends BaseConfig
     //public string $fromEmail  = 'munijloenlinea@gmail.com';
     public string $fromEmail  = 'anaga123op@gmail.com';
     //public string $fromName   = 'Municipalidad Distrital de José Leonardo Ortiz';
-    public string $fromName   = 'AÑA';
+    public string $fromName   = 'Municipalidad Distrital de José Leonardo Ortiz';
     public string $recipients = '';
 
     /**
