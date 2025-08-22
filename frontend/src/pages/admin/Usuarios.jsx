@@ -49,8 +49,8 @@ export function Usuarios() {
   ]);
 
   const roles = [
-    { value: 'administrador', label: 'administrador', color: 'yellow' },
-    { value: 'administrador', label: 'Administrador', color: 'red' }
+    { value: 'admin', label: 'Administrador', color: 'yellow' },
+    { value: 'super_admin', label: 'Super Admin.', color: 'red' }
   ];
 
   const estados = [
@@ -422,13 +422,6 @@ export function Usuarios() {
         modalType={modalType}
         selectedUser={selectedUser}
         roles={roles}
-        formData={formData}
-        showPassword={showPassword}
-        showConfirmPassword={showConfirmPassword}
-        handleInputChange={handleInputChange}
-        setShowPassword={setShowPassword}
-        setShowConfirmPassword={setShowConfirmPassword}
-        handleCreateUser={handleCreateUser}
         changeUserRole={changeUserRole}
         closeModal={closeModal}
       />
