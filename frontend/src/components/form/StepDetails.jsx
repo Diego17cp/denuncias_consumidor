@@ -1,6 +1,7 @@
 import { FaClipboardCheck, FaTrash, FaUpload } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDenuncias } from "../../context/DenunciasContext";
+import { useState } from "react";
 
 export default function StepDetalles({ onNext }) {
     const {
@@ -20,7 +21,22 @@ export default function StepDetalles({ onNext }) {
         MAX_SIZE_MB,
     } = useDenuncias();
 
-    const canProceed = isStepDetailsValid;
+    const [fechaError, setFechaError] = useState(""); // Estado para el mensaje de error de la fecha
+
+    const handleFechaChange = (e) => {
+        const selectedDate = new Date(e.target.value);
+        const today = new Date();
+
+        if (selectedDate > today) {
+            setFechaError("No se permite una fecha posterior a la actual");
+            setFecha(""); // Limpia la fecha
+        } else {
+            setFechaError(""); // Limpia
+            setFecha(e.target.value);
+        }
+    };
+
+    const canProceed = isStepDetailsValid && !fechaError; // deshabilita el botón de siguiente
 
     // Animaciones
     const containerVariants = {
@@ -112,9 +128,12 @@ export default function StepDetalles({ onNext }) {
                 <input
                     type="date"
                     value={fecha}
-                    onChange={(e) => setFecha(e.target.value)}
+                    onChange={handleFechaChange}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
                 />
+                {fechaError && (
+                    <p className="text-red-500 text-sm mt-1">{fechaError}</p>
+                )}
             </motion.div>
 
             {/* Subir archivos con barra de progreso */}
