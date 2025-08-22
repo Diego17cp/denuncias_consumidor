@@ -30,6 +30,14 @@ class AuthController extends ResourceController
                 ->setStatusCode(401)
                 ->setJSON(['error' => 'Credenciales inválidas']);
         }
+
+        // Verificar si está inactivo
+        if (strtolower(trim($user['estado'])) === 'inactivo') {
+            return service("response")
+                ->setStatusCode(403)
+                ->setJSON(['error' => 'Tu cuenta está inactiva, contacta con el administrador principal.']);
+        }
+
         $jwt = createJWT([
             "id" => $user['id'],
             "dni" => $dni,
