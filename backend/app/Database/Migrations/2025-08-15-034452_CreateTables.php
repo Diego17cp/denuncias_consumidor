@@ -274,8 +274,8 @@ class CreateTables extends Migration
                 'null' => false
             ],
             'estado' => [
-                'type' => 'VARCHAR',
-                'constraint' => '100',
+                'type' => 'ENUM',
+                'constraint' => ['1', '0'],
                 'null' => false
             ],
             'created_at' => [
