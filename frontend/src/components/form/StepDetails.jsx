@@ -26,15 +26,21 @@ export default function StepDetalles({ onNext }) {
     const handleFechaChange = (e) => {
         const selectedDate = new Date(e.target.value);
         const today = new Date();
-
+        const selectedYear = selectedDate.getFullYear();
+        const currentYear = today.getFullYear();
+    
         if (selectedDate > today) {
             setFechaError("No se permite una fecha posterior a la actual");
-            setFecha(""); // Limpia la fecha
+            setFecha("");
+        } else if (selectedYear !== currentYear) {
+            setFechaError("Solo se permiten fechas del año actual");
+            setFecha("");
         } else {
-            setFechaError(""); // Limpia
+            setFechaError("");
             setFecha(e.target.value);
         }
     };
+    
 
     const canProceed = isStepDetailsValid && !fechaError; // deshabilita el botón de siguiente
 
@@ -105,35 +111,40 @@ export default function StepDetalles({ onNext }) {
                 </p>
             </motion.div>
 
+            {/* Lugar y Fecha */}
+            <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
+                {/* Lugar */}
+                <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                        Lugar <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        value={lugar}
+                        onChange={(e) => setLugar(e.target.value)}
+                        placeholder="Ej: Av. Principal #123, Colonia Centro"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
+                    />
+                </div>
 
-            {/* Lugar */}
-            <motion.div variants={itemVariants}>
-                <label className="block mb-2 text-sm font-medium text-gray-700">
-                    Lugar <span className="text-red-500">*</span>
-                </label>
-                <input
-                    type="text"
-                    value={lugar}
-                    onChange={(e) => setLugar(e.target.value)}
-                    placeholder="Ej: Av. Principal #123, Colonia Centro"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
-                />
-            </motion.div>
+                {/* Fecha */}
+                <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                        Fecha del incidente <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                        type="date"
+                        value={fecha}
+                        onChange={handleFechaChange}
+                        min={`${new Date().getFullYear()}-01-01`}
+                        max={new Date().toISOString().split("T")[0]} // Fecha de hoy
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
+                    />
 
-            {/* Fecha */}
-            <motion.div variants={itemVariants}>
-                <label className="block mb-2 text-sm font-medium text-gray-700">
-                    Fecha del incidente <span className="text-red-500">*</span>
-                </label>
-                <input
-                    type="date"
-                    value={fecha}
-                    onChange={handleFechaChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 shadow-sm"
-                />
-                {fechaError && (
-                    <p className="text-red-500 text-sm mt-1">{fechaError}</p>
-                )}
+                    {fechaError && (
+                        <p className="text-red-500 text-sm mt-1">{fechaError}</p>
+                    )}
+                </div>
             </motion.div>
 
             {/* Subir archivos con barra de progreso */}
