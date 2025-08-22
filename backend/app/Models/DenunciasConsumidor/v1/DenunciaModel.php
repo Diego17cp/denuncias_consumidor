@@ -291,14 +291,14 @@ class DenunciaModel extends Model
             ->findAll();
     }
 
-    public function DenunciasRegistradas($perPage = 10)
+    public function DenunciasRegistradas($perPage = 2)
     {
         return $this->where('estado', 'registrado')
                     ->orderBy('created_at', 'DESC')
                     ->paginate($perPage);
     }
 
-    public function DenunciasActivas($perPage = 10)
+    public function DenunciasActivas($perPage = 2)
     {
         return $this->whereIn('estado', ['recibida', 'en proceso', 'pendiente'])
                     ->orderBy('created_at', 'DESC') 
