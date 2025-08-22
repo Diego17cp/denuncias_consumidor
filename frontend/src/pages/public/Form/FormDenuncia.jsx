@@ -39,6 +39,12 @@ export const FormDenuncia = () => {
         return false;
     };
 
+    const handleSubmitAndNext = async () => {
+        if (!isStepDenuncianteValid) return
+        const success = await handleSubmit()
+        if (success) stepper.next()
+    }
+
     return (
         <div className="mx-auto max-w-4xl mt-8">
             {/* Stepper */}
@@ -151,17 +157,12 @@ export const FormDenuncia = () => {
                     "complainant-data": () => (
                         <StepDatosDenunciante
                             onPrev={stepper.prev}
-                            onNext={() => isStepDenuncianteValid && stepper.next()}
+                            onNext={handleSubmitAndNext}
+                            isSubmitting={isSubmitting}
                         />
                     ),
                     summary: () => (
-                        <TrackingCodeScreen
-                            onPrev={stepper.prev}
-                            onSubmit={async () => {
-                                const success = await handleSubmit();
-                                if (success) stepper.next();
-                            }}
-                        />
+                        <TrackingCodeScreen />
                     ),
                 })}
             </motion.div>
