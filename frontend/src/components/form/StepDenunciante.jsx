@@ -19,7 +19,6 @@ export default function StepDenunciante({ onNext, onPrev, isSubmitting }) {
 		isStepDenuncianteValid,
 		anonimo,
 		setAnonimo,
-		handleSubmit,
 	} = useDenuncias();
 
 	// Animaciones optimizadas
@@ -199,6 +198,7 @@ export default function StepDenunciante({ onNext, onPrev, isSubmitting }) {
 											tipoDocumento === "RUC" ||
 											tipoDocumento === "DNI"
 										}
+										onChange={handleDenuncianteChange}
 										placeholder="Nombres completos"
 										className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
 									/>
