@@ -33,7 +33,7 @@ class AdministradorModel extends Model
     // Validaciones
     protected $validationRules = [
         'dni'      => 'required|numeric|min_length[8]|max_length[20]',
-        'nombre'   => 'required|string|max_length[100]',
+        'nombre'   => 'permit_empty|string|max_length[100]',
         'password' => 'required|string|min_length[8]|max_length[255]',
         'rol'      => 'required|string|max_length[50]',
         'estado'   => 'required|in_list[activo,inactivo,1,0]'

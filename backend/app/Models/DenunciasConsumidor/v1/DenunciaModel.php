@@ -251,7 +251,7 @@ class DenunciaModel extends Model
     }
 
 
-    public function receiveDenuncia($trackingCode, $estado, $comentario, $seguimientoData)
+    public function recibirDenuncia($trackingCode, $estado, $comentario, $seguimientoData)
     {
         $denuncia = $this->where('tracking_code', $trackingCode)->first();
 
@@ -290,4 +290,19 @@ class DenunciaModel extends Model
             ->where('denuncia.deleted_at', null)
             ->findAll();
     }
+
+    public function DenunciasRegistradas($perPage = 2)
+    {
+        return $this->where('estado', 'registrado')
+                    ->orderBy('created_at', 'DESC')
+                    ->paginate($perPage);
+    }
+
+    public function DenunciasActivas($perPage = 2)
+    {
+        return $this->whereIn('estado', ['recibida', 'en proceso', 'pendiente'])
+                    ->orderBy('created_at', 'DESC') 
+                    ->paginate($perPage);
+    }
+
 }
