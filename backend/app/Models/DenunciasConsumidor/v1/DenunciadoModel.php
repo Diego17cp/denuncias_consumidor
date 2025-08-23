@@ -34,7 +34,7 @@ class DenunciadoModel extends Model
 
     // Validaciones
     protected $validationRules = [
-        'nombre'         => 'required|min_length[3]|max_length[255]',
+        'nombre'         => 'permit_empty|min_length[3]|max_length[255]',
         'tipo_documento' => 'required|in_list[DNI,CE,RUC]',
         'direccion'      => 'permit_empty|max_length[50]',
         'celular'       => 'permit_empty|max_length[20]',

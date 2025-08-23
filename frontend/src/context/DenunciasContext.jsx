@@ -280,6 +280,10 @@ export function DenunciasProvider({ children }) {
 					? denunciante.dni
 					: null,
 			tipo_documento: tipoDocumento,
+			razon_social:
+			tipoDocumento === "RUC" && denunciante.razonSocial
+			? denunciante.razonSocial
+			: null,
 			direccion: denunciante.domicilio,
 			celular:
 				denunciante.celular.length === 9 ? denunciante.celular : null,

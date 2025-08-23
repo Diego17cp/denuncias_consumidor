@@ -38,7 +38,7 @@ class DenuncianteModel extends Model
 
     // Validaciones
     protected $validationRules = [
-        'nombre'           => 'required|min_length[3]|max_length[255]',
+        'nombre'           => 'permit_empty|min_length[3]|max_length[255]',
         'razon_social'     => 'permit_empty|max_length[150]',
         'documento'        => 'required|min_length[8]|max_length[20]',
         'tipo_documento'   => 'required|in_list[DNI,CE,RUC]',
@@ -48,8 +48,8 @@ class DenuncianteModel extends Model
         'departamento'     => 'permit_empty|max_length[100]',
         'email'            => 'required|valid_email|max_length[150]',
         'telefono'         => 'permit_empty|max_length[15]|min_length[7]',
-        'celular'          => 'required|max_length[15]|min_length[7]',
-        'sexo'             => 'required|in_list[M,F,O]',
+        'celular'          => 'permit_empty|max_length[15]|min_length[7]',
+        'sexo'             => 'permit_empty|in_list[M,F,O]',
     ];
 
     // Mensajes de las validaciones
