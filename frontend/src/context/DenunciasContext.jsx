@@ -253,7 +253,7 @@ export function DenunciasProvider({ children }) {
 				denunciado.tipoDocumento === "RUC" && denunciado.representante
 					? denunciado.representante
 					: null,
-			tipo_documento: denunciado.tipoDocumento,
+			tipo_documento: denunciado.tipoDocumento === "CEDULA" ? "CE" : denunciado.tipoDocumento,
 			documento:
 				denunciado.tipoDocumento === "DNI"
 					? denunciado.dni
@@ -279,7 +279,7 @@ export function DenunciasProvider({ children }) {
 					: tipoDocumento === "CEDULA"
 					? denunciante.dni
 					: null,
-			tipo_documento: tipoDocumento,
+			tipo_documento: tipoDocumento === "CEDULA" ? "CE" : tipoDocumento,
 			razon_social:
 			tipoDocumento === "RUC" && denunciante.razonSocial
 			? denunciante.razonSocial
