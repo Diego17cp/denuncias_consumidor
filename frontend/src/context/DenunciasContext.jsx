@@ -209,7 +209,7 @@ export function DenunciasProvider({ children }) {
 
 	const isStepDenuncianteValid = anonimo
 		? true
-		: tipoDocumento === "DNI"
+		: tipoDocumento === "DNI" || tipoDocumento === "CEDULA"
 		? denunciante.dni.trim().length === 8 &&
 		  denunciante.nombres.trim() !== "" &&
 		  denunciante.domicilio.trim() !== "" &&
