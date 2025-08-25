@@ -265,6 +265,7 @@ class AdminsController extends ResourceController
         $admins = $this->adminModel->findAll();
 
         if (!$admins) {
+<<<<<<< HEAD
             return $this->response
                 ->setJSON(['success' => false, 'error' => 'No se encontraron administradores'])
                 ->setStatusCode(404);
@@ -279,6 +280,17 @@ class AdminsController extends ResourceController
             'success' => true,
             'data' => $filteredAdmins
         ]);
+=======
+            return $this->response->setJSON([
+                'success' => false,
+                'error' => 'No se encontraron administradores'
+            ])->setStatusCode(404);
+        }
+        return $this->response->setJSON([
+            "success" => true,
+            "data" => $admins
+        ])->setStatusCode(200);
+>>>>>>> a49378eb99640f834bde27cd7463632bdebbf244
     }
 
     
