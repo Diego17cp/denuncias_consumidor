@@ -26,7 +26,7 @@ $routes->group('/', [
             // Crear denunciante (POST JSON)
             $routes->post('/', 'DenuncianteController::create');
             // Actualizar denunciante
-            $routes->put('update/(:num)', 'DenuncianteController::update/$1');
+            $routes->get('update/(:num)', 'DenuncianteController::update/$1');
             // Eliminar denunciante
             $routes->delete('delete/(:num)', 'DenuncianteController::delete/$1');
         });
@@ -41,7 +41,7 @@ $routes->group('/', [
             // Crear denunciado
             $routes->post('/', 'DenunciadoController::create');
             // Actualizar denunciado
-            $routes->put('update/(:num)', 'DenunciadoController::update/$1');
+            $routes->post('update/(:num)', 'DenunciadoController::update/$1');
             // Eliminar denunciado
             $routes->delete('delete/(:num)', 'DenunciadoController::delete/$1');
         });
