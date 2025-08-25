@@ -8,7 +8,6 @@ export default function ModalUsuario({
 	modalType,
 	selectedUser,
 	roles,
-	changeUserRole,
 	closeModal,
 }) {
     const {
@@ -18,6 +17,11 @@ export default function ModalUsuario({
 		handleShowPassword,
 		handleInputChange,
 		handleCreateUser,
+		updatedPassword,
+		handlePasswordChange,
+		updateUser,
+		handleRoleChange,
+		updatedRol
 	} = useAdmin();
 
     if (!open) return null;
@@ -220,6 +224,7 @@ export default function ModalUsuario({
 						<form
 							onSubmit={(e) => {
 								e.preventDefault();
+								updateUser(selectedUser.dni, "password");
 								closeModal();
 							}}
 							className="space-y-5"
@@ -240,6 +245,9 @@ export default function ModalUsuario({
 								<input
 									type="password"
 									required
+									name="password"
+									value={updatedPassword.password}
+									onChange={handlePasswordChange}
 									className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
 									placeholder="Ingrese la nueva contraseña"
 								/>
@@ -252,6 +260,9 @@ export default function ModalUsuario({
 								<input
 									type="password"
 									required
+									name="confirmPassword"
+									value={updatedPassword.confirmPassword}
+									onChange={handlePasswordChange}
 									className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
 									placeholder="Confirme la nueva contraseña"
 								/>
@@ -294,15 +305,11 @@ export default function ModalUsuario({
 									Nuevo Rol
 								</label>
 								<select
-									defaultValue={selectedUser.rol}
-									onChange={(e) =>
-										changeUserRole(
-											selectedUser.id,
-											e.target.value
-										)
-									}
+									value={updatedRol}
+									onChange={handleRoleChange}
 									className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
 								>
+									<option value="" disabled>Selecciona un rol</option>
 									{roles.map((role) => (
 										<option
 											key={role.value}
@@ -322,7 +329,9 @@ export default function ModalUsuario({
 									Cancelar
 								</button>
 								<button
-									onClick={closeModal}
+									onClick={() => {
+										updateUser(selectedUser.dni, "rol");
+									}}
 									className="cursor-pointer flex-1 px-4 py-3 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg font-medium"
 								>
 									Guardar Cambios
