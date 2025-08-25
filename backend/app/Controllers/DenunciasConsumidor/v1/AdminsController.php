@@ -457,7 +457,7 @@ class AdminsController extends ResourceController
         return $this->response->setJSON([
             'success' => true,
             'data' => $admin
-        ]);
+        ]) ->setStatusCode(200);
     }
 
     public function searchAdminById($id)
@@ -488,7 +488,7 @@ class AdminsController extends ResourceController
         return $this->response->setJSON([
             'success' => true,
             'data' => $admin
-        ]);
+        ]) ->setStatusCode(200);
     }
 
 
