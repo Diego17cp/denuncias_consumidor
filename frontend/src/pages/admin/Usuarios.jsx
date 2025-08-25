@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ArrowLeft,
   Plus,
@@ -12,6 +12,7 @@ import {
   Users
 } from 'lucide-react';
 import ModalUsuario from "./ModalUsuario";
+import { useAdmin } from '../../hooks/admin/usuarios/useAdmin';
 
 export function Usuarios() {
   const [activeTab, setActiveTab] = useState('lista');
@@ -21,32 +22,20 @@ export function Usuarios() {
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const {
+    users,
+    fetchUsers,
+    dniSearch,
+    isSearching,
+    searchedUser,
+    handleSearchDni,
+    searchUser,
+    updateUser,
+  } = useAdmin()
 
-  // Estados para formularios
-  const [formData, setFormData] = useState({
-    dni: '',
-    nombreCompleto: '',
-    password: '',
-    confirmPassword: '',
-    rol: 'usuario'
-  });
-
-  const [searchAdminData, setSearchAdminData] = useState({
-    dni: '',
-    resultado: null,
-    searching: false
-  });
-
-  // Datos simulados de usuarios
-  const [usuarios, setUsuarios] = useState([
-    { id: 1, dni: '12345678', nombre: 'Juan Pérez García', rol: 'administrador', estado: 'activo', fechaCreacion: '2024-01-15' },
-    { id: 2, dni: '87654321', nombre: 'María González López', rol: 'administrador', estado: 'activo', fechaCreacion: '2024-01-20' },
-    { id: 3, dni: '11111111', nombre: 'Carlos Rodríguez Sánchez', rol: 'administrador', estado: 'inactivo', fechaCreacion: '2024-01-25' },
-    { id: 4, dni: '22222222', nombre: 'Ana Martínez Fernández', rol: 'administrador', estado: 'activo', fechaCreacion: '2024-02-01' },
-    { id: 5, dni: '33333333', nombre: 'Luis Torres Jiménez', rol: 'administrador', estado: 'suspendido', fechaCreacion: '2024-02-05' }
-  ]);
+  useEffect(() => {
+    fetchUsers()
+  }, [fetchUsers])
 
   const roles = [
     { value: 'admin', label: 'Administrador', color: 'yellow' },
@@ -54,8 +43,8 @@ export function Usuarios() {
   ];
 
   const estados = [
-    { value: 'activo', label: 'Activo', color: 'green' },
-    { value: 'inactivo', label: 'Inactivo', color: 'gray' },
+    { value: '1', label: 'Activo', color: 'green' },
+    { value: '0', label: 'Inactivo', color: 'red' },
     { value: 'suspendido', label: 'Suspendido', color: 'red' }
   ];
 
@@ -69,9 +58,13 @@ export function Usuarios() {
     const statusObj = estados.find(s => s.value === status);
     return statusObj ? statusObj.color : 'gray';
   };
+  const getStatusLabel = (status) => {
+    const statusObj = estados.find(s => s.value === status);
+    return statusObj ? statusObj.label : 'Desconocido';
+  }
 
   // Filtrar usuarios
-  const filteredUsers = usuarios.filter(user => {
+  const filteredUsers = users.filter(user => {
     const matchesSearch = user.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.dni.includes(searchTerm);
     const matchesRole = roleFilter === 'todos' || user.rol === roleFilter;
@@ -79,94 +72,20 @@ export function Usuarios() {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
-  // Manejadores de eventos
-  const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSearchAdmin = async () => {
-    if (!searchAdminData.dni.trim()) return;
-
-    setSearchAdminData({ ...searchAdminData, searching: true });
-
-    // Simular búsqueda
-    setTimeout(() => {
-      const found = usuarios.find(u => u.dni === searchAdminData.dni);
-      setSearchAdminData({
-        ...searchAdminData,
-        resultado: found || null,
-        searching: false
-      });
-    }, 1000);
-  };
-
   const openModal = (type, user = null) => {
     setModalType(type);
     setSelectedUser(user);
     setShowModal(true);
-    if (type === 'crear') {
-      setFormData({
-        dni: '',
-        nombreCompleto: '',
-        password: '',
-        confirmPassword: '',
-        rol: 'administrador'
-      });
-    }
   };
 
   const closeModal = () => {
     setShowModal(false);
     setModalType('');
     setSelectedUser(null);
-    setFormData({
-      dni: '',
-      nombreCompleto: '',
-      password: '',
-      confirmPassword: '',
-      rol: 'administrador'
-    });
   };
 
-  const handleCreateUser = () => {
-    if (formData.password !== formData.confirmPassword) {
-      alert('Las contraseñas no coinciden');
-      return;
-    }
-
-    const newUser = {
-      id: usuarios.length + 1,
-      dni: formData.dni,
-      nombre: formData.nombreCompleto,
-      rol: formData.rol,
-      estado: 'activo',
-      fechaCreacion: new Date().toISOString().split('T')[0]
-    };
-
-    setUsuarios([...usuarios, newUser]);
-    closeModal();
-  };
-
-  const toggleUserStatus = (userId) => {
-    setUsuarios(usuarios.map(user => {
-      if (user.id === userId) {
-        const newStatus = user.estado === 'activo' ? 'inactivo' : 'activo';
-        return { ...user, estado: newStatus };
-      }
-      return user;
-    }));
-  };
-
-  const changeUserRole = (userId, newRole) => {
-    setUsuarios(usuarios.map(user => {
-      if (user.id === userId) {
-        return { ...user, rol: newRole };
-      }
-      return user;
-    }));
+  const toggleUserStatus = (dni, state) => {
+    updateUser(dni, "estado", state);
   };
 
   return (
@@ -289,7 +208,7 @@ export function Usuarios() {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {filteredUsers.map((user) => (
-                      <tr key={user.id} className="hover:bg-gray-50 transition-colors">
+                      <tr key={user.dni} className="hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           {user.dni}
                         </td>
@@ -309,7 +228,7 @@ export function Usuarios() {
                               getStatusColor(user.estado) === 'gray' ? 'bg-gray-100 text-gray-800' :
                                 getStatusColor(user.estado) === 'red' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
                             }`}>
-                            {user.estado.charAt(0).toUpperCase() + user.estado.slice(1)}
+                            {getStatusLabel(user.estado)}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -329,14 +248,14 @@ export function Usuarios() {
                               <Edit className="cursor-pointer h-4 w-4" />
                             </button>
                             <button
-                              onClick={() => toggleUserStatus(user.id)}
-                              className={`p-2 rounded-lg transition-colors ${user.estado === 'activo'
+                              onClick={() => toggleUserStatus(user.dni, user.estado === "1" ? "0" : "1")}
+                              className={`p-2 rounded-lg transition-colors ${user.estado === '1'
                                   ? 'text-red-600 hover:text-red-900 hover:bg-red-50'
                                   : 'text-green-600 hover:text-green-900 hover:bg-green-50'
                                 }`}
-                              title={user.estado === 'activo' ? 'Desactivar' : 'Activar'}
+                              title={user.estado === '1' ? 'Desactivar' : 'Activar'}
                             >
-                              {user.estado === 'activo' ?
+                              {user.estado === '1' ?
                                 <ToggleRight className="cursor-pointer h-4 w-4" /> :
                                 <ToggleLeft className="cursor-pointer h-4 w-4" />
                               }
@@ -369,39 +288,42 @@ export function Usuarios() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">DNI</label>
                   <input
                     type="text"
-                    value={searchAdminData.dni}
-                    onChange={(e) => setSearchAdminData({ ...searchAdminData, dni: e.target.value })}
+                    value={dniSearch}
+                    onChange={handleSearchDni}
                     placeholder="Ingresa el DNI..."
                     className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
 
                 <button
-                  onClick={handleSearchAdmin}
-                  disabled={searchAdminData.searching || !searchAdminData.dni.trim()}
+                  onClick={() => {
+                    if (dniSearch.length === 8) searchUser()
+                  }}
+                  disabled={isSearching || !dniSearch.trim()}
                   className="
                   cursor-pointer w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:scale-100"
                 >
-                  {searchAdminData.searching ? 'Buscando...' : 'Buscar'}
+                  {isSearching ? 'Buscando...' : 'Buscar'}
                 </button>
 
                 {/* Resultado de búsqueda */}
-                {searchAdminData.resultado && (
+                {/* TODO: MEJORA ESTO PETUSO */}
+                {searchedUser && (
                   <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
                     <div className="flex items-center mb-2">
                       <UserCheck className="h-5 w-5 text-green-600 mr-2" />
                       <h4 className="font-medium text-green-900">Administrador Encontrado</h4>
                     </div>
                     <div className="space-y-1 text-sm text-green-800">
-                      <p><strong>DNI:</strong> {searchAdminData.resultado.dni}</p>
-                      <p><strong>Nombre:</strong> {searchAdminData.resultado.nombre}</p>
-                      <p><strong>Rol:</strong> {searchAdminData.resultado.rol}</p>
-                      <p><strong>Estado:</strong> {searchAdminData.resultado.estado}</p>
+                      <p><strong>DNI:</strong> {searchedUser.dni}</p>
+                      <p><strong>Nombre:</strong> {searchedUser.nombre}</p>
+                      <p><strong>Rol:</strong> {searchedUser.rol === "super_admin" ? "Super Admin.": "Admin"}</p>
+                      <p><strong>Estado:</strong> {searchedUser.estado === "1" ? "Activo" : "Inactivo"}</p>
                     </div>
                   </div>
                 )}
 
-                {searchAdminData.dni && searchAdminData.resultado === null && !searchAdminData.searching && (
+                {dniSearch.dni && searchedUser === null && !isSearching && (
                   <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                     <div className="flex items-center">
                       <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
@@ -422,7 +344,6 @@ export function Usuarios() {
         modalType={modalType}
         selectedUser={selectedUser}
         roles={roles}
-        changeUserRole={changeUserRole}
         closeModal={closeModal}
       />
     </div>
