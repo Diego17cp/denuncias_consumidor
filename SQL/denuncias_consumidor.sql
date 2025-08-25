@@ -23,16 +23,16 @@ DROP TABLE IF EXISTS `adjunto`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `adjunto` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `denuncia_id` int DEFAULT NULL,
-  `file_path` varchar(255) DEFAULT NULL,
-  `file_name` varchar(100) DEFAULT NULL,
-  `file_type` varchar(50) DEFAULT NULL,
-  `fecha_subida` datetime DEFAULT NULL,
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `denuncia_id` int unsigned NOT NULL,
+  `file_path` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `denuncia_id` (`denuncia_id`),
-  CONSTRAINT `adjunto_ibfk_1` FOREIGN KEY (`denuncia_id`) REFERENCES `denuncia` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `adjunto_denuncia_id_foreign` (`denuncia_id`),
+  CONSTRAINT `adjunto_denuncia_id_foreign` FOREIGN KEY (`denuncia_id`) REFERENCES `denuncia` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -52,14 +52,17 @@ DROP TABLE IF EXISTS `administrador`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `administrador` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `dni` varchar(255) NOT NULL,
-  `nombre` varchar(100) DEFAULT NULL,
-  `password` varchar(255) NOT NULL,
-  `rol` varchar(100) DEFAULT NULL,
-  `estado` varchar(100) DEFAULT NULL,
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `dni` varchar(8) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `rol` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `estado` enum('1','0') COLLATE utf8mb4_general_ci NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -68,6 +71,7 @@ CREATE TABLE `administrador` (
 
 LOCK TABLES `administrador` WRITE;
 /*!40000 ALTER TABLE `administrador` DISABLE KEYS */;
+INSERT INTO `administrador` VALUES (1,'TUÑOQUE JULCAS MARTHA LUZ','40346175','$2y$10$3XIAtpHSIEzek1aeswqLnupxjVSPh9SJRslrRWJoNClikPNeeNaVu','super_admin','1',NULL,NULL,NULL);
 /*!40000 ALTER TABLE `administrador` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -79,23 +83,24 @@ DROP TABLE IF EXISTS `denuncia`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `denuncia` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `tracking_code` varchar(20) DEFAULT NULL,
-  `es_anonimo` tinyint(1) DEFAULT NULL,
-  `denunciante_id` int DEFAULT NULL,
-  `motivo_otro` varchar(255) DEFAULT NULL,
-  `descripcion` text,
-  `fecha_incidente` date DEFAULT NULL,
-  `denunciado_id` int DEFAULT NULL,
-  `fecha_registro` datetime DEFAULT NULL,
-  `estado` enum('registrado','revision','en_proceso','resuelto','rechazado') DEFAULT NULL,
-  `pdf_path` varchar(255) DEFAULT NULL,
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `tracking_code` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
+  `denunciante_id` int unsigned DEFAULT NULL,
+  `es_anonimo` tinyint(1) NOT NULL,
+  `denunciado_id` int unsigned NOT NULL,
+  `descripcion` text COLLATE utf8mb4_general_ci NOT NULL,
+  `estado` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
+  `lugar` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `fecha_incidente` date NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `denunciante_id` (`denunciante_id`),
-  KEY `denunciado_id` (`denunciado_id`),
-  CONSTRAINT `denuncia_ibfk_1` FOREIGN KEY (`denunciante_id`) REFERENCES `denunciante` (`id`),
-  CONSTRAINT `denuncia_ibfk_3` FOREIGN KEY (`denunciado_id`) REFERENCES `denunciado` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `denuncia_denunciante_id_foreign` (`denunciante_id`),
+  KEY `denuncia_denunciado_id_foreign` (`denunciado_id`),
+  CONSTRAINT `denuncia_denunciado_id_foreign` FOREIGN KEY (`denunciado_id`) REFERENCES `denunciado` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `denuncia_denunciante_id_foreign` FOREIGN KEY (`denunciante_id`) REFERENCES `denunciante` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -115,13 +120,19 @@ DROP TABLE IF EXISTS `denunciado`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `denunciado` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(255) DEFAULT NULL,
-  `tipo_documento` enum('DNI','CEDULA','RUC') DEFAULT NULL,
-  `direccion` varchar(50) DEFAULT NULL,
-  `telefono` varchar(20) DEFAULT NULL,
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `documento` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
+  `tipo_documento` enum('DNI','CE','RUC') COLLATE utf8mb4_general_ci NOT NULL,
+  `representante_legal` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `razon_social` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `direccion` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `celular` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -141,20 +152,24 @@ DROP TABLE IF EXISTS `denunciante`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `denunciante` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(255) NOT NULL,
-  `email` varchar(255) DEFAULT NULL,
-  `telefono` varchar(90) DEFAULT NULL,
-  `numero_documento` varchar(20) DEFAULT NULL,
-  `tipo_documento` enum('DNI','CEDULA','RUC') DEFAULT NULL,
-  `razon_social` varchar(255) DEFAULT NULL,
-  `sexo` enum('M','F') DEFAULT NULL,
-  `distrito` varchar(100) DEFAULT NULL,
-  `provincia` varchar(100) DEFAULT NULL,
-  `departamento` varchar(100) DEFAULT NULL,
-  `direccion` varchar(100) DEFAULT NULL,
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `razon_social` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `documento` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
+  `tipo_documento` enum('DNI','CE','RUC') COLLATE utf8mb4_general_ci NOT NULL,
+  `direccion` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `distrito` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `provincia` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `departamento` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `email` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `celular` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `telefono` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `sexo` enum('M','F') COLLATE utf8mb4_general_ci NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -167,31 +182,32 @@ LOCK TABLES `denunciante` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `historial_admin`
+-- Table structure for table `migrations`
 --
 
-DROP TABLE IF EXISTS `historial_admin`;
+DROP TABLE IF EXISTS `migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `historial_admin` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `solicitado_por` varchar(8) DEFAULT NULL,
-  `dni` varchar(8) DEFAULT NULL,
-  `accion` varchar(50) DEFAULT NULL,
-  `motivo` varchar(255) DEFAULT NULL,
-  `fecha_accion` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `historial_admin_ibfk_1` FOREIGN KEY (`id`) REFERENCES `administrador` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE `migrations` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `version` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `class` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `group` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `namespace` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `time` int NOT NULL,
+  `batch` int unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `historial_admin`
+-- Dumping data for table `migrations`
 --
 
-LOCK TABLES `historial_admin` WRITE;
-/*!40000 ALTER TABLE `historial_admin` DISABLE KEYS */;
-/*!40000 ALTER TABLE `historial_admin` ENABLE KEYS */;
+LOCK TABLES `migrations` WRITE;
+/*!40000 ALTER TABLE `migrations` DISABLE KEYS */;
+INSERT INTO `migrations` VALUES (1,'2025-08-15-034452','App\\Database\\Migrations\\CreateTables','default','App',1756126673,1);
+/*!40000 ALTER TABLE `migrations` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -202,18 +218,19 @@ DROP TABLE IF EXISTS `seguimiento_denuncia`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `seguimiento_denuncia` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `denuncia_id` int DEFAULT NULL,
-  `estado` varchar(100) DEFAULT NULL,
-  `comentario` text,
-  `fecha_actualizacion` datetime DEFAULT NULL,
-  `administrador_id` int DEFAULT NULL,
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `denuncia_id` int unsigned NOT NULL,
+  `administrador_id` int unsigned NOT NULL,
+  `comentario` text COLLATE utf8mb4_general_ci NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `denuncia_id` (`denuncia_id`),
-  KEY `administrador_id` (`administrador_id`),
-  CONSTRAINT `seguimiento_denuncia_ibfk_1` FOREIGN KEY (`denuncia_id`) REFERENCES `denuncia` (`id`),
-  CONSTRAINT `seguimiento_denuncia_ibfk_2` FOREIGN KEY (`administrador_id`) REFERENCES `administrador` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `seguimiento_denuncia_denuncia_id_foreign` (`denuncia_id`),
+  KEY `seguimiento_denuncia_administrador_id_foreign` (`administrador_id`),
+  CONSTRAINT `seguimiento_denuncia_administrador_id_foreign` FOREIGN KEY (`administrador_id`) REFERENCES `administrador` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `seguimiento_denuncia_denuncia_id_foreign` FOREIGN KEY (`denuncia_id`) REFERENCES `denuncia` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -234,4 +251,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-08-08 12:32:07
+-- Dump completed on 2025-08-25  8:01:10
