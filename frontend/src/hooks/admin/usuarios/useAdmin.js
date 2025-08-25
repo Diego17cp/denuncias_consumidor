@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import axios from "axios";
 import { getServiceData } from "../../../services/documentService";
@@ -93,6 +93,121 @@ export const useAdmin = () => {
         }
 	};
 
+    const [users, setUsers] = useState([]);
+    const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+    const fetchUsers = useCallback(async () => {
+        try {
+            setIsLoadingUsers(true)
+            const response = await axios.get(`${API_URL}/admin`, {
+                withCredentials: true
+            })
+            if (response.data.success || response.status === 200) {
+                const data = response.data.data
+                setUsers(data)
+            }
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                toast.error(error.response?.data?.error || "Error al obtener los usuarios.");
+            }
+            console.error(error);
+        } finally {
+            setIsLoadingUsers(false);
+        }
+    }, [API_URL])
+    const [dniSearch, setDniSearch] = useState("")
+    const [isSearching, setIsSearching] = useState(false)
+    const [searchedUser, setSearchedUser] = useState(null)
+    const handleSearchDni = (e) => {
+        const formattedDni = e.target.value.replace(/\D/g, '').slice(0, 8);
+        setDniSearch(formattedDni);
+    }
+    const searchUser = useCallback(async () => {
+        try {
+            setIsSearching(true)
+            const response = await axios.get(`${API_URL}/admin/dni/${dniSearch}`, {
+                withCredentials: true
+            })
+            if (response.data.success || response.status === 200) {
+                setSearchedUser(response.data.data)
+            }
+        } catch (e) {
+            if (axios.isAxiosError(e)) {
+                toast.error(e.response?.data?.error || "Error al buscar el usuario.");
+            }
+            console.error(e);
+        } finally {
+            setIsSearching(false);
+        }
+    }, [API_URL, dniSearch])
+
+    const [updatedPassword, setUpdatedPassword] = useState({
+        password: "",
+        confirmPassword: ""
+    });
+    const [updatedRol, setUpdatedRol] = useState("");
+    const [updatedEstado, setUpdatedEstado] = useState("");
+
+    const handlePasswordChange = (e) => {
+        const { name, value } = e.target;
+        setUpdatedPassword((prev) => ({ ...prev, [name]: value }));
+    };
+    const handleRoleChange = (e) => {
+        setUpdatedRol(e.target.value);
+    };
+    const handleStateChange = (state) => {
+        setUpdatedEstado(state);
+    }
+    const dataToSend = (actionType) => {
+        switch (actionType) {
+            case "password":
+                return {
+                    password: updatedPassword.password
+                };
+            case "rol":
+                return {
+                    rol: updatedRol
+                };
+            case "estado":
+                return {
+                    estado: updatedEstado
+                };
+            default:
+                return {};
+        }
+    }
+    const updateUser = async (dni, actionType, value = null) => {
+        try {
+            const payload = value !== null ? (
+                actionType === "password" ? { password: value } :
+                actionType === "rol" ? { rol: value } :
+                actionType === "estado" ? { estado: value } : {}
+            ) : dataToSend(actionType);
+
+            console.log("Updating user", dni, actionType, payload);
+
+            const response = await axios.post(`${API_URL}/admin/update/${dni}`, payload, {
+                withCredentials: true
+            });
+
+            if (response.data.success || response.status === 200) {
+                toast.success(response.data.message || "Usuario actualizado exitosamente.");
+                setUpdatedPassword({ password: "", confirmPassword: "" });
+                setUpdatedRol("");
+                setUpdatedEstado("");
+                fetchUsers()
+                return true;
+            } else {
+                toast.error(response.data.error || "Error al actualizar el usuario.");
+            }
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                toast.error(error.response?.data?.error || "Error al actualizar el usuario.");
+            }
+            console.error(error);
+            return false;
+        }
+    }
+
     return {
         createUser,
         showPassword,
@@ -100,6 +215,21 @@ export const useAdmin = () => {
         handleShowPassword,
         handleInputChange,
         handleCreateUser,
-        createErrors
+        createErrors,
+        users,
+        fetchUsers,
+        isLoadingUsers,
+        dniSearch,
+        isSearching,
+        searchedUser,
+        handleSearchDni,
+        searchUser,
+        updatedPassword,
+        updatedRol,
+        updatedEstado,
+        handlePasswordChange,
+        updateUser,
+        handleRoleChange,
+        handleStateChange
     };
 };
