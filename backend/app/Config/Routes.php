@@ -79,10 +79,10 @@ $routes->group('/', [
 
         // Dashboard y gestión de denuncias
         //$routes->get('dashboard', 'AdminsController::dashboard');
-        $routes->post('recibir', 'AdminsController::recibirAdmin');
-        $routes->get('registradas', 'AdminsController::getRegistradas');
-        $routes->get('activas', 'AdminsController::getDenunciasActivas');
-        $routes->post('procesos-denuncia', 'AdminsController::procesosDenuncia');
+        $routes->post('recibir', 'AdminsController::recibirAdmin', ['filter' => 'auth:super_admin,admin']);
+        $routes->get('registradas', 'AdminsController::getRegistradas', ['filter' => 'auth:super_admin,admin']);
+        $routes->get('activas', 'AdminsController::getDenunciasActivas', ['filter' => 'auth:super_admin,admin']);
+        $routes->post('procesos-denuncia', 'AdminsController::procesosDenuncia', ['filter' => 'auth:super_admin,admin']);
 
         // Gestión de administradores
         $routes->get('/', 'AdminsController::getAdministradores', ['filter' => 'auth:super_admin']); 
