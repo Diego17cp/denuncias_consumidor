@@ -327,39 +327,52 @@ class AdminsController extends ResourceController
 
     public function updateAdministrador($dni = null)
     {
-        $admin = $this->authAdmin();
-        if (is_object($admin)) return $admin; 
+        $adminAuth = $this->authAdmin();
+        if (is_object($adminAuth)) return $adminAuth;
 
-        if (!$this->isSuperAdmin($admin)) {
-            return $this->fail(['error' => 'No tienes permisos para actualizar administradores'], 403);
+        if (!$this->isSuperAdmin($adminAuth)) {
+            return $this->fail([
+                'success' => false,
+                'error' => 'No tienes permisos para actualizar administradores'
+            ], 403);
+        }
+
+        if (!$dni) {
+            return $this->response
+                ->setJSON(['success' => false, 'error' => 'DNI no proporcionado'])
+                ->setStatusCode(400);
         }
 
         $input = $this->request->getJSON(true);
 
-        // Verificar si el admin existe por DNI
+        // Verificar si el admin existe
         $admin = $this->adminModel->getByDNI($dni);
         if (!$admin) {
             return $this->failNotFound("Administrador con DNI {$dni} no encontrado");
         }
 
-        // Filtramos solo los campos permitidos en el modelo
-        $data = array_intersect_key($input, array_flip($this->adminModel->allowedFields));
+        // Solo permitimos actualizar estos campos
+        $allowedUpdateFields = ['password', 'estado', 'rol'];
+        $data = array_intersect_key($input, array_flip($allowedUpdateFields));
 
         if (empty($data)) {
-            return $this->failValidationErrors("No se enviaron campos válidos para actualizar");
+            return $this->failValidationErrors("Solo puedes actualizar password, estado o rol");
         }
 
-        // Hashear la contraseña 
+        // Hashear la contraseña si se envía
         if (isset($data['password'])) {
             $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
         }
 
         // Ejecutamos el update usando el DNI
         if ($this->adminModel->where('dni', $dni)->set($data)->update()) {
+            $adminUpdated = $this->adminModel->getByDNI($dni);
+            unset($adminUpdated['id'], $adminUpdated['password']); // Ocultar campos sensibles
+
             return $this->respondUpdated([
                 'success' => true,
                 'message' => "Administrador actualizado correctamente",
-                'data'    => $this->adminModel->getByDNI($dni)
+                'data'    => $adminUpdated
             ]);
         }
 
