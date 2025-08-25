@@ -263,30 +263,23 @@ class AdminsController extends ResourceController
     public function getAdministradores()
     {
         $admins = $this->adminModel->findAll();
+
         if (!$admins) {
-            return $this->response->setJSON(['error' => 'No se encontraron administradores'])->setStatusCode(404);
+            return $this->response
+                ->setJSON(['success' => false, 'error' => 'No se encontraron administradores'])
+                ->setStatusCode(404);
         }
-        return $this->response->setJSON($admins);
+
+        $filteredAdmins = array_map(function ($admin) {
+            unset($admin['id'], $admin['password']);
+            return $admin;
+        }, $admins);
+
+        return $this->response->setJSON([
+            'success' => true,
+            'data' => $filteredAdmins
+        ]);
     }
-
-    public function getAdministradoresPanel()
-{
-    $admins = $this->adminModel->findAll();
-
-    if (!$admins) {
-        return $this->response
-            ->setJSON(['error' => 'No se encontraron administradores'])
-            ->setStatusCode(404);
-    }
-
-    // Eliminar 'id' y 'password' de cada registro
-    $filteredAdmins = array_map(function ($admin) {
-        unset($admin['id'], $admin['password']);
-        return $admin;
-    }, $admins);
-
-    return $this->response->setJSON($filteredAdmins);
-}
 
     
     public function createAdministrador()
@@ -439,44 +432,63 @@ class AdminsController extends ResourceController
     public function searchAdminByDNI($dni = null)
     {
         $admin = $this->authAdmin();
-        if (is_object($admin)) return $admin; 
+        if (is_object($admin)) return $admin;
 
         if (!$this->isSuperAdmin($admin)) {
-            return $this->fail(['error' => 'No tienes permisos para buscar administradores'], 403);
+            return $this->fail(['success' => false, 'error' => 'No tienes permisos para buscar administradores'], 403);
         }
 
         if (!$dni) {
-            return $this->response->setJSON(['error' => 'DNI no proporcionado'])->setStatusCode(400);
+            return $this->response
+                ->setJSON(['success' => false, 'error' => 'DNI no proporcionado'])
+                ->setStatusCode(400);
         }
 
         $admin = $this->adminModel->getByDNI($dni);
+
         if (!$admin) {
-            return $this->response->setJSON(['error' => 'Administrador no encontrado'])->setStatusCode(404);
+            return $this->response
+                ->setJSON(['success' => false, 'error' => 'Administrador no encontrado'])
+                ->setStatusCode(404);
         }
-        return $this->response->setJSON($admin);
+
+        unset($admin['id'], $admin['password']);
+
+        return $this->response->setJSON([
+            'success' => true,
+            'data' => $admin
+        ]);
     }
 
     public function searchAdminById($id)
     {
-        
         $admin = $this->authAdmin();
         if (is_object($admin)) return $admin;
 
         if (!$this->isSuperAdmin($admin)) {
-            return $this->fail(['error' => 'No tienes permisos para buscar administradores'], 403);
+            return $this->fail(['success' => false, 'error' => 'No tienes permisos para buscar administradores'], 403);
         }
 
         if (!$id) {
-            return $this->response->setJSON(['error' => 'ID no proporcionado'])->setStatusCode(400);
+            return $this->response
+                ->setJSON(['success' => false, 'error' => 'ID no proporcionado'])
+                ->setStatusCode(400);
         }
-        
+
         $admin = $this->adminModel->find($id);
 
         if (!$admin) {
-            return $this->response->setJSON(['error' => 'Administrador no encontrado'])->setStatusCode(404);
+            return $this->response
+                ->setJSON(['success' => false, 'error' => 'Administrador no encontrado'])
+                ->setStatusCode(404);
         }
 
-        return $this->response->setJSON($admin);
+        unset($admin['id'], $admin['password']);
+
+        return $this->response->setJSON([
+            'success' => true,
+            'data' => $admin
+        ]);
     }
 
 
