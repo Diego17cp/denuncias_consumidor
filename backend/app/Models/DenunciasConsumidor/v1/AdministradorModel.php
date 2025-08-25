@@ -36,7 +36,7 @@ class AdministradorModel extends Model
         'nombre'   => 'permit_empty|string|max_length[100]',
         'password' => 'required|string|min_length[8]|max_length[255]',
         'rol'      => 'required|string|max_length[50]',
-        'estado'   => 'required|in_list[activo,inactivo,1,0]'
+        'estado'   => 'required|in_list[1,0]'
     ];
 
     protected $validationMessages = [
@@ -61,7 +61,7 @@ class AdministradorModel extends Model
         ],
         'estado' => [
             'required' => 'El estado es obligatorio.',
-            'in_list'  => 'El estado debe ser "activo", "inactivo", 1 o 0.'
+            'in_list'  => 'El estado debe ser "1" o "0"'
         ]
     ];
 

@@ -86,6 +86,7 @@ $routes->group('/', [
 
         // Gestión de administradores
         $routes->get('/', 'AdminsController::getAdministradores'); 
+        $routes->get('panel', 'AdminsController::getAdministradoresPanel'); 
         $routes->post('/', 'AdminsController::createAdministrador', ['filter' => 'auth:super_admin']);
         // actualizar administrador por DNI
         $routes->put('update/(:num)', 'AdminsController::updateAdministrador/$1');
