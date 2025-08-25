@@ -32,7 +32,7 @@ class AuthController extends ResourceController
         }
 
         // Verificar si está inactivo
-        if (strtolower(trim($user['estado'])) === 'inactivo') {
+        if ($user['estado'] === '0') {
             return service("response")
                 ->setStatusCode(403)
                 ->setJSON(['error' => 'Tu cuenta está inactiva, contacta con el administrador principal.']);

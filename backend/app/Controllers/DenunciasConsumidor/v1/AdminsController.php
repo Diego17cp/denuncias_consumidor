@@ -269,6 +269,25 @@ class AdminsController extends ResourceController
         return $this->response->setJSON($admins);
     }
 
+    public function getAdministradoresPanel()
+{
+    $admins = $this->adminModel->findAll();
+
+    if (!$admins) {
+        return $this->response
+            ->setJSON(['error' => 'No se encontraron administradores'])
+            ->setStatusCode(404);
+    }
+
+    // Eliminar 'id' y 'password' de cada registro
+    $filteredAdmins = array_map(function ($admin) {
+        unset($admin['id'], $admin['password']);
+        return $admin;
+    }, $admins);
+
+    return $this->response->setJSON($filteredAdmins);
+}
+
     
     public function createAdministrador()
     {
