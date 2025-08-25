@@ -85,18 +85,18 @@ $routes->group('/', [
         $routes->post('procesos-denuncia', 'AdminsController::procesosDenuncia');
 
         // Gestión de administradores
-        $routes->get('/', 'AdminsController::getAdministradores'); 
+        $routes->get('/', 'AdminsController::getAdministradores', ['filter' => 'auth:super_admin']); 
         $routes->post('/', 'AdminsController::createAdministrador', ['filter' => 'auth:super_admin']);
         // actualizar administrador por DNI
-        $routes->post('update/(:num)', 'AdminsController::updateAdministrador/$1');
+        $routes->post('update/(:num)', 'AdminsController::updateAdministrador/$1', ['filter' => 'auth:super_admin']);
         // eliminar administrador por dni o id del administrador
-        $routes->delete('delete-dni/(:num)', 'AdminsController::deleteAdministrador/$1');
-        $routes->delete('delete-id/(:num)', 'AdminsController::deleteAdministradorById/$1');
+        $routes->delete('delete-dni/(:num)', 'AdminsController::deleteAdministrador/$1', ['filter' => 'auth:super_admin']);
+        $routes->delete('delete-id/(:num)', 'AdminsController::deleteAdministradorById/$1', ['filter' => 'auth:super_admin']);
         // Buscar Admins por dni o ids
-        $routes->get('dni/(:num)', 'AdminsController::searchAdminByDni/$1');
-        $routes->get('id/(:num)', 'AdminsController::searchAdminById/$1');
+        $routes->get('dni/(:num)', 'AdminsController::searchAdminByDni/$1', ['filter' => 'auth:super_admin']);
+        $routes->get('id/(:num)', 'AdminsController::searchAdminById/$1', ['filter' => 'auth:super_admin']);
         // Buscar denuncias por dni o id del denunciante
-        $routes->get('buscar-dni/(:num)', 'AdminsController::searchDenuncias/$1');
-        $routes->get('buscar-id/(:num)', 'AdminsController::searchDenunciasByDenuncianteId/$1');  
+        $routes->get('buscar-dni/(:num)', 'AdminsController::searchDenuncias/$1', ['filter' => 'auth:super_admin,admin']);
+        $routes->get('buscar-id/(:num)', 'AdminsController::searchDenunciasByDenuncianteId/$1', ['filter' => 'auth:super_admin,admin']);
     });
 });
