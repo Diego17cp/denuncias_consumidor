@@ -8,6 +8,8 @@ import {
     MessageSquare,
     Download,
 } from "lucide-react";
+import axios from "axios";
+import { toast } from "sonner";
 
 // Mapeo de colores por estado
 const estadoColors = {
@@ -25,8 +27,33 @@ export default function ModalDetalleDenuncia({
     newStatus,
     setNewStatus,
     onClose,
-    onActualizar,
 }) {
+
+    const API_URL = import.meta.env.VITE_CI_API_BASE_URL
+
+    const onUpdate = async () => {
+        const data = {
+            tracking_code: denuncia.tracking_code,
+            comentario: newComment,
+            estado: newStatus
+        }
+        try {
+            const response = await axios.post(`${API_URL}/admin/procesos-denuncia`, data, {
+                withCredentials: true
+            })
+            if (response.data.success || response.status === 200) {
+                toast.success("Denuncia actualizada correctamente.");
+            }
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                toast.error("Error al actualizar la denuncia. Inténtalo de nuevo.");
+                console.error("Error en la solicitud:", err.response || err.message);
+            }
+            console.error("Error inesperado:", err);
+            toast.error("Error al actualizar la denuncia. Inténtalo de nuevo.");
+        }
+    }
+
     if (!open || !denuncia) return null;
 
     return (
@@ -46,7 +73,7 @@ export default function ModalDetalleDenuncia({
                             Detalles de la Denuncia
                         </h3>
                         <p className="text-blue-600 font-semibold text-base mt-1">
-                            {denuncia.id}
+                            {denuncia.tracking_code}
                         </p>
                     </div>
                     <button
@@ -68,10 +95,10 @@ export default function ModalDetalleDenuncia({
                                 <span className="font-semibold text-blue-700">Denunciante</span>
                             </div>
                             <div className="text-slate-900 font-medium">
-                                {denuncia.denunciante}
+                                {denuncia.denunciante.nombre}
                             </div>
                             <div className="text-slate-600 text-sm">
-                                DNI: {denuncia.denuncianteDni}
+                                Documento: {denuncia.denunciante.documento}
                             </div>
                         </div>
                         {/* Denunciado */}
@@ -80,9 +107,9 @@ export default function ModalDetalleDenuncia({
                                 <Shield className="h-5 w-5 text-red-600" />
                                 <span className="font-semibold text-red-700">Denunciado</span>
                             </div>
-                            <div className="text-slate-900 font-medium">{denuncia.contra}</div>
+                            <div className="text-slate-900 font-medium">{denuncia.denunciado.nombre}</div>
                             <div className="text-slate-600 text-sm">
-                                DNI: {denuncia.denunciadoDni}
+                                Documento: {denuncia.denunciado.documento}
                             </div>
                         </div>
                     </div>
@@ -97,26 +124,22 @@ export default function ModalDetalleDenuncia({
                         </div>
                         <div className="text-slate-900 mb-2">
                             <span className="font-semibold">Motivo:</span>{" "}
-                            {denuncia.detalleIncidente}
+                            {denuncia.descripcion}
                         </div>
                         <div className="flex flex-col md:flex-row gap-4 text-slate-700 text-sm">
                             <div>
                                 <span className="font-semibold">Fecha:</span>{" "}
-                                {new Date(denuncia.fechaIncidente).toLocaleDateString("es-ES", {
-                                    year: "numeric",
-                                    month: "long",
-                                    day: "numeric",
-                                })}
+                                {denuncia.fecha_incidente}
                             </div>
                             <div>
                                 <span className="font-semibold">Lugar:</span>{" "}
-                                {denuncia.lugarIncidente}
+                                {denuncia.lugar}
                             </div>
                         </div>
                     </div>
 
                     {/* Historial de estados */}
-                    <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-100">
+                    {/* <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-100">
                         <div className="flex items-center gap-2 mb-2">
                             <Clock className="h-5 w-5 text-emerald-600" />
                             <span className="font-semibold text-emerald-700">
@@ -139,7 +162,7 @@ export default function ModalDetalleDenuncia({
                                 </div>
                             ))}
                         </div>
-                    </div>
+                    </div> */}
 
                     {/* Gestión y comentarios */}
                     <div className="bg-purple-50 rounded-xl p-4 border border-purple-100">
@@ -156,7 +179,7 @@ export default function ModalDetalleDenuncia({
                             <textarea
                                 value={newComment}
                                 onChange={(e) => setNewComment(e.target.value)}
-                                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 resize-none"
+                                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none transition-all duration-200 resize-none"
                                 rows="3"
                                 placeholder="Agregar comentario sobre el estado de la denuncia..."
                             />
@@ -168,22 +191,24 @@ export default function ModalDetalleDenuncia({
                             <select
                                 value={newStatus}
                                 onChange={(e) => setNewStatus(e.target.value)}
-                                className="cursor-pointer w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
+                                className="cursor-pointer w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none transition-all duration-200"
                             >
-                                <option value="Registrada">Registrada</option>
-                                <option value="Pendiente">Pendiente</option>
-                                <option value="Cerrada">Cerrada</option>
-                                <option value="Archivada">Archivada</option>
+                                <option value="" disabled>Seleccionar un nuevo estado</option>
+                                <option value="recibido">Recibida</option>
+                                <option value="en_proceso">En proceso</option>
+                                <option value="rechazado">Rechazada</option>
+                                <option value="aceptado">Aceptada</option>
+                                <option value="finalizado">Finalizada</option>
                             </select>
                         </div>
                         <div className="flex flex-wrap gap-2 mt-2">
-                            <button
-                                onClick={() => alert("Descargando evidencias...")}
+                            <a
+                                href={`${API_URL}/denuncias/adjunto/descargar/${denuncia.id}`}
                                 className="cursor-pointer bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-700 transition-all duration-200 flex items-center shadow-sm"
                             >
                                 <Download className="h-4 w-4 mr-2" />
                                 Descargar evidencias
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -197,7 +222,7 @@ export default function ModalDetalleDenuncia({
                         Cerrar
                     </button>
                     <button
-                        onClick={onActualizar}
+                        onClick={onUpdate}
                         className="cursor-pointer px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg transition-all duration-300 flex items-center justify-center shadow-lg"
                     >
                         <MessageSquare className="h-4 w-4 mr-2" />
