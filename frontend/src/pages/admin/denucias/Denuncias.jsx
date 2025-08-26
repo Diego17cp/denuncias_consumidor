@@ -165,25 +165,20 @@ export const Denuncias = () => {
                   index % 2 === 0 ? "bg-white" : "bg-slate-25"
                 }`}
               >
-                {/* deberia cambiar los denunciado y denunciante id por solo denunciado o denunciante */}
                 <td className="px-6 py-4">
-                  <div className="font-semibold text-slate-900">{denuncia.denunciado_id}</div>
+                  <div className="font-semibold text-slate-900">{denuncia.denunciado}</div>
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center text-sm text-slate-600">
                     <User className="h-4 w-4 mr-2 text-slate-400" />
-                    <span>{denuncia.denunciante_id}</span>
+                    <span>{denuncia.denunciante}</span>
                   </div>
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center text-sm text-slate-600">
                     <Calendar className="h-4 w-4 mr-2 text-slate-400" />
                     <span>
-                      {new Date(denuncia.fecha).toLocaleDateString("es-ES", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
+                      {denuncia.fecha_incidente}
                     </span>
                   </div>
                 </td>
@@ -242,12 +237,12 @@ export const Denuncias = () => {
                   <div className="text-primary font-bold text-sm">{denuncia.tracking_code}</div>
                 </td>
                 <td className="px-6 py-4">
-                  <div className="font-semibold text-slate-900">{denuncia.denunciado}</div>
+                  <div className="font-semibold text-slate-900">{denuncia.denunciado.nombre}</div>
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center text-sm text-slate-600">
                     <User className="h-4 w-4 mr-2 text-slate-400" />
-                    <span>{denuncia.denunciante}</span>
+                    <span>{denuncia.denunciante.nombre}</span>
                   </div>
                 </td>
                 <td className="px-6 py-4">
@@ -265,18 +260,18 @@ export const Denuncias = () => {
                     {denuncia.estado}
                   </span>
                 </td>
-                {/* <td className="px-6 py-4">
+                <td className="px-6 py-4">
                   <div className="flex items-center gap-4 text-xs text-slate-500">
                     <div className="flex items-center">
                       <Activity className="h-3 w-3 mr-1" />
-                      <span>{denuncia.historial.length}</span>
+                      <span>{denuncia.historial}</span>
                     </div>
                     <div className="flex items-center">
                       <FileBox className="h-3 w-3 mr-1" />
-                      <span>{denuncia.evidencias.length}</span>
+                      <span>{denuncia.adjuntos}</span>
                     </div>
                   </div>
-                </td> */}
+                </td>
                 <td className="px-6 py-4 text-center">
                   <button
                     onClick={() => mostrarDetalles(denuncia)}
@@ -660,7 +655,6 @@ export const Denuncias = () => {
         newStatus={newStatus}
         setNewStatus={setNewStatus}
         onClose={() => setShowDetails(false)}
-        onActualizar={actualizarDenuncia}
       />
     </div>
   )
