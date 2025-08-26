@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useCallback, useState } from "react"
+import { toast } from "sonner";
 
 export function useDenunciasGestion() {
 
@@ -44,7 +45,54 @@ export function useDenunciasGestion() {
 			setIsLoading(false);
 		}
 	}, [API_URL]);
-
+    const [recievedDenuncias, setRecievedDenuncias] = useState([]);
+    const fetchRecievedDenuncias = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const response = await axios.get(`${API_URL}/admin/activas`, {
+                withCredentials: true,
+            });
+            if (response.data.success || response.status === 200) {
+                const data = response.data.data;
+                setRecievedDenuncias(data);
+            } else {
+                setRecievedDenuncias([]);
+            }
+        } catch (e) {
+            if (axios.isAxiosError(e)) {
+                console.error(
+                    e.response?.data?.error ||
+                        "Error al obtener las denuncias recibidas."
+                );
+            }
+            console.error(e);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [API_URL]);
+    const recieveDenuncia = useCallback(async (trackingCode) => {
+        try {
+            const response = await axios.post(`${API_URL}/admin/recibir`, { 
+                tracking_code: trackingCode
+            }, {
+                withCredentials: true
+            })
+            if (response.data.success || response.status === 200) {
+                toast.success("Denuncia recibida exitosamente")
+                fetchRegisteredDenuncias()
+            } else {
+                toast.error("Error al recibir la denuncia.")
+            }
+        } catch (e) {
+            if (axios.isAxiosError(e)) {
+                console.error(
+                    e.response?.data?.error ||
+                        "Error al recibir la denuncia."
+                );
+            }
+            console.error(e);
+        }
+    }, [API_URL])
     const [denunciasRecibidas, setDenunciasRecibidas] = useState([
         {
             id: "DEN-2025-001",
@@ -262,10 +310,13 @@ export function useDenunciasGestion() {
         setDenunciasRecibidas,
         estados,
         filteredDenuncias,
+        recievedDenuncias,
+        fetchRecievedDenuncias,
         // Funciones
         getStatusStyles,
         getPriorityStyles,
         recibirDenuncia,
+        recieveDenuncia,
         mostrarDetalles,
         actualizarDenuncia,
         buscarDenuncias,
