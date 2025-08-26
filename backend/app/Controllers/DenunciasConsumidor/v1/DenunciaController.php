@@ -57,7 +57,11 @@ class DenunciaController extends ResourceController
             ]);
         }
 
-        $seguimientos = $this->seguimientoDenunciasModel->where('denuncia_id', $denuncia['id'])->findAll();
+        // Ordenar por fecha de creación descendente (más recientes primero)
+        $seguimientos = $this->seguimientoDenunciasModel
+            ->where('denuncia_id', $denuncia['id'])
+            ->orderBy('created_at', 'DESC')
+            ->findAll();
 
         return $this->respond([
             'success' => true,
