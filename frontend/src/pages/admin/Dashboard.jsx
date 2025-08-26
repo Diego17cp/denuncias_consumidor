@@ -9,7 +9,6 @@ export function Dashboard() {
 	const { user, confirmLogout } = useAuth();
 	const { showLogoutModal, openLogoutModal, closeLogoutModal } = useHeader();
 	const navigate = useNavigate();
-	const [activeFilter, setActiveFilter] = useState("all");
 
 	// Función para redirigir a los diferentes módulos
 	const redirectToModule = (module) => {
@@ -88,38 +87,39 @@ export function Dashboard() {
 								<div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></div>
 							</button>
 						</div>
-						{showLogoutModal && (
-							<Modal
-								title="Confirmar Cierre de Sesión"
-								isOpen={showLogoutModal}
-								onClose={closeLogoutModal}
-								size="xl"
-								classes={{
-									closeButton: "cursor-pointer",
-								}}
-							>
-								<p className="text-lg text-center text-gray-800 font-bold my-4">
-									¿Estás seguro de que deseas cerrar sesión?
-								</p>
-								<div className="flex justify-center mt-6 gap-3">
-									<button
-										onClick={closeLogoutModal}
-										className="px-4 py-2 bg-white border border-gray-200 text-sm rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 transition duration-300 ease-in-out cursor-pointer"
-									>
-										Cancelar
-									</button>
-									<button
-										onClick={() => confirmLogout("s")}
-										className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 transition duration-300 ease-in-out cursor-pointer"
-									>
-										Confirmar
-									</button>
-								</div>
-							</Modal>
-						)}
 					</div>
 				</div>
 			</header>
+
+			{/* MODAL de cerrar sesion */}
+			{showLogoutModal && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center min-h-screen bg-black/30">
+					<Modal
+						title="Confirmar Cierre de Sesión"
+						isOpen={showLogoutModal}
+						onClose={closeLogoutModal}
+						size="xl"
+					>
+						<p className="text-lg text-center text-gray-800 font-bold my-4">
+							¿Estás seguro de que deseas cerrar sesión?
+						</p>
+						<div className="flex justify-center mt-6 gap-3">
+							<button
+								onClick={closeLogoutModal}
+								className="px-4 py-2 bg-white border border-gray-200 text-sm rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 transition duration-300 ease-in-out cursor-pointer"
+							>
+								Cancelar
+							</button>
+							<button
+								onClick={() => confirmLogout("s")}
+								className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 transition duration-300 ease-in-out cursor-pointer"
+							>
+								Confirmar
+							</button>
+						</div>
+					</Modal>
+				</div>
+			)}
 
 			{/* Contenido principal */}
 			<main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -129,19 +129,6 @@ export function Dashboard() {
 						<h2 className="text-xl font-bold text-gray-900">
 							Módulos Principales
 						</h2>
-						<div className="flex items-center space-x-2">
-							<select
-								value={activeFilter}
-								onChange={(e) =>
-									setActiveFilter(e.target.value)
-								}
-								className="text-sm border border-gray-200 rounded-lg px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-							>
-								<option value="all">Todos los módulos</option>
-								<option value="active">Módulos activos</option>
-								<option value="priority">Alta prioridad</option>
-							</select>
-						</div>
 					</div>
 					<div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
 						{moduleCards.map((module, index) => (
