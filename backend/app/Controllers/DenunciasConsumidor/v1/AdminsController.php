@@ -277,14 +277,75 @@ class AdminsController extends ResourceController
             return $this->fail(['message' => 'Falta el parámetro documento del denunciado']);
         }
 
-        $denuncia = $this->denunciaModel->searchByDocumentoDenunciado($documento);
+        $denuncias = $this->denunciaModel->searchByDocumentoDenunciado($documento);
 
-        if (empty($denuncia)) {
+        if (empty($denuncias)) {
             return $this->fail(['message' => 'No se encontró ninguna denuncia para este documento']);
         }
 
-        return $this->respond(['success' => true, 'data' => $denuncia]);
+        // Construimos un array limpio para la respuesta
+        $data = array_map(function ($denuncia) {
+            return [
+                'id'             => $denuncia['id'],
+                'tracking_code'  => $denuncia['tracking_code'],
+                'estado'         => $denuncia['estado'],
+                'descripcion'    => $denuncia['descripcion'],
+                'fecha_incidente'=> $denuncia['fecha_incidente'],
+                'lugar'          => $denuncia['lugar'],
+                'denunciante' => [
+                    'nombre'    => $denuncia['nombre_denunciante'] ?? 'Anónimo',
+                    'documento' => $denuncia['documento_denunciante'] ?? 'No especificado',
+                ],
+                'denunciado' => [
+                    'nombre'    => $denuncia['nombre_denunciado'],
+                    'documento' => $denuncia['documento_denunciado'],
+                ],
+                'created_at' => $denuncia['created_at'],
+            ];
+        }, $denuncias);
+
+        return $this->respond(['success' => true, 'data' => $data]);
     }
+
+    public function searchDenunciaByNombreDenunciado($nombre = null)
+    {
+        $admin = $this->authAdmin();
+        if (is_object($admin)) return $admin;
+
+        if (empty($nombre)) {
+            return $this->fail(['message' => 'Falta el parámetro nombre del denunciado']);
+        }
+
+        $denuncias = $this->denunciaModel->searchByNombreDenunciado($nombre);
+
+        if (empty($denuncias)) {
+            return $this->fail(['message' => 'No se encontró ninguna denuncia para este nombre']);
+        }
+
+        // Construimos la respuesta
+        $data = array_map(function ($denuncia) {
+            return [
+                'id'             => $denuncia['id'],
+                'tracking_code'  => $denuncia['tracking_code'],
+                'estado'         => $denuncia['estado'],
+                'descripcion'    => $denuncia['descripcion'],
+                'fecha_incidente'=> $denuncia['fecha_incidente'],
+                'lugar'          => $denuncia['lugar'],
+                'denunciante' => [
+                    'nombre'    => $denuncia['nombre_denunciante'] ?? 'Anónimo',
+                    'documento' => $denuncia['documento_denunciante'] ?? 'No especificado',
+                ],
+                'denunciado' => [
+                    'nombre'    => $denuncia['nombre_denunciado'],
+                    'documento' => $denuncia['documento_denunciado'],
+                ],
+                'created_at' => $denuncia['created_at'],
+            ];
+        }, $denuncias);
+
+        return $this->respond(['success' => true, 'data' => $data]);
+    }
+
 
     
 

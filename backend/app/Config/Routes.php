@@ -112,5 +112,7 @@ $routes->group('/', [
         
         // Buscar denuncias por documento del denunciado
         $routes->get('documento/(:num)', 'AdminsController::searchDenunciaByDocumentoDenunciado/$1', ['filter' => 'auth:super_admin,admin']);
+        // Buscar denuncias por nombre del denunciado
+        $routes->get('nombre/(:any)', 'AdminsController::searchDenunciaByNombreDenunciado/$1', ['filter' => 'auth:super_admin,admin']);
     });
 });

@@ -325,10 +325,28 @@ class DenunciaModel extends Model
 
     public function searchByDocumentoDenunciado($documento)
     {
-        return $this->select('denuncia.*, denunciado.nombre AS nombre_denunciado, denunciado.documento')
+        return $this->select('denuncia.*, 
+                            denunciado.nombre AS nombre_denunciado, 
+                            denunciado.documento AS documento_denunciado,
+                            denunciante.nombre AS nombre_denunciante,
+                            denunciante.documento AS documento_denunciante')
                     ->join('denunciado', 'denunciado.id = denuncia.denunciado_id')
+                    ->join('denunciante', 'denunciante.id = denuncia.denunciante_id', 'left')
                     ->where('denunciado.documento', $documento)
-                    ->first(); // O ->findAll() si quieres varias denuncias
+                    ->findAll();
+    }
+
+    public function searchByNombreDenunciado($nombre)
+    {
+        return $this->select('denuncia.*, 
+                            denunciado.nombre AS nombre_denunciado, 
+                            denunciado.documento AS documento_denunciado,
+                            denunciante.nombre AS nombre_denunciante,
+                            denunciante.documento AS documento_denunciante')
+                    ->join('denunciado', 'denunciado.id = denuncia.denunciado_id')
+                    ->join('denunciante', 'denunciante.id = denuncia.denunciante_id', 'left')
+                    ->like('denunciado.nombre', $nombre) // usamos LIKE para coincidencias parciales
+                    ->findAll();
     }
 
     public function DenunciasRegistradas($perPage = 10, $page = 1)
@@ -352,7 +370,8 @@ class DenunciaModel extends Model
                             denunciado.documento AS denunciado_documento')
                     ->join('denunciante', 'denunciante.id = denuncia.denunciante_id', 'left')
                     ->join('denunciado',  'denunciado.id  = denuncia.denunciado_id',  'left')
-                    ->whereIn('denuncia.estado', ['recibida', 'en proceso', 'pendiente'])
+                    //->whereIn('denuncia.estado', ['recibida', 'en proceso', 'pendiente'])
+                    ->where('denuncia.estado !=', 'registrado')
                     ->orderBy('denuncia.created_at', 'DESC')
                     ->paginate($perPage, 'default', $page);
     }
