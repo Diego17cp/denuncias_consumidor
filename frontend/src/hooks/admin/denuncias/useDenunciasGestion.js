@@ -92,7 +92,7 @@ export function useDenunciasGestion() {
             }
             console.error(e);
         }
-    }, [API_URL])
+    }, [API_URL, fetchRegisteredDenuncias])
     const [denunciasRecibidas, setDenunciasRecibidas] = useState([
         {
             id: "DEN-2025-001",
@@ -252,16 +252,33 @@ export function useDenunciasGestion() {
         setSelectedDenuncia(denunciaActualizada) // No cerrar el modal, solo actualizar
         alert("Denuncia actualizada exitosamente")
     }
-
-    const buscarDenuncias = () => {
-        const resultados = denunciasRecibidas.filter((denuncia) => {
-            const matchDocument = searchDocument ? denuncia.denunciadoDni.includes(searchDocument) : true
-            const matchName = searchName ? denuncia.contra.toLowerCase().includes(searchName.toLowerCase()) : true
-            return matchDocument && matchName
-        })
-
-        setSearchResults(resultados)
-    }
+    const [isSearching, setIsSearching] = useState(false)
+    const buscarDenuncias = async () => {
+        setIsSearching(true)
+        const typeFetch = !(searchDocument.length > 0) && searchName ? "nombre" : "documento"
+        const paramFetch = typeFetch === "documento" ? searchDocument : searchName
+        try {
+            const response = await axios.get(`${API_URL}/admin/${typeFetch}/${paramFetch}`, {
+                withCredentials: true
+            })
+            if (response.data.success || response.status === 200) {
+                const resultados = response.data.data
+                setSearchResults(resultados)
+            } else {
+                toast.error("No se encontraron denuncias con ese documento.")
+                setSearchResults([])
+            }
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                console.error("Error en la solicitud:", error.response || error.message)
+                toast.error("Ocurrió un error al buscar denuncias.")
+            }
+            console.error("Error al buscar denuncias:", error)
+            setSearchResults([])
+        } finally {
+            setIsSearching(false)
+        }
+    } 
 
     const limpiarBusqueda = () => {
         setSearchDocument("")
@@ -312,6 +329,7 @@ export function useDenunciasGestion() {
         filteredDenuncias,
         recievedDenuncias,
         fetchRecievedDenuncias,
+        isSearching,
         // Funciones
         getStatusStyles,
         getPriorityStyles,
