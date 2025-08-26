@@ -194,11 +194,11 @@ export default function ModalDetalleDenuncia({
                                 className="cursor-pointer w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none transition-all duration-200"
                             >
                                 <option value="" disabled>Seleccionar un nuevo estado</option>
-                                <option value="recibido">Recibida</option>
+                                <option value="recibida">Recibida</option>
                                 <option value="en_proceso">En proceso</option>
-                                <option value="rechazado">Rechazada</option>
-                                <option value="aceptado">Aceptada</option>
-                                <option value="finalizado">Finalizada</option>
+                                <option value="rechazada">Rechazada</option>
+                                <option value="aceptada">Aceptada</option>
+                                <option value="finalizada">Finalizada</option>
                             </select>
                         </div>
                         <div className="flex flex-wrap gap-2 mt-2">
