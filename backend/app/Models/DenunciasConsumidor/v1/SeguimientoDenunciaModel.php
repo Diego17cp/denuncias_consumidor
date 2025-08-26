@@ -13,7 +13,8 @@ class SeguimientoDenunciaModel extends Model
     protected $allowedFields    = [
         'denuncia_id',
         'comentario',
-        'administrador_id'
+        'administrador_id',
+        'estado'
     ];
 
     // Manejo automático de fechas
@@ -27,7 +28,8 @@ class SeguimientoDenunciaModel extends Model
     protected $validationRules = [
         'denuncia_id'     => 'required|integer',
         'comentario'      => 'permit_empty|string|max_length[500]',
-        'administrador_id'=> 'required|integer'
+        'administrador_id'=> 'required|integer',
+        'estado'           => 'required|string|max_length[100]'
     ];
 
     protected $validationMessages = [
@@ -41,6 +43,10 @@ class SeguimientoDenunciaModel extends Model
         'administrador_id' => [
             'required' => 'El ID del administrador es obligatorio',
             'integer'  => 'El ID del administrador debe ser un número entero'
+        ],
+        'estado' => [
+            'required'   => 'El estado es obligatorio',
+            'max_length' => 'El estado no puede exceder los 100 caracteres'
         ]
     ];
 
