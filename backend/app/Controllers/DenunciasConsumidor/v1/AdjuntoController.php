@@ -90,14 +90,31 @@ class AdjuntoController extends BaseController
             return $this->failServerError('No se pudo crear el ZIP');
         }
 
+        // foreach ($adjuntos as $adjunto) {
+        //     $filePath = FCPATH . $adjunto['file_path'];
+        //     if (file_exists($filePath)) {
+        //         $zip->addFile($filePath, basename($filePath));
+        //     }
+        // }
         foreach ($adjuntos as $adjunto) {
-            $filePath = FCPATH . $adjunto['file_path'];
+            $filePath = $adjunto['file_path'];
+
+            if (!preg_match('/^[A-Z]:\\\\|^\//i', $filePath)) { 
+                $filePath = FCPATH . $filePath;
+            }
+
             if (file_exists($filePath)) {
                 $zip->addFile($filePath, basename($filePath));
+            } else {
+                log_message('error', 'Archivo no encontrado: ' . $filePath);
             }
         }
 
         $zip->close();
+        
+        if (!file_exists($zipFile)) {
+            return $this->failServerError('El ZIP no se creó correctamente');
+        }
 
         //  Descargar y borrar archivo temporal después
         $response = $this->response->download($zipFile, null)
