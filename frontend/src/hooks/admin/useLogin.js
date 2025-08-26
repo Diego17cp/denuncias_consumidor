@@ -31,6 +31,7 @@ export const useLogin = () => {
 		try {
 			const success = await login(dni, password);
 			if (success) toast.success("Inicio de sesión exitoso");
+			else toast.error("Credenciales incorrectas");
 		} catch (err) {
 			if (axios.isAxiosError(err)) {
 				setError(err.response?.data?.error || "Error de red");
