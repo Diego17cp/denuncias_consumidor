@@ -9,6 +9,14 @@ import {
     Download,
 } from "lucide-react";
 
+// Mapeo de colores por estado
+const estadoColors = {
+    Registrada: "bg-green-50 border-green-400 text-green-700",
+    Pendiente: "bg-amber-50 border-amber-400 text-amber-700",
+    Cerrada: "bg-slate-50 border-slate-400 text-slate-700",
+    Archivada: "bg-red-50 border-red-400 text-red-700",
+};
+
 export default function ModalDetalleDenuncia({
     open,
     denuncia,
@@ -119,10 +127,14 @@ export default function ModalDetalleDenuncia({
                             {denuncia.historial.map((item, idx) => (
                                 <div
                                     key={idx}
-                                    className="bg-white p-3 rounded-lg border-l-4 border-emerald-400 shadow-sm"
+                                    className={`bg-white p-3 rounded-lg border-l-4 shadow-sm ${
+                                        estadoColors[item.estado] || "border-slate-400 text-slate-700 bg-slate-50"
+                                    }`}
                                 >
                                     <div className="text-xs text-slate-600">{item.fecha}</div>
-                                    <div className="font-bold text-emerald-700">{item.estado}</div>
+                                    <div className={`font-bold mb-1 ${estadoColors[item.estado]?.split(" ").find(c => c.startsWith("text-")) || "text-slate-700"}`}>
+                                        {item.estado}
+                                    </div>
                                     <div className="text-slate-700 text-sm">{item.comentario}</div>
                                 </div>
                             ))}
