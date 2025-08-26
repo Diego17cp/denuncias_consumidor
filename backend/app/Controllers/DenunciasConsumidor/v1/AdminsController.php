@@ -167,6 +167,23 @@ class AdminsController extends ResourceController
             ], 404);
         }
 
+        $denuncia = $resultado['denuncia'];
+        $correo = null;
+
+        if (!empty($denuncia['denunciante_id'])) {
+            $denunciante = $this->denuncianteModel->find($denuncia['denunciante_id']);
+            if ($denunciante && !empty($denunciante['correo'])) {
+                $correo = $denunciante['correo'];
+            }
+        }
+
+        if ($correo) {
+            $enviado = $this->enviarCorreo($correo, $code, $estado, $comentario);
+            if ($enviado !== true) {
+                log_message('error', 'Error al enviar correo: ' . print_r($enviado, true));
+            }
+        }
+
         return $this->respond([
             'success'    => true,
             'message'    => 'Denuncia recibida correctamente',
@@ -174,7 +191,7 @@ class AdminsController extends ResourceController
             'seguimiento'=> $resultado['seguimiento']
         ]);
     }
-
+    
     public function procesosDenuncia()
     {
 
