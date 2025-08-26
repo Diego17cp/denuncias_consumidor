@@ -38,14 +38,13 @@ export function Usuarios() {
   }, [fetchUsers])
 
   const roles = [
-    { value: 'admin', label: 'Administrador', color: 'yellow' },
+    { value: 'admin', label: 'Administrador', color: 'blue' },
     { value: 'super_admin', label: 'Super Admin.', color: 'red' }
   ];
 
   const estados = [
     { value: '1', label: 'Activo', color: 'green' },
-    { value: '0', label: 'Inactivo', color: 'red' },
-    { value: 'suspendido', label: 'Suspendido', color: 'red' }
+    { value: '0', label: 'Inactivo', color: 'red' }
   ];
 
   // Funciones
@@ -216,18 +215,21 @@ export function Usuarios() {
                           {user.nombre}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleColor(user.rol) === 'blue' ? 'bg-blue-100 text-blue-800' :
-                              getRoleColor(user.rol) === 'yellow' ? 'bg-yellow-100 text-yellow-800' :
-                                getRoleColor(user.rol) === 'red' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
-                            }`}>
-                            {user.rol.charAt(0).toUpperCase() + user.rol.slice(1)}
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            getRoleColor(user.rol) === 'blue' ? 'bg-blue-100 text-blue-800' :
+                            getRoleColor(user.rol) === 'red' ? 'bg-red-100 text-red-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {user.rol === "super_admin" ? "Super Admin." : "Administrador"}
+                            {/* {user.rol.charAt(0).toUpperCase() + user.rol.slice(1)} */}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(user.estado) === 'green' ? 'bg-green-100 text-green-800' :
-                              getStatusColor(user.estado) === 'gray' ? 'bg-gray-100 text-gray-800' :
-                                getStatusColor(user.estado) === 'red' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
-                            }`}>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            getStatusColor(user.estado) === 'green' ? 'bg-green-100 text-green-800' :
+                            getStatusColor(user.estado) === 'red' ? 'bg-red-100 text-red-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
                             {getStatusLabel(user.estado)}
                           </span>
                         </td>
