@@ -251,27 +251,59 @@ class DenunciaModel extends Model
     }
 
 
+    // public function recibirDenuncia($trackingCode, $estado, $comentario, $seguimientoData)
+    // {
+    //     $denuncia = $this->where('tracking_code', $trackingCode)->first();
+
+    //     if (!$denuncia) {
+    //         return false;
+    //     }
+
+    //     $this->where('id', $denuncia['id'])
+    //         ->set(
+    //             ['estado' => $estado],
+    //             ['comentario' => $comentario]
+    //         )
+    //         ->update();
+
+    //     $seguimientoModel = new \App\Models\DenunciasConsumidor\v1\SeguimientoDenunciaModel();
+    //     $seguimientoData['denuncia_id'] = $denuncia['id'];
+    //     $seguimientoModel->insert($seguimientoData);
+
+    //     return true;
+    // }
+
     public function recibirDenuncia($trackingCode, $estado, $comentario, $seguimientoData)
     {
+        
         $denuncia = $this->where('tracking_code', $trackingCode)->first();
 
         if (!$denuncia) {
             return false;
         }
 
-        $this->where('id', $denuncia['id'])
-            ->set(
-                ['estado' => $estado],
-                ['comentario' => $comentario]
-            )
-            ->update();
+        // Actualizar estado y comentario en la denuncia
+        $this->update($denuncia['id'], [
+            'estado' => $estado
+        ]);
 
+        // Insertar el seguimiento
         $seguimientoModel = new \App\Models\DenunciasConsumidor\v1\SeguimientoDenunciaModel();
         $seguimientoData['denuncia_id'] = $denuncia['id'];
         $seguimientoModel->insert($seguimientoData);
 
-        return true;
+        // Traer la denuncia actualizada
+        $denunciaActualizada = $this->find($denuncia['id']);
+
+        // Ultimo seguimiento insertado
+        $ultimoSeguimiento = $seguimientoModel->find($seguimientoModel->getInsertID());
+
+        return [
+            'denuncia'   => $denunciaActualizada,
+            'seguimiento'=> $ultimoSeguimiento
+        ];
     }
+
 
 
     public function searchByDocumento($documento)
@@ -291,14 +323,27 @@ class DenunciaModel extends Model
             ->findAll();
     }
 
-    public function DenunciasRegistradas($perPage = 2)
+    public function searchByDocumentoDenunciado($documento)
     {
-        return $this->where('estado', 'registrado')
-                    ->orderBy('created_at', 'DESC')
-                    ->paginate($perPage);
+        return $this->select('denuncia.*, denunciado.nombre AS nombre_denunciado, denunciado.documento')
+                    ->join('denunciado', 'denunciado.id = denuncia.denunciado_id')
+                    ->where('denunciado.documento', $documento)
+                    ->first(); // O ->findAll() si quieres varias denuncias
     }
 
-    public function DenunciasActivas($perPage = 2)
+    public function DenunciasRegistradas($perPage = 10, $page = 1)
+    {
+        return $this->select('denuncia.*, 
+                            denunciante.nombre AS denunciante_nombre, 
+                            denunciado.nombre AS denunciado_nombre')
+                    ->join('denunciante', 'denunciante.id = denuncia.denunciante_id', 'left')
+                    ->join('denunciado', 'denunciado.id = denuncia.denunciado_id', 'left')
+                    ->where('denuncia.estado', 'registrado')
+                    ->orderBy('denuncia.created_at', 'DESC')
+                    ->paginate($perPage, 'default', $page);
+    }
+
+    public function DenunciasActivas($perPage = 2 , $page = null)
     {
         return $this->whereIn('estado', ['recibida', 'en proceso', 'pendiente'])
                     ->orderBy('created_at', 'DESC') 
