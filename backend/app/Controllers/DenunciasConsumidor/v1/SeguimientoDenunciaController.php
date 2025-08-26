@@ -20,21 +20,23 @@ class SeguimientoDenunciaController extends ResourceController
             $input = $this->request->getPost();
         }
 
-        // Mapear explícitamente a los campos permitidos
+        // Mapear los campos
         $seguimientoData = [
-            'denuncia_id'     => $input['denuncia_id'] ?? null,
-            'comentario'      => $input['comentario'] ?? '',
-            'administrador_id'=> $input['administrador_id'] ?? null
+            'denuncia_id'      => $input['denuncia_id'] ?? null,
+            'comentario'       => $input['comentario'] ?? '',
+            'administrador_id' => $input['administrador_id'] ?? null,
+            'estado'           => $input['estado'] ?? null 
         ];
-
-        // Log para depuración
-        log_message('debug', 'Datos procesados: ' . json_encode($seguimientoData));
 
         if ($this->model->insert($seguimientoData)) {
             return $this->respondCreated([
                 'success' => true,
                 'message' => 'Seguimiento registrado correctamente',
-                'id'      => $this->model->getInsertID()
+                'data'    => [
+                    'id'          => $this->model->getInsertID(),
+                    'denuncia_id' => $seguimientoData['denuncia_id'],
+                    'estado'      => $seguimientoData['estado']
+                ]
             ]);
         }
 
@@ -44,24 +46,36 @@ class SeguimientoDenunciaController extends ResourceController
     /**
      * Obtener seguimientos por ID de denuncia
      */
-    public function getByDenunciaId($denunciaId = null)
+    public function getByDenunciaId($denunciaId)
     {
         if (!$denunciaId || !is_numeric($denunciaId)) {
-            return $this->failValidationErrors(['denuncia_id' => 'Debe proporcionar un ID válido']);
+            return $this->respond([
+                'success' => false,
+                'message' => 'Debe proporcionar un ID válido',
+                'data'    => null
+            ], 400);
         }
 
-        $seguimientos = $this->model->obtenerPorDenunciaId((int) $denunciaId);
+        // Obtenemos los seguimientos incluyendo el estado
+        $seguimientos = $this->model
+            ->select('id, denuncia_id, comentario, estado, created_at')
+            ->where('denuncia_id', $denunciaId)
+            ->orderBy('created_at', 'DESC')
+            ->findAll();
 
         if (empty($seguimientos)) {
             return $this->respond([
                 'success' => false,
-                'message' => 'No se encontraron seguimientos para esta denuncia'
+                'message' => 'No se encontraron seguimientos para esta denuncia',
+                'data'    => []
             ]);
         }
 
         return $this->respond([
             'success' => true,
+            'message' => 'Seguimientos obtenidos correctamente',
             'data'    => $seguimientos
         ]);
     }
+
 }
