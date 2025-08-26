@@ -325,10 +325,15 @@ class DenunciaModel extends Model
 
     public function searchByDocumentoDenunciado($documento)
     {
-        return $this->select('denuncia.*, denunciado.nombre AS nombre_denunciado, denunciado.documento')
+        return $this->select('denuncia.*, 
+                            denunciado.nombre AS nombre_denunciado, 
+                            denunciado.documento AS documento_denunciado,
+                            denunciante.nombre AS nombre_denunciante,
+                            denunciante.documento AS documento_denunciante')
                     ->join('denunciado', 'denunciado.id = denuncia.denunciado_id')
+                    ->join('denunciante', 'denunciante.id = denuncia.denunciante_id', 'left')
                     ->where('denunciado.documento', $documento)
-                    ->first(); // O ->findAll() si quieres varias denuncias
+                    ->findAll();
     }
 
     public function DenunciasRegistradas($perPage = 10, $page = 1)
