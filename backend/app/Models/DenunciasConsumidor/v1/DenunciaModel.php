@@ -343,11 +343,18 @@ class DenunciaModel extends Model
                     ->paginate($perPage, 'default', $page);
     }
 
-    public function DenunciasActivas($perPage = 2 , $page = null)
+    public function DenunciasActivas($perPage = 2, $page = null)
     {
-        return $this->whereIn('estado', ['recibida', 'en proceso', 'pendiente'])
-                    ->orderBy('created_at', 'DESC') 
-                    ->paginate($perPage);
+        return $this->select('denuncia.*, 
+                            denunciante.nombre   AS denunciante_nombre,
+                            denunciante.documento AS denunciante_documento,
+                            denunciado.nombre    AS denunciado_nombre,
+                            denunciado.documento AS denunciado_documento')
+                    ->join('denunciante', 'denunciante.id = denuncia.denunciante_id', 'left')
+                    ->join('denunciado',  'denunciado.id  = denuncia.denunciado_id',  'left')
+                    ->whereIn('denuncia.estado', ['recibida', 'en proceso', 'pendiente'])
+                    ->orderBy('denuncia.created_at', 'DESC')
+                    ->paginate($perPage, 'default', $page);
     }
 
 }

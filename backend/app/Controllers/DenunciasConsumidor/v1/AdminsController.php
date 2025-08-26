@@ -372,39 +372,67 @@ class AdminsController extends ResourceController
     //     ]);
     // }
 
-    public function getdenunciasActivas()
-{
-    $admin = $this->authAdmin();
-    if (is_object($admin)) return $admin;
+    public function getDenunciasActivas($page = 1)
+    {
+        $admin = $this->authAdmin();
+        if (is_object($admin)) return $admin;
 
-    $perPage = $this->request->getGet('per_page') ?? 10;
+        $perPage = 2; 
 
-    $denuncias = $this->denunciaModel->DenunciasActivas($perPage);
+        $denuncias = $this->denunciaModel->DenunciasActivas($perPage, $page);
 
-    if (empty($denuncias)) {
-        return $this->fail(['message' => 'No hay denuncias activas']);
+        if (empty($denuncias)) {
+            return $this->fail(['message' => 'No hay denuncias activas']);
+        }
+
+        $pager = $this->denunciaModel->pager;
+
+        // Armamos el payload incluyendo historial (seguimientos) y adjuntos (archivos)
+        $data = [];
+        foreach ($denuncias as $denuncia) {
+            // Conteos
+            $historialCount = $this->seguimientoDenunciaModel
+                ->where('denuncia_id', $denuncia['id'])
+                ->countAllResults();
+
+            $adjuntosCount = $this->adjuntoModel
+                ->where('denuncia_id', $denuncia['id'])
+                ->countAllResults();
+
+            $data[] = [
+                'id'             => $denuncia['id'],
+                'tracking_code'  => $denuncia['tracking_code'],
+                'estado'         => $denuncia['estado'],
+                'descripcion'    => $denuncia['descripcion'],
+                'fecha_incidente'=> $denuncia['fecha_incidente'],
+                'lugar'          => $denuncia['lugar'],
+                'denunciante' => [
+                    'nombre'    => $denuncia['denunciante_nombre']    ?? 'Anónimo',
+                    'documento' => $denuncia['denunciante_documento'] ?? 'No especificado',
+                ],
+                'denunciado' => [
+                    'nombre'    => $denuncia['denunciado_nombre']    ?? 'Desconocido',
+                    'documento' => $denuncia['denunciado_documento'] ?? 'No especificado',
+                ],
+                'historial' => $historialCount,   
+                'adjuntos'  => $adjuntosCount,    
+                'created_at'=> $denuncia['created_at'],
+            ];
+        }
+
+        return $this->response->setStatusCode(200)->setJSON([
+            'success' => true,
+            'data'    => $data,
+            'pager'   => [
+                'currentPage' => (int) $page,
+                'perPage'     => (int) $perPage,
+                'total'       => $pager->getTotal(),
+                'pageCount'   => (int) ceil($pager->getTotal() / $perPage),
+                'next'        => $page < ceil($pager->getTotal() / $perPage) ? base_url("admin/activas/" . ($page + 1)) : null,
+                'prev'        => $page > 1 ? base_url("admin/activas/" . ($page - 1)) : null,
+            ],
+        ]);
     }
-
-    // Enriquecer cada denuncia con historial y adjuntos
-    foreach ($denuncias as &$denuncia) {
-        $historialCount = $this->seguimientoDenunciaModel
-            ->where('denuncia_id', $denuncia['id'])
-            ->countAllResults();
-
-        $adjuntosCount = $this->adjuntoModel
-            ->where('denuncia_id', $denuncia['id'])
-            ->countAllResults();
-
-        $denuncia['historial'] = $historialCount;
-        $denuncia['adjuntos']  = $adjuntosCount;
-    }
-
-    return $this->respond([
-        'success' => true,
-        'data'    => $denuncias,
-        'pager'   => $this->denunciaModel->pager->getDetails()
-    ], 200);
-}
 
 
 
