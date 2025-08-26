@@ -337,6 +337,51 @@ class CreateTables extends Migration
         $this->forge->addForeignKey('denuncia_id', 'denuncia', 'id', 'NO ACTION', 'CASCADE');
         $this->forge->addForeignKey('administrador_id', 'administrador', 'id', 'NO ACTION', 'CASCADE');
         $this->forge->createTable('seguimiento_denuncia');
+
+        // Create historial_admin table
+        $this->forge->addField([
+            'id' => [
+                'type' => 'INT',
+                'unsigned' => true,
+                'auto_increment' => true
+            ],
+            'administrador_id' => [
+                'type' => 'INT',
+                'unsigned' => true,
+                'null' => false
+            ],
+            'afectado_id' => [
+                'type' => 'INT',
+                'unsigned' => true,
+                'null' => false
+            ],
+            'accion' => [
+                'type' => 'VARCHAR',
+                'constraint' => '50',
+                'null' => false
+            ],
+            'motivo' => [
+                'type' => 'VARCHAR',
+                'constraint' => '255',
+                'null' => false
+            ],
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true
+            ],
+            'updated_at' => [
+                'type' => 'DATETIME',
+                'null' => true
+            ],
+            'deleted_at' => [
+                'type' => 'DATETIME',
+                'null' => true
+            ]
+        ]);
+        $this->forge->addKey('id', true);
+        $this->forge->addForeignKey('administrador_id', 'administrador', 'id', 'NO ACTION', 'CASCADE');
+        $this->forge->addForeignKey('afectado_id', 'administrador', 'id', 'NO ACTION', 'CASCADE');
+        $this->forge->createTable('historial_admin');
     }
 
     public function down()
