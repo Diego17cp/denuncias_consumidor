@@ -1,6 +1,10 @@
-import { useState } from "react"
+import axios from "axios";
+import { useCallback, useState } from "react"
 
 export function useDenunciasGestion() {
+
+    const API_URL = import.meta.env.VITE_CI_API_BASE_URL;
+
     const [activeTab, setActiveTab] = useState("disponibles")
     const [searchTerm, setSearchTerm] = useState("")
     const [statusFilter, setStatusFilter] = useState("todos")
@@ -14,35 +18,32 @@ export function useDenunciasGestion() {
     const [searchResults, setSearchResults] = useState([])
     const [expandedFilters, setExpandedFilters] = useState(false)
 
-    const [denunciasDisponibles, setDenunciasDisponibles] = useState([
-        {
-            id: 1,
-            denunciado: "Juan Carlos Pérez",
-            fecha: "2025-08-20",
-            descripcion: "Agresión física durante una discusión en el establecimiento",
-            lugar: "Centro Comercial Plaza Norte - Piso 2",
-            denunciante: "María González",
-            prioridad: "alta",
-        },
-        {
-            id: 2,
-            denunciado: "Ana Torres Vega",
-            fecha: "2025-08-19",
-            descripcion: "Acoso laboral y discriminación por género",
-            lugar: "Oficinas administrativas - Edificio Central",
-            denunciante: "Roberto Silva",
-            prioridad: "media",
-        },
-        {
-            id: 3,
-            denunciado: "Luis Alberto Morales",
-            fecha: "2025-08-18",
-            descripcion: "Robo de pertenencias personales en vestuario",
-            lugar: "Vestuarios del gimnasio municipal",
-            denunciante: "Anónimo",
-            prioridad: "baja",
-        },
-    ])
+    const [registeredDenuncias, setRegisteredDenuncias] = useState([]);
+	const [isLoading, setIsLoading] = useState(false);
+	const fetchRegisteredDenuncias = useCallback(async () => {
+		setIsLoading(true);
+		try {
+			const response = await axios.get(`${API_URL}/admin/registradas`, {
+				withCredentials: true,
+			});
+			if (response.data.success || response.status === 200) {
+				const data = response.data.data;
+				setRegisteredDenuncias(data);
+			} else {
+				setRegisteredDenuncias([]);
+			}
+		} catch (e) {
+			if (axios.isAxiosError(e)) {
+				console.error(
+					e.response?.data?.error ||
+						"Error al obtener las denuncias registradas."
+				);
+			}
+			console.error(e);
+		} finally {
+			setIsLoading(false);
+		}
+	}, [API_URL]);
 
     const [denunciasRecibidas, setDenunciasRecibidas] = useState([
         {
@@ -255,8 +256,8 @@ export function useDenunciasGestion() {
         setSearchResults,
         expandedFilters,
         setExpandedFilters,
-        denunciasDisponibles,
-        setDenunciasDisponibles,
+        registeredDenuncias,
+        fetchRegisteredDenuncias,
         denunciasRecibidas,
         setDenunciasRecibidas,
         estados,
