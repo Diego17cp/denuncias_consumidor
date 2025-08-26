@@ -1,6 +1,6 @@
 "use client"
 
-import { useDenunciasGestion } from "./useDenunciasGestion"
+import { useDenunciasGestion } from "../../../hooks/admin/denuncias/useDenunciasGestion"
 import {
   ArrowLeft,
   Search,
@@ -21,6 +21,7 @@ import {
   Activity,
 } from "lucide-react"
 import ModalDetalleDenuncia from "./ModalDetalleDenuncia"
+import { useEffect } from "react"
 
 export const Denuncias = () => {
   // Usa el hook para obtener estados y funciones
@@ -49,8 +50,8 @@ export const Denuncias = () => {
     setSearchResults,
     expandedFilters,
     setExpandedFilters,
-    denunciasDisponibles,
-    setDenunciasDisponibles,
+    registeredDenuncias,
+    setregisteredDenuncias,
     denunciasRecibidas,
     setDenunciasRecibidas,
     estados,
@@ -63,7 +64,12 @@ export const Denuncias = () => {
     buscarDenuncias,
     limpiarBusqueda,
     stats,
+    fetchRegisteredDenuncias,
   } = useDenunciasGestion()
+
+  useEffect(() =>{
+    fetchRegisteredDenuncias()
+  }, [fetchRegisteredDenuncias])
 
   // --- Header ---
   const HeaderModulo = () => (
@@ -148,20 +154,21 @@ export const Denuncias = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {denunciasDisponibles.map((denuncia, index) => (
+            {registeredDenuncias.map((denuncia, index) => (
               <tr
                 key={denuncia.id}
                 className={`hover:bg-slate-50 transition-colors duration-200 ${
                   index % 2 === 0 ? "bg-white" : "bg-slate-25"
                 }`}
               >
+                {/* deberia cambiar los denunciado y denunciante id por solo denunciado o denunciante */}
                 <td className="px-6 py-4">
-                  <div className="font-semibold text-slate-900">{denuncia.denunciado}</div>
+                  <div className="font-semibold text-slate-900">{denuncia.denunciado_id}</div>
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center text-sm text-slate-600">
                     <User className="h-4 w-4 mr-2 text-slate-400" />
-                    <span>{denuncia.denunciante}</span>
+                    <span>{denuncia.denunciante_id}</span>
                   </div>
                 </td>
                 <td className="px-6 py-4">
@@ -393,7 +400,7 @@ export const Denuncias = () => {
               </div>
               <div className="cursor-pointer text-left">
                 <div>Disponibles</div>
-                <div className="text-xs opacity-75">({denunciasDisponibles.length})</div>
+                <div className="text-xs opacity-75">({registeredDenuncias.length})</div>
               </div>
             </button>
             <button
@@ -472,7 +479,7 @@ export const Denuncias = () => {
               </div>
             )}
 
-            {denunciasDisponibles.length === 0 ? (
+            {registeredDenuncias.length === 0 ? (
               <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center">
                 <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <FileText className="h-8 w-8 text-slate-400" />
