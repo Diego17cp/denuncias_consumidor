@@ -336,6 +336,19 @@ class DenunciaModel extends Model
                     ->findAll();
     }
 
+    public function searchByNombreDenunciado($nombre)
+    {
+        return $this->select('denuncia.*, 
+                            denunciado.nombre AS nombre_denunciado, 
+                            denunciado.documento AS documento_denunciado,
+                            denunciante.nombre AS nombre_denunciante,
+                            denunciante.documento AS documento_denunciante')
+                    ->join('denunciado', 'denunciado.id = denuncia.denunciado_id')
+                    ->join('denunciante', 'denunciante.id = denuncia.denunciante_id', 'left')
+                    ->like('denunciado.nombre', $nombre) // usamos LIKE para coincidencias parciales
+                    ->findAll();
+    }
+
     public function DenunciasRegistradas($perPage = 10, $page = 1)
     {
         return $this->select('denuncia.*, 
