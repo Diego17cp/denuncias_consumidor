@@ -6,6 +6,7 @@ use CodeIgniter\RESTful\ResourceController;
 use App\Models\DenunciasConsumidor\v1\DenuncianteModel;
 use App\Models\DenunciasConsumidor\v1\DenunciaModel;
 use App\Models\DenunciasConsumidor\v1\SeguimientoDenunciaModel;
+use App\Models\DenunciasConsumidor\v1\AdjuntoModel;
 use App\Models\DenunciasConsumidor\v1\AdministradorModel;
 use App\Controllers\DenunciasConsumidor\v1\AuthController;
 use CodeIgniter\Config\Services;
@@ -17,6 +18,7 @@ class AdminsController extends ResourceController
     private $denunciaModel;
     private $seguimientoDenunciaModel;
     private $adminModel;
+    private $adjuntoModel;
     //private $historialModel;
 
     // Utils
@@ -29,6 +31,7 @@ class AdminsController extends ResourceController
         $this->denuncianteModel          = new DenuncianteModel();
         $this->denunciaModel             = new DenunciaModel();
         $this->seguimientoDenunciaModel  = new SeguimientoDenunciaModel();
+        $this->adjuntoModel              = new AdjuntoModel();
 
         // Modelos de admins
         $this->adminModel     = new AdministradorModel();
@@ -86,9 +89,51 @@ class AdminsController extends ResourceController
     // Funciones de ADMINs
     //==========================
     
+    // public function recibirAdmin()
+    // {
+        
+    //     $admin = $this->authAdmin();
+    //     if (is_object($admin)) return $admin;
+
+    //     $input = $this->request->getJSON(true); 
+
+    //     $code       = $input['tracking_code'] ?? null;
+    //     $estado     = 'recibida'; 
+    //     $comentario = 'La denuncia ha sido recibida por el administrador'; 
+
+    //     if (empty($code)) {
+    //         return $this->fail(['message' => 'Faltan parámetros requeridos']);
+    //     }
+
+    //     $seguimientoData = [
+    //         'administrador_id' => $admin['id'],
+    //         'estado'             => $estado,
+    //         'comentario'         => $comentario,
+    //     ];
+
+    //     $denuncia = $this->denunciaModel->recibirDenuncia(
+    //         $code,
+    //         $estado,
+    //         $comentario,
+    //         $seguimientoData
+    //     );
+
+    //     if (!$denuncia) {
+    //         return $this->respond([
+    //             'success' => false,
+    //             'message' => 'No se encontró la denuncia con el código ingresado.'
+    //         ], 404);
+    //     }
+
+    //     return $this->respond([
+    //         'success' => true,
+    //         'message' => 'Denuncia recibida correctamente',
+    //         'denuncia'=> $denuncia
+    //     ]);
+    // }
+
     public function recibirAdmin()
     {
-        
         $admin = $this->authAdmin();
         if (is_object($admin)) return $admin;
 
@@ -104,18 +149,18 @@ class AdminsController extends ResourceController
 
         $seguimientoData = [
             'administrador_id' => $admin['id'],
-            'estado'             => $estado,
-            'comentario'         => $comentario,
+            'estado'           => $estado,
+            'comentario'       => $comentario,
         ];
 
-        $denuncia = $this->denunciaModel->recibirDenuncia(
+        $resultado = $this->denunciaModel->recibirDenuncia(
             $code,
             $estado,
             $comentario,
             $seguimientoData
         );
 
-        if (!$denuncia) {
+        if (!$resultado) {
             return $this->respond([
                 'success' => false,
                 'message' => 'No se encontró la denuncia con el código ingresado.'
@@ -123,9 +168,10 @@ class AdminsController extends ResourceController
         }
 
         return $this->respond([
-            'success' => true,
-            'message' => 'Denuncia recibida correctamente',
-            'denuncia'=> $denuncia
+            'success'    => true,
+            'message'    => 'Denuncia recibida correctamente',
+            'denuncia'   => $resultado['denuncia'],
+            'seguimiento'=> $resultado['seguimiento']
         ]);
     }
 
@@ -160,7 +206,8 @@ class AdminsController extends ResourceController
         $this->seguimientoDenunciaModel->insert([
             'denuncia_id'     => $denuncia['id'],
             'administrador_id' => $admin['id'], 
-            'comentario'      => $comentario
+            'comentario'      => $comentario,
+            'estado'           => $estado,
         ]);
 
         $this->denunciaModel
@@ -216,45 +263,149 @@ class AdminsController extends ResourceController
         return $this->respond(['success' => true, 'data' => $denuncias]);
     }
 
-    public function getRegistradas(){
+    
+    //===========================
+    // FUNCION PARA BUSCAR DENUNCIA
+    // POR DOCUMENTO DEL DENUNCIADO
+    //===========================
+    public function searchDenunciaByDocumentoDenunciado($documento = null)
+    {
         $admin = $this->authAdmin();
         if (is_object($admin)) return $admin;
 
-        $perPage = $this->request->getGet('per_page') ?? 10;
-        $page = $this->request->getGet('page') ?? 1;
+        if (empty($documento)) {
+            return $this->fail(['message' => 'Falta el parámetro documento del denunciado']);
+        }
 
-        $denuncias = $this->denunciaModel->DenunciasRegistradas($perPage);
+        $denuncia = $this->denunciaModel->searchByDocumentoDenunciado($documento);
+
+        if (empty($denuncia)) {
+            return $this->fail(['message' => 'No se encontró ninguna denuncia para este documento']);
+        }
+
+        return $this->respond(['success' => true, 'data' => $denuncia]);
+    }
+
+    
+
+    // public function getRegistradas(){
+    //     $admin = $this->authAdmin();
+    //     if (is_object($admin)) return $admin;
+
+    //     $perPage = $this->request->getGet('per_page') ?? 10;
+    //     $page = $this->request->getGet('page') ?? 1;
+
+    //     $denuncias = $this->denunciaModel->DenunciasRegistradas($perPage);
+
+    //     if (empty($denuncias)) {
+    //         return $this->fail(['message' => 'No hay denuncias registradas']);
+    //     }
+
+    //     return $this->response->setStatusCode(200)->setJSON([
+    //         'success' => true,
+    //         'data' => $denuncias,
+    //         'pager' => $this->denunciaModel->pager->getDetails() 
+    //     ]);
+    // }
+
+    public function getRegistradas($page = 1)
+    {
+        $admin = $this->authAdmin();
+        if (is_object($admin)) return $admin;
+
+        $perPage = 2; // Para prueba
+
+        // Primero llamamos paginate (esto crea el pager)
+        $denuncias = $this->denunciaModel->DenunciasRegistradas($perPage, $page);
 
         if (empty($denuncias)) {
             return $this->fail(['message' => 'No hay denuncias registradas']);
         }
 
+        // Ahora que paginate ya se ejecutó, el pager existe
+        $pager = $this->denunciaModel->pager;
+
         return $this->response->setStatusCode(200)->setJSON([
             'success' => true,
-            'data' => $denuncias,
-            'pager' => $this->denunciaModel->pager->getDetails() 
+            'data' => array_map(function ($denuncia) {
+                return [
+                    'id' => $denuncia['id'],
+                    'tracking_code' => $denuncia['tracking_code'],
+                    'estado' => $denuncia['estado'],
+                    'descripcion' => $denuncia['descripcion'],
+                    'fecha_incidente' => $denuncia['fecha_incidente'],
+                    'lugar' => $denuncia['lugar'],
+                    'denunciante' => $denuncia['denunciante_nombre'] ?? 'Anónimo',
+                    'denunciado' => $denuncia['denunciado_nombre'] ?? 'Desconocido',
+                    'created_at' => $denuncia['created_at']
+                ];
+            }, $denuncias),
+            'pager' => [
+                'currentPage' => $page,
+                'perPage' => $perPage,
+                'total' => $pager->getTotal(),
+                'pageCount' => ceil($pager->getTotal() / $perPage),
+                'next' => $page < ceil($pager->getTotal() / $perPage) ? base_url("admin/registradas/" . ($page + 1)) : null,
+                'prev' => $page > 1 ? base_url("admin/registradas/" . ($page - 1)) : null
+            ]
         ]);
     }
+
+
+    // public function getdenunciasActivas()
+    // {
+    //     $admin = $this->authAdmin();
+    //     if (is_object($admin)) return $admin;
+
+    //     $perPage = $this->request->getGet('per_page') ?? 10;
+    //     $page = $this->request->getGet('page') ?? 1;
+
+    //     $denuncias = $this->denunciaModel->DenunciasActivas($perPage);
+
+    //     if (empty($denuncias)) {
+    //         return $this->fail(['message' => 'No hay denuncias activas']);
+    //     }
+    //     return $this->response->setStatusCode(200)->setJSON([
+    //         'success' => true,
+    //         'data' => $denuncias,
+    //         'pager' => $this->denunciaModel->pager->getDetails()
+    //     ]);
+    // }
 
     public function getdenunciasActivas()
-    {
-        $admin = $this->authAdmin();
-        if (is_object($admin)) return $admin;
+{
+    $admin = $this->authAdmin();
+    if (is_object($admin)) return $admin;
 
-        $perPage = $this->request->getGet('per_page') ?? 10;
-        $page = $this->request->getGet('page') ?? 1;
+    $perPage = $this->request->getGet('per_page') ?? 10;
 
-        $denuncias = $this->denunciaModel->DenunciasActivas($perPage);
+    $denuncias = $this->denunciaModel->DenunciasActivas($perPage);
 
-        if (empty($denuncias)) {
-            return $this->fail(['message' => 'No hay denuncias activas']);
-        }
-        return $this->response->setStatusCode(200)->setJSON([
-            'success' => true,
-            'data' => $denuncias,
-            'pager' => $this->denunciaModel->pager->getDetails()
-        ]);
+    if (empty($denuncias)) {
+        return $this->fail(['message' => 'No hay denuncias activas']);
     }
+
+    // Enriquecer cada denuncia con historial y adjuntos
+    foreach ($denuncias as &$denuncia) {
+        $historialCount = $this->seguimientoDenunciaModel
+            ->where('denuncia_id', $denuncia['id'])
+            ->countAllResults();
+
+        $adjuntosCount = $this->adjuntoModel
+            ->where('denuncia_id', $denuncia['id'])
+            ->countAllResults();
+
+        $denuncia['historial'] = $historialCount;
+        $denuncia['adjuntos']  = $adjuntosCount;
+    }
+
+    return $this->respond([
+        'success' => true,
+        'data'    => $denuncias,
+        'pager'   => $this->denunciaModel->pager->getDetails()
+    ], 200);
+}
+
 
 
     // =========================
