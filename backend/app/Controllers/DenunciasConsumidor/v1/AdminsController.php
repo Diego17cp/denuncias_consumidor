@@ -773,7 +773,7 @@ class AdminsController extends ResourceController
     {
         $email = \Config\Services::email();
 
-        $email->setFrom('anaga123op@gmail.com', 'Municipalidad Distrital de José Leonardo Ortiz');
+        $email->setFrom('munijloenlinea@gmail.com', 'Municipalidad Distrital de José Leonardo Ortiz');
         $email->setTo($correo);
         $email->setSubject('Código de Seguimiento de Denuncia');
 
