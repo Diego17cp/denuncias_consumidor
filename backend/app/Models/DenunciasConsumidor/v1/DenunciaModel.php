@@ -352,7 +352,8 @@ class DenunciaModel extends Model
                             denunciado.documento AS denunciado_documento')
                     ->join('denunciante', 'denunciante.id = denuncia.denunciante_id', 'left')
                     ->join('denunciado',  'denunciado.id  = denuncia.denunciado_id',  'left')
-                    ->whereIn('denuncia.estado', ['recibida', 'en proceso', 'pendiente'])
+                    //->whereIn('denuncia.estado', ['recibida', 'en proceso', 'pendiente'])
+                    ->where('denuncia.estado !=', 'registrado')
                     ->orderBy('denuncia.created_at', 'DESC')
                     ->paginate($perPage, 'default', $page);
     }
