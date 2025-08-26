@@ -21,6 +21,7 @@ import {
   Activity,
 } from "lucide-react"
 import ModalDetalleDenuncia from "./ModalDetalleDenuncia"
+import { Loader } from "dialca-ui"
 import { useEffect } from "react"
 
 export const Denuncias = () => {
@@ -67,7 +68,8 @@ export const Denuncias = () => {
     fetchRegisteredDenuncias,
     recievedDenuncias,
     fetchRecievedDenuncias,
-    recieveDenuncia
+    recieveDenuncia,
+    isSearching
   } = useDenunciasGestion()
 
   useEffect(() =>{
@@ -290,7 +292,7 @@ export const Denuncias = () => {
   )
 
   const SearchResultsTable = () => (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden w-full">
       <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100">
         <h4 className="text-xl font-bold text-slate-900">Resultados de Búsqueda</h4>
         <span className="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-semibold border border-primary/20">
@@ -319,13 +321,13 @@ export const Denuncias = () => {
                 }`}
               >
                 <td className="px-6 py-4">
-                  <div className="text-primary font-bold text-sm">{denuncia.id}</div>
+                  <div className="text-primary font-bold text-sm">{denuncia.tracking_code}</div>
                 </td>
                 <td className="px-6 py-4">
-                  <div className="font-semibold text-slate-900">{denuncia.contra}</div>
+                  <div className="font-semibold text-slate-900">{denuncia.denunciado.nombre}</div>
                 </td>
                 <td className="px-6 py-4">
-                  <div className="text-sm text-slate-600 font-mono">{denuncia.denunciadoDni}</div>
+                  <div className="text-sm text-slate-600 font-mono">{denuncia.denunciado.documento}</div>
                 </td>
                 <td className="px-6 py-4">
                   <span
@@ -336,18 +338,14 @@ export const Denuncias = () => {
                 </td>
                 <td className="px-6 py-4">
                   <div className="text-sm text-slate-700 max-w-md">
-                    <p className="line-clamp-2">{denuncia.motivo}</p>
+                    <p className="line-clamp-2">{denuncia.descripcion}</p>
                   </div>
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center text-sm text-slate-600">
                     <Calendar className="h-4 w-4 mr-2 text-slate-400" />
                     <span>
-                      {new Date(denuncia.fecha).toLocaleDateString("es-ES", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
+                      {denuncia.fecha_incidente}
                     </span>
                   </div>
                 </td>
@@ -576,7 +574,7 @@ export const Denuncias = () => {
                   <select
                     value={searchType}
                     onChange={(e) => setSearchType(e.target.value)}
-                    className="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                    className="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all duration-200 text-sm"
                   >
                     <option value="DNI">DNI</option>
                     <option value="RUC">RUC</option>
@@ -591,7 +589,7 @@ export const Denuncias = () => {
                     value={searchDocument}
                     onChange={(e) => setSearchDocument(e.target.value)}
                     placeholder={`Ingrese ${searchType}`}
-                    className="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                    className="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all duration-200 text-sm"
                   />
                 </div>
 
@@ -602,7 +600,7 @@ export const Denuncias = () => {
                     value={searchName}
                     onChange={(e) => setSearchName(e.target.value)}
                     placeholder="Nombre completo"
-                    className="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                    className="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all duration-200 text-sm"
                   />
                 </div>
               </div>
@@ -612,8 +610,12 @@ export const Denuncias = () => {
                   onClick={buscarDenuncias}
                   className="cursor-pointer bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300 transform hover:scale-105 flex items-center shadow-lg"
                 >
-                  <Search className="h-5 w-5 mr-3" />
-                  Buscar Denuncias
+                  {isSearching ? <Loader /> : (
+                    <>
+                      <Search className="h-5 w-5 mr-3" />
+                      Buscar Denuncias
+                    </>
+                  )}
                 </button>
                 <button
                   onClick={limpiarBusqueda}
@@ -622,14 +624,7 @@ export const Denuncias = () => {
                   Limpiar Búsqueda
                 </button>
               </div>
-
-              {searchResults.length > 0 && (
-                <div className="mt-10">
-                  <SearchResultsTable />
-                </div>
-              )}
-
-              {searchResults.length === 0 && (searchDocument || searchName) && (
+              {searchResults.length === 0 && (searchDocument || searchName) && !isSearching && (
                 <div className="mt-10 p-8 bg-amber-50 border border-amber-200 rounded-2xl">
                   <div className="flex items-center justify-center">
                     <div className="text-center">
@@ -643,6 +638,11 @@ export const Denuncias = () => {
                 </div>
               )}
             </div>
+              {searchResults.length > 0 && (
+                <div className="mt-10 w-full">
+                  <SearchResultsTable />
+                </div>
+              )}
           </div>
         )}
       </main>
