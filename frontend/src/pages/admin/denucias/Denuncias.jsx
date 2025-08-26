@@ -65,11 +65,15 @@ export const Denuncias = () => {
     limpiarBusqueda,
     stats,
     fetchRegisteredDenuncias,
+    recievedDenuncias,
+    fetchRecievedDenuncias,
+    recieveDenuncia
   } = useDenunciasGestion()
 
   useEffect(() =>{
-    fetchRegisteredDenuncias()
-  }, [fetchRegisteredDenuncias])
+    if (activeTab === 'disponibles') fetchRegisteredDenuncias()
+    else fetchRecievedDenuncias()
+  }, [fetchRegisteredDenuncias, fetchRecievedDenuncias, activeTab])
 
   // --- Header ---
   const HeaderModulo = () => (
@@ -196,7 +200,7 @@ export const Denuncias = () => {
                 </td>
                 <td className="px-6 py-4 text-center">
                   <button
-                    onClick={() => recibirDenuncia(denuncia)}
+                    onClick={() => recieveDenuncia(denuncia.tracking_code)}
                     className="cursor-pointer inline-flex items-center px-4 py-2 text-white bg-[#002f59] rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm hover:shadow-md"
                   >
                     <CheckCircle className="h-4 w-4 mr-2" />
@@ -222,13 +226,12 @@ export const Denuncias = () => {
               <th className="px-6 py-4 text-left text-sm font-bold text-slate-700">Denunciante</th>
               <th className="px-6 py-4 text-left text-sm font-bold text-slate-700">Fecha</th>
               <th className="px-6 py-4 text-left text-sm font-bold text-slate-700">Estado</th>
-              <th className="px-6 py-4 text-left text-sm font-bold text-slate-700">Motivo</th>
               <th className="px-6 py-4 text-left text-sm font-bold text-slate-700">Progreso</th>
               <th className="px-6 py-4 text-center text-sm font-bold text-slate-700">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {filteredDenuncias.map((denuncia, index) => (
+            {recievedDenuncias.map((denuncia, index) => (
               <tr
                 key={denuncia.id}
                 className={`hover:bg-slate-50 transition-colors duration-200 ${
@@ -236,10 +239,10 @@ export const Denuncias = () => {
                 }`}
               >
                 <td className="px-6 py-4">
-                  <div className="text-primary font-bold text-sm">{denuncia.id}</div>
+                  <div className="text-primary font-bold text-sm">{denuncia.tracking_code}</div>
                 </td>
                 <td className="px-6 py-4">
-                  <div className="font-semibold text-slate-900">{denuncia.contra}</div>
+                  <div className="font-semibold text-slate-900">{denuncia.denunciado}</div>
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center text-sm text-slate-600">
@@ -251,11 +254,7 @@ export const Denuncias = () => {
                   <div className="flex items-center text-sm text-slate-600">
                     <Calendar className="h-4 w-4 mr-2 text-slate-400" />
                     <span>
-                      {new Date(denuncia.fecha).toLocaleDateString("es-ES", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
+                      {denuncia.fecha_incidente}
                     </span>
                   </div>
                 </td>
@@ -266,12 +265,7 @@ export const Denuncias = () => {
                     {denuncia.estado}
                   </span>
                 </td>
-                <td className="px-6 py-4">
-                  <div className="text-sm text-slate-700 max-w-md">
-                    <p className="line-clamp-2">{denuncia.motivo}</p>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
+                {/* <td className="px-6 py-4">
                   <div className="flex items-center gap-4 text-xs text-slate-500">
                     <div className="flex items-center">
                       <Activity className="h-3 w-3 mr-1" />
@@ -282,7 +276,7 @@ export const Denuncias = () => {
                       <span>{denuncia.evidencias.length}</span>
                     </div>
                   </div>
-                </td>
+                </td> */}
                 <td className="px-6 py-4 text-center">
                   <button
                     onClick={() => mostrarDetalles(denuncia)}
@@ -416,7 +410,7 @@ export const Denuncias = () => {
               </div>
               <div className="text-left">
                 <div>Recibidos</div>
-                <div className="text-xs opacity-75">({denunciasRecibidas.length})</div>
+                <div className="text-xs opacity-75">({recievedDenuncias.length})</div>
               </div>
             </button>
             <button
