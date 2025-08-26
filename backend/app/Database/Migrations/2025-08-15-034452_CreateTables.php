@@ -315,6 +315,11 @@ class CreateTables extends Migration
                 'type' => 'TEXT',
                 'null' => false
             ],
+            'estado' => [
+                'type' => "VARCHAR",
+                'constraint' => "100",
+                'null' => false
+            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true
