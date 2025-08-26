@@ -79,9 +79,20 @@ $routes->group('/', [
 
         // Dashboard y gestión de denuncias
         //$routes->get('dashboard', 'AdminsController::dashboard');
+
+        // PARA RECIBIR DENUNCIAS ASIGNADAS A UN ADMINISTRADOR
         $routes->post('recibir', 'AdminsController::recibirAdmin', ['filter' => 'auth:super_admin,admin']);
+
+        // PARA VER DENUCNIAS QUE TENGAN DE ESTADO "REGISTRADO"
         $routes->get('registradas', 'AdminsController::getRegistradas', ['filter' => 'auth:super_admin,admin']);
+        // PARA VER DENUNCIAS "REGISTRADO" CON PAGINACION
+        $routes->get('registradas/(:num)', 'AdminsController::getRegistradas/$1', ['filter' => 'auth:super_admin,admin']);
+        // PARA VER DENUNCIAS ACTIVAS (EN PROCESO, PENDIENTE, RECIBIDO)
         $routes->get('activas', 'AdminsController::getDenunciasActivas', ['filter' => 'auth:super_admin,admin']);
+        // PARA VER DENUNCIAS ACTIVAS CON PAGINACION
+        $routes->get('activas/(:num)', 'AdminsController::getDenunciasActivas/$1', ['filter' => 'auth:super_admin,admin']);
+
+        // PARA CAMBIAR EL ESTADO DE UNA DENUNCIA
         $routes->post('procesos-denuncia', 'AdminsController::procesosDenuncia', ['filter' => 'auth:super_admin,admin']);
 
         // Gestión de administradores
@@ -98,5 +109,8 @@ $routes->group('/', [
         // Buscar denuncias por dni o id del denunciante
         $routes->get('buscar-dni/(:num)', 'AdminsController::searchDenuncias/$1', ['filter' => 'auth:super_admin,admin']);
         $routes->get('buscar-id/(:num)', 'AdminsController::searchDenunciasByDenuncianteId/$1', ['filter' => 'auth:super_admin,admin']);
+        
+        // Buscar denuncias por documento del denunciado
+        $routes->get('documento/(:num)', 'AdminsController::searchDenunciaByDocumentoDenunciado/$1', ['filter' => 'auth:super_admin,admin']);
     });
 });
