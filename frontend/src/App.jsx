@@ -10,19 +10,37 @@ import { DenunciasProvider } from "./context/DenunciasContext";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/admin/ProtectedRoute";
 
-// Lazy load del resto de páginas y layout para reducir bundle inicial
-const BaseLayout = lazy(() => import("./layouts/BaseLayout"));
-const FormDenuncia = lazy(() => import("./pages/public/Form/FormDenuncia"));
-const TrackingDenuncia = lazy(() =>
-	import("./pages/public/Tracking/TrackingDenuncia")
+// Lazy load del resto de páginas y layout (patrón solicitado)
+const BaseLayout = lazy(() =>
+	import("./layouts/BaseLayout").then((m) => ({ default: m.BaseLayout ?? m.default }))
 );
-const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
-const Usuarios = lazy(() => import("./pages/admin/Usuarios"));
-const AdminsHistorial = lazy(() => import("./pages/admin/AdminsHistorial"));
-const Denuncias = lazy(() => import("./pages/admin/denucias/Denuncias"));
-const Login = lazy(() => import("./pages/admin/Login"));
-const NotFound = lazy(() => import("./pages/404"));
-const Unauthorized = lazy(() => import("./pages/Unauthorized"));
+const FormDenuncia = lazy(() =>
+	import("./pages/public/Form/FormDenuncia").then((m) => ({ default: m.FormDenuncia ?? m.default }))
+);
+const TrackingDenuncia = lazy(() =>
+	import("./pages/public/Tracking/TrackingDenuncia").then((m) => ({ default: m.TrackingDenuncia ?? m.default }))
+);
+const Dashboard = lazy(() =>
+	import("./pages/admin/Dashboard").then((m) => ({ default: m.Dashboard ?? m.default }))
+);
+const Usuarios = lazy(() =>
+	import("./pages/admin/Usuarios").then((m) => ({ default: m.Usuarios ?? m.default }))
+);
+const AdminsHistorial = lazy(() =>
+	import("./pages/admin/AdminsHistorial").then((m) => ({ default: m.AdminsHistorial ?? m.default }))
+);
+const Denuncias = lazy(() =>
+	import("./pages/admin/denucias/Denuncias").then((m) => ({ default: m.Denuncias ?? m.default }))
+);
+const Login = lazy(() =>
+	import("./pages/admin/Login").then((m) => ({ default: m.Login ?? m.default }))
+);
+const NotFound = lazy(() =>
+	import("./pages/404").then((m) => ({ default: m.NotFound ?? m.default }))
+);
+const Unauthorized = lazy(() =>
+	import("./pages/Unauthorized").then((m) => ({ default: m.Unauthorized ?? m.default }))
+);
 
 function App() {
 	return (
