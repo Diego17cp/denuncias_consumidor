@@ -47,13 +47,13 @@ $routes->group('/', [
         });
 
         /*---- DENUNCIAS ----*/
-        $routes->group('denuncias', ['filter' => 'auth:super_admin,admin'], function ($routes) {
+        $routes->group('denuncias', function ($routes) {
             // Buscar denuncia por tracking_code
             $routes->get('codigo/(:alphanum)', 'DenunciaController::query/$1');
             // Listar todas las denuncias
-            $routes->get('/', 'DenunciaController::index');
+            $routes->get('/', 'DenunciaController::index', ['filter' => 'auth:super_admin,admin']);
             $routes->post('/', 'DenunciaController::create');
-            $routes->get('stats', 'AdminsController::getDenunciasStats');
+            $routes->get('stats', 'AdminsController::getDenunciasStats', ['filter' => 'auth:super_admin,admin']);
 
             /*---- ADJUNTOS ----*/
             $routes->group('adjunto', function ($routes) {
