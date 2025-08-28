@@ -162,6 +162,7 @@ class AuthController extends ResourceController
                         "dni" => $user['dni'],
                         "estado" => $user['estado'],
                         "rol" => $user['rol'],
+                        "nombre" => $user['nombre'] ?? 'Administrador',
                     ]
                 ])
                 ->setStatusCode(200);
