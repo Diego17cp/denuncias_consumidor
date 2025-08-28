@@ -66,7 +66,8 @@ export const Denuncias = () => {
     pager,
     handlePageChange,
     getStatistics,
-    isLoading
+    isLoading,
+    isRecieving
   } = useDenunciasGestion()
 
   useEffect(() => {
@@ -161,52 +162,84 @@ export const Denuncias = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {registeredDenuncias.map((denuncia, index) => (
-              <tr
-                key={denuncia.id}
-                className={`hover:bg-slate-50 transition-colors duration-200 ${
-                  index % 2 === 0 ? "bg-white" : "bg-slate-25"
-                }`}
-              >
-                <td className="px-6 py-4">
-                  <div className="font-semibold text-slate-900">{denuncia.denunciado}</div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center text-sm text-slate-600">
-                    <User className="h-4 w-4 mr-2 text-slate-400" />
-                    <span>{denuncia.denunciante}</span>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center text-sm text-slate-600">
-                    <Calendar className="h-4 w-4 mr-2 text-slate-400" />
-                    <span>
-                      {denuncia.fecha_incidente}
-                    </span>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex items-start text-sm text-slate-600 max-w-xs">
-                    <MapPin className="h-4 w-4 mr-2 mt-0.5 text-slate-400 flex-shrink-0" />
-                    <span className="line-clamp-2">{denuncia.lugar}</span>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="text-sm text-slate-700 max-w-md">
-                    <p className="line-clamp-2">{denuncia.descripcion}</p>
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-center">
-                  <button
-                    onClick={() => recieveDenuncia(denuncia.tracking_code)}
-                    className="cursor-pointer inline-flex items-center px-4 py-2 text-white bg-[#002f59] rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm hover:shadow-md"
+            {isLoading
+              ? Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={`skeleton-registradas-${i}`} className="bg-white">
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-slate-200 rounded animate-pulse w-40" />
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-slate-200 rounded animate-pulse w-36" />
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-slate-200 rounded animate-pulse w-28" />
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-slate-200 rounded animate-pulse w-48" />
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-slate-200 rounded animate-pulse w-56" />
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <div className="inline-block h-8 w-24 bg-slate-200 rounded-lg animate-pulse" />
+                    </td>
+                  </tr>
+                ))
+              : registeredDenuncias.map((denuncia, index) => (
+                  <tr
+                    key={denuncia.id}
+                    className={`hover:bg-slate-50 transition-colors duration-200 ${
+                      index % 2 === 0 ? "bg-white" : "bg-slate-25"
+                    }`}
                   >
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Recibir
-                  </button>
-                </td>
-              </tr>
-            ))}
+                    <td className="px-6 py-4">
+                      <div className="font-semibold text-slate-900">{denuncia.denunciado}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center text-sm text-slate-600">
+                        <User className="h-4 w-4 mr-2 text-slate-400" />
+                        <span>{denuncia.denunciante}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center text-sm text-slate-600">
+                        <Calendar className="h-4 w-4 mr-2 text-slate-400" />
+                        <span>{denuncia.fecha_incidente}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-start text-sm text-slate-600 max-w-xs">
+                        <MapPin className="h-4 w-4 mr-2 mt-0.5 text-slate-400 flex-shrink-0" />
+                        <span className="line-clamp-2">{denuncia.lugar}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-slate-700 max-w-md">
+                        <p className="line-clamp-2">{denuncia.descripcion}</p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      
+                        <button
+                          onClick={() => recieveDenuncia(denuncia.tracking_code)}
+                          disabled={isRecieving.get(denuncia.tracking_code)}
+                          className={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm ${
+                            isRecieving.get(denuncia.tracking_code) ? "bg-slate-300 text-slate-700 cursor-not-allowed" : "bg-[#002f59] hover:bg-muni-primary text-white hover:shadow-md cursor-pointer"
+                          }`}
+                        >
+                          {isRecieving.get(denuncia.tracking_code) ? (
+                            <Loader size='sm' />
+                          ) : (
+                            <>
+                              <CheckCircle className="h-4 w-4 mr-2" />
+                              Recibir
+                            </>
+                          )}
+                        </button>
+                      
+                    </td>
+                  </tr>
+                ))}
           </tbody>
         </table>
       </div>
@@ -237,63 +270,89 @@ export const Denuncias = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {recievedDenuncias.map((denuncia, index) => (
-              <tr
-                key={denuncia.id}
-                className={`hover:bg-slate-50 transition-colors duration-200 ${
-                  index % 2 === 0 ? "bg-white" : "bg-slate-25"
-                }`}
-              >
-                <td className="px-6 py-4">
-                  <div className="text-primary font-bold text-sm">{denuncia.tracking_code}</div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="font-semibold text-slate-900">{denuncia.denunciado.nombre}</div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center text-sm text-slate-600">
-                    <User className="h-4 w-4 mr-2 text-slate-400" />
-                    <span>{denuncia.denunciante.nombre}</span>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center text-sm text-slate-600">
-                    <Calendar className="h-4 w-4 mr-2 text-slate-400" />
-                    <span>
-                      {denuncia.fecha_incidente}
-                    </span>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`inline-flex px-3 py-1.5 rounded-full text-xs font-semibold border ${getStatusStyles(denuncia.estado)}`}
+            {isLoading
+              ? Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={`skeleton-recibidas-${i}`} className="bg-white">
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-slate-200 rounded animate-pulse w-28" />
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-slate-200 rounded animate-pulse w-40" />
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-slate-200 rounded animate-pulse w-36" />
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-slate-200 rounded animate-pulse w-28" />
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-slate-200 rounded animate-pulse w-24" />
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-slate-200 rounded animate-pulse w-20" />
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <div className="inline-block h-8 w-24 bg-slate-200 rounded-lg animate-pulse" />
+                    </td>
+                  </tr>
+                ))
+              : recievedDenuncias.map((denuncia, index) => (
+                  <tr
+                    key={denuncia.id}
+                    className={`hover:bg-slate-50 transition-colors duration-200 ${
+                      index % 2 === 0 ? "bg-white" : "bg-slate-25"
+                    }`}
                   >
-                    {estados.find((estado) => estado.value === denuncia.estado)?.label}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-4 text-xs text-slate-500">
-                    <div className="flex items-center">
-                      <Activity className="h-3 w-3 mr-1" />
-                      <span>{denuncia.historial}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <FileBox className="h-3 w-3 mr-1" />
-                      <span>{denuncia.adjuntos}</span>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-center">
-                  <button
-                    onClick={() => mostrarDetalles(denuncia)}
-                    className="cursor-pointer inline-flex items-center px-4 py-2 bg-[#002f59] text-white rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm hover:shadow-md"
-                  >
-                    <Eye className="h-4 w-4 mr-2" />
-                    Detalles
-                  </button>
-                </td>
-              </tr>
-            ))}
+                    <td className="px-6 py-4">
+                      <div className="text-primary font-bold text-sm">{denuncia.tracking_code}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="font-semibold text-slate-900">{denuncia.denunciado.nombre}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center text-sm text-slate-600">
+                        <User className="h-4 w-4 mr-2 text-slate-400" />
+                        <span>{denuncia.denunciante.nombre}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center text-sm text-slate-600">
+                        <Calendar className="h-4 w-4 mr-2 text-slate-400" />
+                        <span>
+                          {denuncia.fecha_incidente}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex px-3 py-1.5 rounded-full text-xs font-semibold border ${getStatusStyles(denuncia.estado)}`}
+                      >
+                        {estados.find((estado) => estado.value === denuncia.estado)?.label}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-4 text-xs text-slate-500">
+                        <div className="flex items-center">
+                          <Activity className="h-3 w-3 mr-1" />
+                          <span>{denuncia.historial}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <FileBox className="h-3 w-3 mr-1" />
+                          <span>{denuncia.adjuntos}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <button
+                        onClick={() => mostrarDetalles(denuncia)}
+                        className="cursor-pointer inline-flex items-center px-4 py-2 bg-[#002f59] text-white rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm hover:shadow-md"
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        Detalles
+                      </button>
+                    </td>
+                  </tr>
+                ))}
           </tbody>
         </table>
       </div>
