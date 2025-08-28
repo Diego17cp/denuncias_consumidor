@@ -386,12 +386,13 @@ class AdminsController extends ResourceController
     //     ]);
     // }
 
-    public function getRegistradas($page = 1)
+    public function getRegistradas()
     {
+        $page = $this->request->getGet("page");
         $admin = $this->authAdmin();
         if (is_object($admin)) return $admin;
 
-        $perPage = 2; // Para prueba
+        $perPage = 10; // Para prueba
 
         // Primero llamamos paginate (esto crea el pager)
         $denuncias = $this->denunciaModel->DenunciasRegistradas($perPage, $page);
@@ -450,12 +451,13 @@ class AdminsController extends ResourceController
     //     ]);
     // }
 
-    public function getDenunciasActivas($page = 1)
+    public function getDenunciasActivas()
     {
+        $page = $this->request->getGet("page");
         $admin = $this->authAdmin();
         if (is_object($admin)) return $admin;
 
-        $perPage = 2; 
+        $perPage = 10; 
 
         $denuncias = $this->denunciaModel->DenunciasActivas($perPage, $page);
 
