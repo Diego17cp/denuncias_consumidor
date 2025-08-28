@@ -104,7 +104,7 @@ export const AuthProvider = ({ children }) => {
 				logout();
 				return;
 			}
-			if (response.data.roleChanged) {
+			if (response.data.role_changed) {
 				const user = response.data.user;
 				setUser({
 					id: user.id,
