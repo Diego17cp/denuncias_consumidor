@@ -40,6 +40,10 @@ export default function ModalDetalleDenuncia({
             comentario: newComment,
             estado: newStatus
         }
+        if (data.comentario.trim() === "" || data.estado.trim() === "") {
+            toast.error("Por favor, coloca un comentario y selecciona un estado.");
+            return;
+        }
         try {
             const response = await axios.post(`${API_URL}/admin/procesos-denuncia`, data, {
                 withCredentials: true
