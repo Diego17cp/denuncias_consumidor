@@ -66,6 +66,7 @@ export const AuthProvider = ({ children }) => {
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				console.error("Error logging in:", error.response?.data?.error);
+				toast.error(error.response?.data?.error || 'Error desconocido al iniciar sesión.')
 			} else console.error("Unexpected error:", error);
 			return false;
 		}
