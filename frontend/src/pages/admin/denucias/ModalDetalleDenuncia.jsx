@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
+import { useDenunciasGestion } from "../../../hooks/admin/denuncias/useDenunciasGestion";
 
 // Mapeo de colores por estado
 const estadoColors = {
@@ -27,7 +28,9 @@ export default function ModalDetalleDenuncia({
     newStatus,
     setNewStatus,
     onClose,
+    callback
 }) {
+    const { getStatistics, fetchRecievedDenuncias } = useDenunciasGestion()
 
     const API_URL = import.meta.env.VITE_CI_API_BASE_URL
 
@@ -43,6 +46,10 @@ export default function ModalDetalleDenuncia({
             })
             if (response.data.success || response.status === 200) {
                 toast.success("Denuncia actualizada correctamente.");
+                await fetchRecievedDenuncias();
+                await getStatistics();
+                await callback?.()
+                onClose()
             }
         } catch (err) {
             if (axios.isAxiosError(err)) {
