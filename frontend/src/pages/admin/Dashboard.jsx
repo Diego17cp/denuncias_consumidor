@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { Users, AlertTriangle, Clock, Activity } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useAuth } from "../../hooks/admin/useAuth";
@@ -48,6 +47,12 @@ export function Dashboard() {
 		},
 	];
 
+	// Si el usuario NO es super_admin, solo permitir ver el módulo "denuncias"
+	const visibleModules =
+		user?.rol === "super_admin"
+			? moduleCards
+			: moduleCards.filter((m) => m.id === "denuncias");
+
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
 			{/* Header */}
@@ -69,7 +74,7 @@ export function Dashboard() {
 											¡Bienvenido, {user.nombre}!
 										</p>
 										<span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-											Administrador
+											{user.rol === "super_admin" ? "Super Admin." : "Administrador"}
 										</span>
 									</div>
 								)}
@@ -131,7 +136,7 @@ export function Dashboard() {
 						</h2>
 					</div>
 					<div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-						{moduleCards.map((module, index) => (
+						{visibleModules.map((module, index) => (
 							<div
 								key={module.id}
 								className={`group relative overflow-hidden bg-white rounded-2xl shadow-lg border border-gray-100 cursor-pointer transform transition-all duration-500 hover:scale-105 hover:shadow-2xl ${module.bgPattern}`}
