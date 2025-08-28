@@ -429,7 +429,27 @@ class AdminsController extends ResourceController
             ]
         ]);
     }
+    public function getDenunciasStats()
+    {
+        $admin = $this->authAdmin();
+        if (is_object($admin)) return $admin;
+        $total = $this->denunciaModel->countAllResults();
+        $pending = $this->denunciaModel->where('estado', 'registrado')->countAllResults();
+        $inProcess = $this->denunciaModel->where('estado', 'en_proceso')->countAllResults();
+        $closed = $this->denunciaModel->where('estado', 'finalizada')->countAllResults();
+        $recieved = $this->denunciaModel->whereNotIn('estado', ['registrado'])->countAllResults();
 
+        return $this->respond([
+            'success' => true,
+            'data' => [
+                'total' => $total,
+                'pending' => $pending,
+                'in_process' => $inProcess,
+                'closed' => $closed,
+                'recieved' => $recieved
+            ]
+        ]);
+    }
 
     // public function getdenunciasActivas()
     // {
