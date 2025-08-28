@@ -29,7 +29,7 @@ export const ProtectedRoute = ({
     }
     if (isAdminRoute && !isAuthenticated) return (<Navigate to="/admin/login" state={{ from: location }} replace />)
     if (isAuthenticated && user && !allowedRoles.includes(user.rol)) {
-        return <Navigate to='/unauthorized' replace />
+        return <Navigate to='/admin/unauthorized' replace />
     }
     return <>{children}</>;
 }
