@@ -23,6 +23,7 @@ import {
 import ModalDetalleDenuncia from "./ModalDetalleDenuncia"
 import { Loader } from "dialca-ui"
 import { useEffect } from "react"
+import { PaginationNav } from "../../../components/PaginationNav"
 
 export const Denuncias = () => {
   // Usa el hook para obtener estados y funciones
@@ -34,7 +35,6 @@ export const Denuncias = () => {
     statusFilter,
     setStatusFilter,
     selectedDenuncia,
-    setSelectedDenuncia,
     showDetails,
     setShowDetails,
     newComment,
@@ -48,20 +48,13 @@ export const Denuncias = () => {
     searchName,
     setSearchName,
     searchResults,
-    setSearchResults,
     expandedFilters,
     setExpandedFilters,
     registeredDenuncias,
-    setregisteredDenuncias,
-    denunciasRecibidas,
-    setDenunciasRecibidas,
     estados,
     filteredDenuncias,
     getStatusStyles,
-    getPriorityStyles,
-    recibirDenuncia,
     mostrarDetalles,
-    actualizarDenuncia,
     buscarDenuncias,
     limpiarBusqueda,
     stats,
@@ -69,8 +62,16 @@ export const Denuncias = () => {
     recievedDenuncias,
     fetchRecievedDenuncias,
     recieveDenuncia,
-    isSearching
+    isSearching,
+    pager,
+    handlePageChange,
+    getStatistics,
+    isLoading
   } = useDenunciasGestion()
+
+  useEffect(() => {
+    getStatistics()
+  }, [])
 
   useEffect(() =>{
     if (activeTab === 'disponibles') fetchRegisteredDenuncias()
@@ -118,7 +119,7 @@ export const Denuncias = () => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-amber-600 text-sm font-medium">Pendientes</p>
-            <p className="text-2xl font-bold text-amber-900">{stats.pendientes}</p>
+            <p className="text-2xl font-bold text-amber-900">{stats.pending}</p>
           </div>
           <Clock className="h-8 w-8 text-amber-500" />
         </div>
@@ -127,7 +128,7 @@ export const Denuncias = () => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-indigo-600 text-sm font-medium">En Proceso</p>
-            <p className="text-2xl font-bold text-indigo-900">{stats.enInvestigacion}</p>
+            <p className="text-2xl font-bold text-indigo-900">{stats.in_process}</p>
           </div>
           <Activity className="h-8 w-8 text-indigo-500" />
         </div>
@@ -136,7 +137,7 @@ export const Denuncias = () => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-emerald-600 text-sm font-medium">Cerradas</p>
-            <p className="text-2xl font-bold text-emerald-900">{stats.cerradas}</p>
+            <p className="text-2xl font-bold text-emerald-900">{stats.closed}</p>
           </div>
           <CheckCircle className="h-8 w-8 text-emerald-500" />
         </div>
@@ -209,6 +210,14 @@ export const Denuncias = () => {
           </tbody>
         </table>
       </div>
+
+      <div className="px-6 py-4 border-t border-slate-100 flex justify-end">
+        <PaginationNav
+          currentPage={pager.registradas.currentPage}
+          totalPages={pager.registradas.totalPages}
+          onPageChange={(page) => handlePageChange("registradas", page)}
+        />
+      </div>
     </div>
   )
 
@@ -259,7 +268,7 @@ export const Denuncias = () => {
                   <span
                     className={`inline-flex px-3 py-1.5 rounded-full text-xs font-semibold border ${getStatusStyles(denuncia.estado)}`}
                   >
-                    {denuncia.estado}
+                    {estados.find((estado) => estado.value === denuncia.estado)?.label}
                   </span>
                 </td>
                 <td className="px-6 py-4">
@@ -287,6 +296,13 @@ export const Denuncias = () => {
             ))}
           </tbody>
         </table>
+      </div>
+      <div className="px-6 py-4 border-t border-slate-100 flex justify-end">
+        <PaginationNav
+          currentPage={pager.recibidas.currentPage}
+          totalPages={pager.recibidas.totalPages}
+          onPageChange={(page) => handlePageChange("recibidas", page)}
+        />
       </div>
     </div>
   )
@@ -387,7 +403,7 @@ export const Denuncias = () => {
               </div>
               <div className="cursor-pointer text-left">
                 <div>Disponibles</div>
-                <div className="text-xs opacity-75">({registeredDenuncias.length})</div>
+                <div className="text-xs opacity-75">({stats.pending})</div>
               </div>
             </button>
             <button
@@ -403,7 +419,7 @@ export const Denuncias = () => {
               </div>
               <div className="text-left">
                 <div>Recibidos</div>
-                <div className="text-xs opacity-75">({recievedDenuncias.length})</div>
+                <div className="text-xs opacity-75">({stats.recieved})</div>
               </div>
             </button>
             <button
@@ -655,6 +671,10 @@ export const Denuncias = () => {
         newStatus={newStatus}
         setNewStatus={setNewStatus}
         onClose={() => setShowDetails(false)}
+        callback={async () => {
+          await getStatistics();
+          await fetchRecievedDenuncias();
+        }}
       />
     </div>
   )
