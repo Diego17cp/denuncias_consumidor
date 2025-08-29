@@ -31,6 +31,15 @@ export function Usuarios() {
     handleSearchDni,
     searchUser,
     updateUser,
+    handleCreateUser,
+    reFetchUsers,
+    createUser,
+    handleInputChange,
+    isCreating,
+    updatedPassword,
+    updatedRol,
+    handleRoleChange,
+    handlePasswordChange
   } = useAdmin()
 
   useEffect(() => {
@@ -293,7 +302,7 @@ export function Usuarios() {
                     value={dniSearch}
                     onChange={handleSearchDni}
                     placeholder="Ingresa el DNI..."
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none transition-all duration-300 ease-in-out focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
 
@@ -347,6 +356,16 @@ export function Usuarios() {
         selectedUser={selectedUser}
         roles={roles}
         closeModal={closeModal}
+        onCreateUser={handleCreateUser}
+        onUserCreated={reFetchUsers}
+        formData={createUser}
+        handleInputChange={handleInputChange}
+        updateUser={updateUser}
+        isCreating={isCreating}
+        handlePasswordChange={handlePasswordChange}
+        handleRoleChange={handleRoleChange}
+        updatedPassword={updatedPassword}
+        updatedRol={updatedRol}
       />
     </div>
   );
