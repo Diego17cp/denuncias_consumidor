@@ -134,8 +134,8 @@ export function Usuarios() {
                 key={key}
                 onClick={() => setActiveTab(key)}
                 className={`cursor-pointer flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === key
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
               >
                 <Icon className="h-4 w-4" />
@@ -226,20 +226,18 @@ export function Usuarios() {
                             {user.nombre}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              getRoleColor(user.rol) === 'blue' ? 'bg-blue-100 text-blue-800' :
-                              getRoleColor(user.rol) === 'red' ? 'bg-red-100 text-red-800' :
-                              'bg-gray-100 text-gray-800'
-                            }`}>
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleColor(user.rol) === 'blue' ? 'bg-blue-100 text-blue-800' :
+                                getRoleColor(user.rol) === 'red' ? 'bg-red-100 text-red-800' :
+                                  'bg-gray-100 text-gray-800'
+                              }`}>
                               {user.rol === "super_admin" ? "Super Admin." : "Administrador"}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              getStatusColor(user.estado) === 'green' ? 'bg-green-100 text-green-800' :
-                              getStatusColor(user.estado) === 'red' ? 'bg-red-100 text-red-800' :
-                              'bg-gray-100 text-gray-800'
-                            }`}>
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(user.estado) === 'green' ? 'bg-green-100 text-green-800' :
+                                getStatusColor(user.estado) === 'red' ? 'bg-red-100 text-red-800' :
+                                  'bg-gray-100 text-gray-800'
+                              }`}>
                               {getStatusLabel(user.estado)}
                             </span>
                           </td>
@@ -262,8 +260,8 @@ export function Usuarios() {
                               <button
                                 onClick={() => toggleUserStatus(user.dni, user.estado === "1" ? "0" : "1")}
                                 className={`p-2 rounded-lg transition-colors ${user.estado === '1'
-                                    ? 'text-red-600 hover:text-red-900 hover:bg-red-50'
-                                    : 'text-green-600 hover:text-green-900 hover:bg-green-50'
+                                  ? 'text-red-600 hover:text-red-900 hover:bg-red-50'
+                                  : 'text-green-600 hover:text-green-900 hover:bg-green-50'
                                   }`}
                                 title={user.estado === '1' ? 'Desactivar' : 'Activar'}
                               >
@@ -334,18 +332,102 @@ export function Usuarios() {
                 </button>
 
                 {/* Resultado de búsqueda */}
-                {/* TODO: MEJORA ESTO PETUSO */}
                 {searchedUser && (
-                  <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <div className="flex items-center mb-2">
-                      <UserCheck className="h-5 w-5 text-green-600 mr-2" />
-                      <h4 className="font-medium text-green-900">Administrador Encontrado</h4>
+                  <div className="mt-6 bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-5 pb-3 border-b border-gray-100 flex items-center">
+                      <svg className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+                      </svg>
+                      Detalles del Administrador
+                    </h3>
+
+                    <div className="space-y-4">
+                      <div className="flex items-start">
+                        
+                        <div className="flex-1">
+                          <span className="text-xs font-medium text-gray-500 block mb-1">DNI</span>
+                          <span className="text-sm text-gray-800 font-medium">{searchedUser.dni}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start">
+                        
+                        <div className="flex-1">
+                          <span className="text-xs font-medium text-gray-500 block mb-1">Nombre</span>
+                          <span className="text-sm text-gray-800">{searchedUser.nombre}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start">
+                        
+                        <div className="flex-1">
+                          <span className="text-xs font-medium text-gray-500 block mb-1">Rol</span>
+                          <span className={`inline-flex justify-center items-center w-fit px-3 py-1.5 rounded-full text-xs font-medium ${getRoleColor(searchedUser.rol) === 'blue' ? 'bg-blue-50 text-blue-700' :
+                              getRoleColor(searchedUser.rol) === 'red' ? 'bg-red-50 text-red-700' :
+                                'bg-gray-50 text-gray-700'
+                            }`}>
+                            {searchedUser.rol === "super_admin" ? "Super Admin." : "Administrador"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start">
+                        
+                        <div className="flex-1">
+                          <span className="text-xs font-medium text-gray-500 block mb-1">Estado</span>
+                          <span className={`inline-flex justify-center items-center w-fit px-3 py-1.5 rounded-full text-xs font-medium ${getStatusColor(searchedUser.estado) === 'green' ? 'bg-green-50 text-green-700' :
+                              getStatusColor(searchedUser.estado) === 'red' ? 'bg-red-50 text-red-700' :
+                                'bg-gray-50 text-gray-700'
+                            }`}>
+                            {getStatusLabel(searchedUser.estado)}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="space-y-1 text-sm text-green-800">
-                      <p><strong>DNI:</strong> {searchedUser.dni}</p>
-                      <p><strong>Nombre:</strong> {searchedUser.nombre}</p>
-                      <p><strong>Rol:</strong> {searchedUser.rol === "super_admin" ? "Super Admin.": "Admin"}</p>
-                      <p><strong>Estado:</strong> {searchedUser.estado === "1" ? "Activo" : "Inactivo"}</p>
+
+                    {/* Acciones */}
+                    <div className="mt-6 pt-5 border-t border-gray-100 flex flex-col gap-3">
+                      <button
+                        onClick={() => openModal('password', searchedUser)}
+                        className="w-full px-4 py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm font-medium rounded-lg transition-colors flex items-center justify-center"
+                      >
+                        <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                        </svg>
+                        Cambiar Contraseña
+                      </button>
+                      <button
+                        onClick={() => openModal('role', searchedUser)}
+                        className="w-full px-4 py-3 bg-green-50 hover:bg-green-100 text-green-700 text-sm font-medium rounded-lg transition-colors flex items-center justify-center"
+                      >
+                        <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Cambiar Rol
+                      </button>
+                      <button
+                        onClick={() => toggleUserStatus(searchedUser.dni, searchedUser.estado === "1" ? "0" : "1")}
+                        className={`w-full px-4 py-3 text-sm font-medium rounded-lg transition-colors flex items-center justify-center ${searchedUser.estado === "1"
+                            ? "bg-red-50 hover:bg-red-100 text-red-700"
+                            : "bg-green-50 hover:bg-green-100 text-green-700"
+                          }`}
+                      >
+                        {searchedUser.estado === "1" ? (
+                          <>
+                            <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Desactivar
+                          </>
+                        ) : (
+                          <>
+                            <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905a3.61 3.61 0 01-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                            </svg>
+                            Activar
+                          </>
+                        )}
+                      </button>
                     </div>
                   </div>
                 )}
