@@ -43,6 +43,16 @@ export function DenunciasProvider({ children }) {
 	const [trackingCode, setTrackingCode] = useState("");
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isDenunciaEnviada, setIsDenunciaEnviada] = useState(false);
+	const [isFetching, setIsFetching] = useState({
+		denunciado: {
+			dni: false,
+			ruc: false,
+		},
+		denunciante: {
+			dni: false,
+			ruc: false,
+		},
+	});
 
 	// Lógica de archivos
 	const totalSize = files.reduce(
@@ -150,13 +160,31 @@ export function DenunciasProvider({ children }) {
 				denunciado.dni.trim().length !== 8
 			)
 				return;
-			const data = await getServiceData("dni", denunciado.dni);
-			if (data)
-				setDenunciado((prev) => ({
+			setIsFetching((prev) => ({
+				...prev,
+				denunciado: {
+					...prev.denunciado,
+					dni: true,
+				},
+			}));
+			try {
+				const data = await getServiceData("dni", denunciado.dni);
+				if (data) {
+					setDenunciado((prev) => ({
+						...prev,
+						nombres: data.nombre,
+						direccion: data.direccion,
+					}));
+				}
+			} finally {
+				setIsFetching((prev) => ({
 					...prev,
-					nombres: data.nombre,
-					direccion: data.direccion,
+					denunciado: {
+						...prev.denunciado,
+						dni: false,
+					},
 				}));
+			}
 		};
 
 		const getRucData = async () => {
@@ -165,8 +193,26 @@ export function DenunciasProvider({ children }) {
 				denunciado.ruc.trim().length !== 11
 			)
 				return;
-			const data = await getServiceData("ruc", denunciado.ruc);
-			if (data) setDenunciado((prev) => ({ ...prev, razonSocial: data }));
+			setIsFetching((prev) => ({
+				...prev,
+				denunciado: {
+					...prev.denunciado,
+					ruc: true,
+				},
+			}));
+			try {
+				const data = await getServiceData("ruc", denunciado.ruc);
+				if (data)
+					setDenunciado((prev) => ({ ...prev, razonSocial: data }));
+			} finally {
+				setIsFetching((prev) => ({
+					...prev,
+					denunciado: {
+						...prev.denunciado,
+						ruc: false,
+					},
+				}));
+			}
 		};
 
 		if (
@@ -200,24 +246,58 @@ export function DenunciasProvider({ children }) {
 		const fetchDniData = async () => {
 			if (tipoDocumento !== "DNI" || denunciante.dni.trim().length !== 8)
 				return;
-			const data = await getServiceData("dni", denunciante.dni);
-			if (data)
-				setDenunciante((prev) => ({
+			setIsFetching((prev) => ({
+				...prev,
+				denunciante: {
+					...prev.denunciante,
+					dni: true,
+				},
+			}));
+			try {
+				const data = await getServiceData("dni", denunciante.dni);
+				if (data)
+					setDenunciante((prev) => ({
+						...prev,
+						nombres: data.nombre,
+						domicilio: data.direccion,
+						distrito: data.distrito,
+						provincia: data.provincia,
+						departamento: data.departamento,
+					}));
+			} finally {
+				setIsFetching((prev) => ({
 					...prev,
-					nombres: data.nombre,
-					domicilio: data.direccion,
-					distrito: data.distrito,
-					provincia: data.provincia,
-					departamento: data.departamento,
+					denunciante: {
+						...prev.denunciante,
+						dni: false,
+					},
 				}));
+			}
 		};
 
 		const getRucData = async () => {
 			if (tipoDocumento !== "RUC" || denunciante.ruc.trim().length !== 11)
 				return;
-			const data = await getServiceData("ruc", denunciante.ruc);
-			if (data)
-				setDenunciante((prev) => ({ ...prev, razonSocial: data }));
+			setIsFetching((prev) => ({
+				...prev,
+				denunciante: {
+					...prev.denunciante,
+					ruc: true,
+				},
+			}));
+			try {
+				const data = await getServiceData("ruc", denunciante.ruc);
+				if (data)
+					setDenunciante((prev) => ({ ...prev, razonSocial: data }));
+			} finally {
+				setIsFetching((prev) => ({
+					...prev,
+					denunciante: {
+						...prev.denunciante,
+						ruc: false,
+					},
+				}));
+			}
 		};
 
 		if (tipoDocumento === "DNI" && denunciante.dni.trim().length === 8) {
@@ -294,6 +374,39 @@ export function DenunciasProvider({ children }) {
 		  denunciante.correo.trim() !== "";
 
 	const API_BASE_URL = import.meta.env.VITE_CI_API_BASE_URL;
+	const resetForm = () => {
+		setDescripcion("");
+		setLugar("");
+		setFecha("");
+		setFiles([]);
+		setDenunciante({
+			dni: "",
+			nombres: "",
+			domicilio: "",
+			departamento: "",
+			provincia: "",
+			distrito: "",
+			celular: "",
+			correo: "",
+			ruc: "",
+			representante: "",
+			razonSocial: "",
+			sexo: "",
+		});
+		setDenunciado({
+			tipoDocumento: "DNI", // Tipo de documento del denunciado
+			dni: "",
+			nombres: "",
+			direccion: "",
+			celular: "",
+			ruc: "",
+			representante: "",
+			razonSocial: "",
+		});
+		setTipoDocumento("DNI");
+		setAnonimo(false);
+		setIsDenunciaEnviada(false);
+	};
 
 	const handleSubmit = async () => {
 		const formData = new FormData();
@@ -376,7 +489,8 @@ export function DenunciasProvider({ children }) {
 			if (response.data.success || response.status === 200) {
 				const data = response.data;
 				setTrackingCode(data.tracking_code);
-				setIsDenunciaEnviada(true); // Actualiza el estado a true
+				setIsDenunciaEnviada(true);
+				resetForm();
 				toast.success(data.message || "Denuncia enviada exitosamente");
 				return true;
 			}
@@ -435,6 +549,7 @@ export function DenunciasProvider({ children }) {
 				isSubmitting,
 				trackingCode,
 				isDenunciaEnviada,
+				isFetching,
 			}}
 		>
 			{children}
