@@ -9,6 +9,7 @@ use App\Models\DenunciasConsumidor\v1\SeguimientoDenunciaModel;
 use App\Models\DenunciasConsumidor\v1\AdjuntoModel;
 use App\Models\DenunciasConsumidor\v1\AdministradorModel;
 use App\Controllers\DenunciasConsumidor\v1\AuthController;
+use App\Models\DenunciasConsumidor\v1\HistorialAdminModel;
 use CodeIgniter\Config\Services;
 
 class AdminsController extends ResourceController
@@ -19,7 +20,7 @@ class AdminsController extends ResourceController
     private $seguimientoDenunciaModel;
     private $adminModel;
     private $adjuntoModel;
-    //private $historialModel;
+    private $historialModel;
 
     // Utils
     private $email;
@@ -35,7 +36,7 @@ class AdminsController extends ResourceController
 
         // Modelos de admins
         $this->adminModel     = new AdministradorModel();
-        //$this->historialModel = new HistorialAdminModel();
+        $this->historialModel = new HistorialAdminModel();
 
         // Servicios
         $this->email         = Services::email();
@@ -487,7 +488,6 @@ class AdminsController extends ResourceController
 
         $pager = $this->denunciaModel->pager;
 
-        // Armamos el payload incluyendo historial (seguimientos) y adjuntos (archivos)
         $data = [];
         foreach ($denuncias as $denuncia) {
             // Conteos
@@ -580,7 +580,6 @@ class AdminsController extends ResourceController
             'estado'   => $input['estado'] ?? null,
         ];
 
-        // Verificar si ya existe un administrador con ese DNI
         if (!empty($adminData['dni']) && $this->adminModel->getByDNI($adminData['dni'])) {
             return $this->fail([
                 'success' => false,
@@ -589,11 +588,25 @@ class AdminsController extends ResourceController
         }
 
         if ($this->adminModel->insert($adminData)) {
+            $nuevoId = $this->adminModel->getInsertID();
+
+            $this->registrarHistorial(
+                $admin['id'],    
+                $nuevoId,         
+                'crear',
+                'Creación de un nuevo administrador con DNI: ' . $adminData['dni']
+            );
+
             return $this->respondCreated([
                 'success' => true,
                 'message' => 'Administrador registrado correctamente',
-                'id'      => $this->adminModel->getInsertID()
-            ]);
+                'id'      => $nuevoId
+            ], 200);
+            // return $this->respondCreated([
+            //     'success' => true,
+            //     'message' => 'Administrador registrado correctamente',
+            //     'id'      => $this->adminModel->getInsertID()
+            // ]);
         }
 
         return $this->fail([
@@ -624,13 +637,11 @@ class AdminsController extends ResourceController
 
         $input = $this->request->getJSON(true);
 
-        // Verificar si el admin existe
         $admin = $this->adminModel->getByDNI($dni);
         if (!$admin) {
             return $this->failNotFound("Administrador con DNI {$dni} no encontrado");
         }
 
-        // Solo permitimos actualizar estos campos
         $allowedUpdateFields = ['password', 'estado', 'rol'];
         $data = array_intersect_key($input, array_flip($allowedUpdateFields));
 
@@ -646,13 +657,21 @@ class AdminsController extends ResourceController
         // Ejecutamos el update usando el DNI
         if ($this->adminModel->where('dni', $dni)->set($data)->update()) {
             $adminUpdated = $this->adminModel->getByDNI($dni);
-            unset($adminUpdated['id'], $adminUpdated['password']); // Ocultar campos sensibles
+            unset($adminUpdated['id'], $adminUpdated['password']); 
+
+            $cambios = implode(', ', array_keys($data));
+            $this->registrarHistorial(
+                $adminAuth['id'],       
+                $admin['id'],           
+                'actualizar',
+                'Se actualizaron los campos: ' . $cambios
+            );
 
             return $this->respondUpdated([
                 'success' => true,
                 'message' => "Administrador actualizado correctamente",
                 'data'    => $adminUpdated
-            ]);
+            ], 200);
         }
 
         return $this->fail("No se pudo actualizar el administrador");
@@ -661,10 +680,10 @@ class AdminsController extends ResourceController
 
     public function deleteAdministrador($dni)
     {
-        $admin = $this->authAdmin();
-        if (is_object($admin)) return $admin; 
+        $adminAuth = $this->authAdmin();
+        if (is_object($adminAuth)) return $adminAuth;
 
-        if (!$this->isSuperAdmin($admin)) {
+        if (!$this->isSuperAdmin($adminAuth)) {
             return $this->fail(['error' => 'No tienes permisos para eliminar administradores'], 403);
         }
 
@@ -678,16 +697,25 @@ class AdminsController extends ResourceController
         }
 
         if ($this->adminModel->where('dni', $dni)->delete()) {
+            // Registrar en el historial
+            $this->registrarHistorial(
+                $adminAuth['id'],     
+                $admin['id'],        
+                'eliminar',
+                'Eliminación del administrador con DNI: ' . $dni
+            );
+
             return $this->respondDeleted([
                 'message' => 'Administrador eliminado correctamente',
                 'dni'     => $dni
-            ]);
+            ], 200);
         }
 
         return $this->fail([
             'error' => 'No se pudo eliminar el administrador'
         ], 500);
     }
+
 
     public function deleteAdministradorById($id)
     {
@@ -783,30 +811,42 @@ class AdminsController extends ResourceController
         ]) ->setStatusCode(200);
     }
 
+    public function listarHistorial()
+    {
+        $admin = $this->authAdmin();
+        if (is_object($admin)) return $admin;
 
-    // =========================
-    // 📧 Función auxiliar
-    // =========================
-    // private function enviarCorreo($correo, $code, $estado, $comentario)
-    // {
-    //     $this->email->setFrom('munijloenlinea@gmail.com', 'Municipalidad Distrital de José Leonardo Ortiz');
-    //     $this->email->setTo($correo);
-    //     $this->email->setSubject('Código de Seguimiento de Denuncia');
-    //     $this->email->setMessage("
-    //         <html><body>
-    //         <p>Estimado usuario,</p>
-    //         <p>Estado actual de su denuncia:</p>
-    //         <p><strong>Código:</strong> $code</p>
-    //         <p><strong>Estado:</strong> $estado</p>
-    //         <p><strong>Comentario:</strong> $comentario</p>
-    //         <p><a href='http://localhost:5173/tracking-denuncia?codigo=$code'>Ver seguimiento</a></p>
-    //         </body></html>
-    //     ");
-    //     return $this->email->send();
-    // }
+        if (!$this->isSuperAdmin($admin)) {
+            return $this->fail(['error' => 'No tienes permisos para ver el historial'], 403);
+        }
+
+        $perPage = 5;
+        $historial = $this->historialModel->getHistorialConDetalles($perPage);
+
+        
+        $pager = $this->historialModel->pager;
+        $currentPage = $pager->getCurrentPage();
+        $totalPages = $pager->getPageCount();
+
+        return $this->respond([
+            'success' => true,
+            'data'    => $historial,
+            'pager'   => [
+                'currentPage' => $currentPage,
+                'totalPages'  => $totalPages,
+                'perPage'     => $pager->getPerPage(),
+                'total'       => $pager->getTotal()
+            ],
+            'links'   => [
+                'actual'    => current_url() . '?page=' . $currentPage,
+                'siguiente' => ($currentPage < $totalPages) ? current_url() . '?page=' . ($currentPage + 1) : null,
+                'anterior'  => ($currentPage > 1) ? current_url() . '?page=' . ($currentPage - 1) : null
+            ]
+        ], 200);
+    }
 
     //====================================
-    // METODO PRIVADO PARA ENVIO DE CORREO
+    // METODOS PRIVADO DE LA CLASE
     //==================================== 
     private function enviarCorreo($correo, $code, $estado, $comentario)
     {
@@ -834,5 +874,15 @@ class AdminsController extends ResourceController
         } else {
             return $email->printDebugger(['headers']);
         }
+    }
+
+    private function registrarHistorial($adminId, $afectadoId, $accion, $motivo)
+    {
+        $this->historialModel->insert([
+            'administrador_id' => $adminId,
+            'afectado_id'      => $afectadoId,
+            'accion'           => $accion,
+            'motivo'           => $motivo
+        ]);
     }
 }
