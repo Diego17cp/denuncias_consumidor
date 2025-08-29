@@ -41,8 +41,6 @@ export const Denuncias = () => {
     setNewComment,
     newStatus,
     setNewStatus,
-    searchType,
-    setSearchType,
     searchDocument,
     setSearchDocument,
     searchName,
@@ -642,32 +640,17 @@ export const Denuncias = () => {
                 <h3 className="text-2xl font-bold text-slate-900 mb-2">Búsqueda Avanzada</h3>
                 <p className="text-slate-600">Busca denuncias por documento o nombre del denunciado</p>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-3">Tipo de Documento</label>
-                  <select
-                    value={searchType}
-                    onChange={(e) => setSearchType(e.target.value)}
-                    className="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all duration-200 text-sm"
-                  >
-                    <option value="DNI">DNI</option>
-                    <option value="RUC">RUC</option>
-                    <option value="CEDULA">CÉDULA</option>
-                  </select>
-                </div>
-
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-3">Número de Documento</label>
                   <input
                     type="text"
                     value={searchDocument}
                     onChange={(e) => setSearchDocument(e.target.value)}
-                    placeholder={`Ingrese ${searchType}`}
+                    placeholder="Ingrese DNI, RUC o Cedula"
                     className="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all duration-200 text-sm"
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-3">Nombre del Denunciado</label>
                   <input
