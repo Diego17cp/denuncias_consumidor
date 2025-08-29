@@ -641,12 +641,28 @@ class AdminsController extends ResourceController
             $adminUpdated = $this->adminModel->getByDNI($dni);
             unset($adminUpdated['id'], $adminUpdated['password']); 
 
-            $cambios = implode(', ', array_keys($data));
+            $mensajes = [];
+            if (isset($data['password'])) {
+                $mensajes[] = "Se actualizó la contraseña";
+            }
+            if (isset($data['rol'])) {
+                $mensajes[] = "Se actualizó el rol a: " . $data['rol'];
+            }
+            if (isset($data['estado'])) {
+                if ($data['estado'] == 1) {
+                    $mensajes[] = "Se activó el usuario";
+                } else {
+                    $mensajes[] = "Se suspendió el usuario";
+                }
+            }
+
+            $motivo = implode(' | ', $mensajes);
+
             $this->registrarHistorial(
-                $adminAuth['id'],       
-                $admin['id'],           
+                $adminAuth['id'], 
+                $admin['id'],      
                 'actualizar',
-                'Se actualizaron los campos: ' . $cambios
+                $motivo
             );
 
             return $this->respondUpdated([
