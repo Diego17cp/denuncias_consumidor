@@ -372,6 +372,7 @@ class AdminsController extends ResourceController
                 'denunciado' => [
                     'nombre'    => $denuncia['nombre_denunciado'],
                     'documento' => $denuncia['documento_denunciado'],
+                    'tipo'      => strlen($denuncia['documento_denunciado']) === 11 ? 'Empresa (RUC)' : 'Persona',
                 ],
                 'created_at' => $denuncia['created_at'],
             ];
