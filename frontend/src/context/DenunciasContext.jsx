@@ -479,6 +479,11 @@ export function DenunciasProvider({ children }) {
 			!anonimo ? JSON.stringify(denuncianteData) : null
 		);
 
+		if (denunciadoData.tipo_documento === denuncianteData.tipo_documento && denunciadoData.documento === denuncianteData.documento && !anonimo) {
+			toast.error("El denunciante no puede ser la misma persona que el denunciado.");
+			return;
+		}
+
 		// Enviar la denuncia
 		try {
 			setIsSubmitting(true);
