@@ -27,13 +27,13 @@ export function useDenunciasGestion() {
 			totalPages: 1,
 		},
 	});
-    const [stats, setStats] = useState({
-        total: 0,
-        pending: 0,
-        in_process: 0,
-        closed: 0,
-        recieved: 0
-    });
+	const [stats, setStats] = useState({
+		total: 0,
+		pending: 0,
+		in_process: 0,
+		closed: 0,
+		recieved: 0,
+	});
 	const [isRecieving, setRecieving] = useState(new Map());
 	const handlePageChange = (type, page) => {
 		setPager((prev) => ({
@@ -130,19 +130,19 @@ export function useDenunciasGestion() {
 		}
 	}, [API_URL, pager.recibidas.currentPage]);
 	const startReceiving = (key) => {
-		setRecieving(prev => {
-			const m = new Map(prev)
-			m.set(key, true)
-			return m
-		})
-	} 
+		setRecieving((prev) => {
+			const m = new Map(prev);
+			m.set(key, true);
+			return m;
+		});
+	};
 	const stopReceiving = (key) => {
-		setRecieving(prev => {
-			const m = new Map(prev)
-			m.delete(key)
-			return m
-		})
-	}
+		setRecieving((prev) => {
+			const m = new Map(prev);
+			m.delete(key);
+			return m;
+		});
+	};
 	const recieveDenuncia = useCallback(
 		async (trackingCode) => {
 			startReceiving(trackingCode);
@@ -158,7 +158,7 @@ export function useDenunciasGestion() {
 				);
 				if (response.data.success || response.status === 200) {
 					toast.success("Denuncia recibida exitosamente");
-                    await getStatistics();
+					await getStatistics();
 					await fetchRegisteredDenuncias();
 				} else {
 					toast.error("Error al recibir la denuncia.");
@@ -233,25 +233,51 @@ export function useDenunciasGestion() {
 		},
 	]);
 
-    const estados = [
-        { value: "recibida", label: "Recibida", color: "blue" },
-        { value: "en_proceso", label: "En proceso", color: "amber" },
-        { value: "rechazada", label: "Rechazada", color: "red" },
-        { value: "aceptada", label: "Aceptada", color: "emerald" },
-        { value: "finalizada", label: "Finalizada", color: "slate" },
-    ];
+	const estados = [
+		{ value: "recibida", label: "Recibida", color: "blue" },
+		{ value: "en_proceso", label: "En proceso", color: "amber" },
+		{ value: "rechazada", label: "Rechazada", color: "red" },
+		{ value: "aceptada", label: "Aceptada", color: "emerald" },
+		{ value: "finalizada", label: "Finalizada", color: "slate" },
+	];
 
 	const filteredDenuncias = recievedDenuncias.filter((denuncia) => {
+		const q = String(searchTerm || "")
+			.trim()
+			.toLowerCase();
+
+		const nombreDenunciado = String(
+			denuncia?.denunciado?.nombre || ""
+		).toLowerCase();
+		const nombreDenunciante = String(
+			denuncia?.denunciante?.nombre || ""
+		).toLowerCase();
+		const tracking = String(denuncia?.tracking_code || "").toLowerCase();
+		const descripcion = String(denuncia?.descripcion || "").toLowerCase();
+		const dniDenunciado = String(denuncia?.denunciado?.dni || "");
+		const dniDenunciante = String(denuncia?.denunciante?.dni || "");
+
 		const matchesSearch =
-			denuncia.denunciado.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			denuncia.tracking_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			denuncia.descripcion.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            denuncia.denunciante.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            denuncia.denunciado.dni.includes(searchTerm) ||
-            denuncia.denunciante.dni.includes(searchTerm);
+			q === "" ||
+			nombreDenunciado.includes(q) ||
+			tracking.includes(q) ||
+			descripcion.includes(q) ||
+			nombreDenunciante.includes(q) ||
+			dniDenunciado.includes(q) ||
+			dniDenunciante.includes(q);
+
+		const estadoNormalized = String(denuncia?.estado || "")
+			.toLowerCase()
+			.replace(/_/g, "")
+			.replace(/\s+/g, "");
 		const matchesStatus =
 			statusFilter === "todos" ||
-			denuncia.estado.toLowerCase().replace("_", "") === statusFilter;
+			estadoNormalized ===
+				String(statusFilter || "")
+					.toLowerCase()
+					.replace(/_/g, "")
+					.replace(/\s+/g, "");
+
 		return matchesSearch && matchesStatus;
 	});
 
@@ -414,27 +440,27 @@ export function useDenunciasGestion() {
 
 	async function getStatistics() {
 		try {
-            const response = await axios.get(`${API_URL}/denuncias/stats`, {
-                withCredentials: true
-            });
-            if (response.data.success) {
-                setStats(response.data.data);
-            } else {
-                setStats({
-                    total: 0,
-                    pending: 0,
-                    in_process: 0,
-                    closed: 0
-                })
-            }
+			const response = await axios.get(`${API_URL}/denuncias/stats`, {
+				withCredentials: true,
+			});
+			if (response.data.success) {
+				setStats(response.data.data);
+			} else {
+				setStats({
+					total: 0,
+					pending: 0,
+					in_process: 0,
+					closed: 0,
+				});
+			}
 		} catch (error) {
 			console.error("Error al obtener estadísticas:", error);
-            setStats({
-                total: 0,
-                pending: 0,
-                in_process: 0,
-                closed: 0
-            });
+			setStats({
+				total: 0,
+				pending: 0,
+				in_process: 0,
+				closed: 0,
+			});
 		}
 	}
 
@@ -487,8 +513,8 @@ export function useDenunciasGestion() {
 		limpiarBusqueda,
 		stats,
 		handlePageChange,
-        getStatistics,
+		getStatistics,
 		startReceiving,
-		stopReceiving
+		stopReceiving,
 	};
 }
