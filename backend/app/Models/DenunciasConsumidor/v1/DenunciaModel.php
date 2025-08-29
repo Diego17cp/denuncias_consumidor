@@ -328,18 +328,6 @@ class DenunciaModel extends Model
     }
 
 
-    // public function searchByNombreDenunciado($nombre)
-    // {
-    //     return $this->select('denuncia.*, 
-    //                         denunciado.nombre AS nombre_denunciado, 
-    //                         denunciado.documento AS documento_denunciado,
-    //                         denunciante.nombre AS nombre_denunciante,
-    //                         denunciante.documento AS documento_denunciante')
-    //                 ->join('denunciado', 'denunciado.id = denuncia.denunciado_id')
-    //                 ->join('denunciante', 'denunciante.id = denuncia.denunciante_id', 'left')
-    //                 ->like('denunciado.nombre', $nombre) 
-    //                 ->findAll();
-    // }
     public function searchByNombreDenunciado($nombre)
     {
         return $this->select('denuncia.*, 
@@ -354,7 +342,7 @@ class DenunciaModel extends Model
                         ->orLike('denunciado.razon_social', $nombre)
                     ->groupEnd()
                     ->findAll();
-}
+    }
 
     // public function DenunciasRegistradas($perPage = 10, $page = 1)
     // {

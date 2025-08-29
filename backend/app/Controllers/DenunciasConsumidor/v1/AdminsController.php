@@ -829,7 +829,7 @@ class AdminsController extends ResourceController
             return $this->fail(['error' => 'No tienes permisos para ver el historial'], 403);
         }
 
-        $perPage = 5;
+        $perPage = 10;
         $historial = $this->historialModel->getHistorialConDetalles($perPage);
 
         
