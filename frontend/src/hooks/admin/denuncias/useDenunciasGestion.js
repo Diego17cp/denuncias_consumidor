@@ -237,7 +237,7 @@ export function useDenunciasGestion() {
         { value: "recibida", label: "Recibida", color: "blue" },
         { value: "en_proceso", label: "En proceso", color: "amber" },
         { value: "rechazada", label: "Rechazada", color: "red" },
-        { value: "aceptado", label: "Aceptada", color: "emerald" },
+        { value: "aceptada", label: "Aceptada", color: "emerald" },
         { value: "finalizada", label: "Finalizada", color: "slate" },
     ];
 
