@@ -56,7 +56,6 @@ class AdjuntoController extends BaseController
                     $filePath = 'denuncias/' . $denunciaId . '/' . $newName;
                     $savedFiles[] = $filePath;
 
-                    // Insertar registro en la tabla adjunto
                     $this->adjuntoModel->insert([
                         'denuncia_id' => $denunciaId,
                         'file_path'   => 'denuncias/' . $denunciaId . '/' . $newName
@@ -90,12 +89,6 @@ class AdjuntoController extends BaseController
             return $this->failServerError('No se pudo crear el ZIP');
         }
 
-        // foreach ($adjuntos as $adjunto) {
-        //     $filePath = FCPATH . $adjunto['file_path'];
-        //     if (file_exists($filePath)) {
-        //         $zip->addFile($filePath, basename($filePath));
-        //     }
-        // }
         foreach ($adjuntos as $adjunto) {
             $filePath = $adjunto['file_path'];
 
