@@ -43,6 +43,9 @@ class AdminsController extends ResourceController
         $this->AuthController = new AuthController();
     }
 
+    //===========================
+    // VERIFICAR AUTENTICACION
+    //===========================
     private function authAdmin()
     {
         $token = get_cookie('access_token');
@@ -74,7 +77,9 @@ class AdminsController extends ResourceController
         }
     }
 
-    
+    //====================================
+    // METODOS PRIVADO DE LA CLASE
+    //==================================== 
     private function isSuperAdmin($admin)
     {
         return isset($admin['rol']) && $admin['rol'] === 'super_admin';
@@ -85,54 +90,51 @@ class AdminsController extends ResourceController
         return isset($admin['rol']) && $admin['rol'] === 'admin';
     }
 
+    private function enviarCorreo($correo, $code, $estado, $comentario)
+    {
+        $email = \Config\Services::email();
 
-    //==========================
-    // Funciones de ADMINs
-    //==========================
-    
-    // public function recibirAdmin()
-    // {
-        
-    //     $admin = $this->authAdmin();
-    //     if (is_object($admin)) return $admin;
+        $email->setFrom('munijloenlinea@gmail.com', 'Municipalidad Distrital de José Leonardo Ortiz');
+        $email->setTo($correo);
+        $email->setSubject('Código de Seguimiento de Denuncia');
 
-    //     $input = $this->request->getJSON(true); 
+        $mensaje = "
+            <html><body>
+            <p>Estimado usuario,</p>
+            <p>Estado actual de su denuncia: $estado</p>
+            <p><strong>Código:</strong> $code</p>
+            <p><strong>Estado:</strong> $estado</p>
+            <p><strong>Comentario:</strong> $comentario</p>
+            <p><a href='http://localhost:5173/tracking-denuncia?codigo=$code'>Ver seguimiento</a></p>
+            </body></html>
+        ";
 
-    //     $code       = $input['tracking_code'] ?? null;
-    //     $estado     = 'recibida'; 
-    //     $comentario = 'La denuncia ha sido recibida por el administrador'; 
+        $email->setMessage($mensaje);
 
-    //     if (empty($code)) {
-    //         return $this->fail(['message' => 'Faltan parámetros requeridos']);
-    //     }
+        if($email->send()){
+            return true;
+        } else {
+            return $email->printDebugger(['headers']);
+        }
+    }
 
-    //     $seguimientoData = [
-    //         'administrador_id' => $admin['id'],
-    //         'estado'             => $estado,
-    //         'comentario'         => $comentario,
-    //     ];
+    private function registrarHistorial($adminId, $afectadoId, $accion, $motivo)
+    {
+        $this->historialModel->insert([
+            'administrador_id' => $adminId,
+            'afectado_id'      => $afectadoId,
+            'accion'           => $accion,
+            'motivo'           => $motivo
+        ]);
+    }
 
-    //     $denuncia = $this->denunciaModel->recibirDenuncia(
-    //         $code,
-    //         $estado,
-    //         $comentario,
-    //         $seguimientoData
-    //     );
+    //===========================
+    // FUNCIONES PARA ADMINS
+    //===========================
 
-    //     if (!$denuncia) {
-    //         return $this->respond([
-    //             'success' => false,
-    //             'message' => 'No se encontró la denuncia con el código ingresado.'
-    //         ], 404);
-    //     }
-
-    //     return $this->respond([
-    //         'success' => true,
-    //         'message' => 'Denuncia recibida correctamente',
-    //         'denuncia'=> $denuncia
-    //     ]);
-    // }
-
+    //============================================
+    // FUNCION PARA RECIBIR DENUNCIA POR EL ADMIN
+    //============================================
     public function recibirAdmin()
     {
         $admin = $this->authAdmin();
@@ -192,7 +194,10 @@ class AdminsController extends ResourceController
             'seguimiento'=> $resultado['seguimiento']
         ]);
     }
-    
+
+    //============================================
+    // FUNCION PARA PROCESAR DENUNCIAS POR EL ADMIN
+    //============================================
     public function procesosDenuncia()
     {
 
@@ -245,6 +250,10 @@ class AdminsController extends ResourceController
         return $this->respond(['success' => true, 'message' => 'Denuncia actualizada']);
     }
 
+    //=============================
+    // FUNCION PARA BUSCAR DENUNCIA
+    // POR DOCUMENTO DEL DENUNCIANTE
+    //==============================
     public function searchDenuncias($documento = null)
     {
         $admin = $this->authAdmin();
@@ -263,6 +272,10 @@ class AdminsController extends ResourceController
         return $this->respond(['success' => true, 'data' => $denuncias]);
     }
 
+    //===============================
+    // FUNCION PARA BUSCAR DENUNCIA
+    // POR ID DEL DENUNCIANTE
+    //===============================
     public function searchDenunciasByDenuncianteId($denuncianteId = null)
     {
         $admin = $this->authAdmin();
@@ -325,6 +338,10 @@ class AdminsController extends ResourceController
         return $this->respond(['success' => true, 'data' => $data]);
     }
 
+    //=============================
+    // FUNCION PARA BUSCAR DENUNCIA
+    // POR NOMBRE DEL DENUNCIADO
+    //=============================
     public function searchDenunciaByNombreDenunciado($nombre = null)
     {
         $admin = $this->authAdmin();
@@ -340,7 +357,6 @@ class AdminsController extends ResourceController
             return $this->fail(['message' => 'No se encontró ninguna denuncia para este nombre']);
         }
 
-        // Construimos la respuesta
         $data = array_map(function ($denuncia) {
             return [
                 'id'             => $denuncia['id'],
@@ -364,45 +380,23 @@ class AdminsController extends ResourceController
         return $this->respond(['success' => true, 'data' => $data]);
     }
 
-
-    
-
-    // public function getRegistradas(){
-    //     $admin = $this->authAdmin();
-    //     if (is_object($admin)) return $admin;
-
-    //     $perPage = $this->request->getGet('per_page') ?? 10;
-    //     $page = $this->request->getGet('page') ?? 1;
-
-    //     $denuncias = $this->denunciaModel->DenunciasRegistradas($perPage);
-
-    //     if (empty($denuncias)) {
-    //         return $this->fail(['message' => 'No hay denuncias registradas']);
-    //     }
-
-    //     return $this->response->setStatusCode(200)->setJSON([
-    //         'success' => true,
-    //         'data' => $denuncias,
-    //         'pager' => $this->denunciaModel->pager->getDetails() 
-    //     ]);
-    // }
-
+    //===========================================
+    // FUNCION PARA LISTAR DENUNCIAS REGISTRADAS
+    //===========================================
     public function getRegistradas()
     {
         $page = $this->request->getGet("page");
         $admin = $this->authAdmin();
         if (is_object($admin)) return $admin;
 
-        $perPage = 10; // Para prueba
+        $perPage = 10; 
 
-        // Primero llamamos paginate (esto crea el pager)
         $denuncias = $this->denunciaModel->DenunciasRegistradas($perPage, $page);
 
         if (empty($denuncias)) {
             return $this->fail(['message' => 'No hay denuncias registradas']);
         }
 
-        // Ahora que paginate ya se ejecutó, el pager existe
         $pager = $this->denunciaModel->pager;
 
         return $this->response->setStatusCode(200)->setJSON([
@@ -430,6 +424,10 @@ class AdminsController extends ResourceController
             ]
         ]);
     }
+
+    //==============================================
+    // FUNCION PARA OBTENER ESTADISTICAS DE DENUNCIAS
+    //==============================================
     public function getDenunciasStats()
     {
         $admin = $this->authAdmin();
@@ -452,26 +450,10 @@ class AdminsController extends ResourceController
         ]);
     }
 
-    // public function getdenunciasActivas()
-    // {
-    //     $admin = $this->authAdmin();
-    //     if (is_object($admin)) return $admin;
-
-    //     $perPage = $this->request->getGet('per_page') ?? 10;
-    //     $page = $this->request->getGet('page') ?? 1;
-
-    //     $denuncias = $this->denunciaModel->DenunciasActivas($perPage);
-
-    //     if (empty($denuncias)) {
-    //         return $this->fail(['message' => 'No hay denuncias activas']);
-    //     }
-    //     return $this->response->setStatusCode(200)->setJSON([
-    //         'success' => true,
-    //         'data' => $denuncias,
-    //         'pager' => $this->denunciaModel->pager->getDetails()
-    //     ]);
-    // }
-
+    
+    //========================================
+    // FUNCION PARA LISTAR DENUNCIAS ACTIVAS
+    //========================================
     public function getDenunciasActivas()
     {
         $page = $this->request->getGet("page");
@@ -537,8 +519,13 @@ class AdminsController extends ResourceController
 
 
     // =========================
-    // Funciones de SUPER ADMINS
+    // FUNCIONES PARA SUPER ADMINS
     // =========================
+
+
+    //=======================================
+    // FUNCION PARA LISTAR ADMINISTRADORES
+    //=======================================
     public function getAdministradores()
     {
         $admins = $this->adminModel->findAll();
@@ -560,7 +547,9 @@ class AdminsController extends ResourceController
         ])->setStatusCode(200);
     }
 
-    
+    //=======================================
+    // FUNCION PARA CREAR ADMINISTRADORES
+    //=======================================
     public function createAdministrador()
     {
         $admin = $this->authAdmin();
@@ -602,11 +591,6 @@ class AdminsController extends ResourceController
                 'message' => 'Administrador registrado correctamente',
                 'id'      => $nuevoId
             ], 200);
-            // return $this->respondCreated([
-            //     'success' => true,
-            //     'message' => 'Administrador registrado correctamente',
-            //     'id'      => $this->adminModel->getInsertID()
-            // ]);
         }
 
         return $this->fail([
@@ -616,7 +600,9 @@ class AdminsController extends ResourceController
         ], 500);
     }
 
-
+    //========================================
+    // FUNCION PARA ACTUALIZAR ADMINISTRADORES
+    //========================================
     public function updateAdministrador($dni = null)
     {
         $adminAuth = $this->authAdmin();
@@ -649,12 +635,10 @@ class AdminsController extends ResourceController
             return $this->failValidationErrors("Solo puedes actualizar password, estado o rol");
         }
 
-        // Hashear la contraseña si se envía
         if (isset($data['password'])) {
             $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
         }
 
-        // Ejecutamos el update usando el DNI
         if ($this->adminModel->where('dni', $dni)->set($data)->update()) {
             $adminUpdated = $this->adminModel->getByDNI($dni);
             unset($adminUpdated['id'], $adminUpdated['password']); 
@@ -677,7 +661,9 @@ class AdminsController extends ResourceController
         return $this->fail("No se pudo actualizar el administrador");
     }
 
-
+    //=============================================
+    // FUNCION PARA ELIMINAR ADMINISTRADORES POR DNI
+    //=============================================
     public function deleteAdministrador($dni)
     {
         $adminAuth = $this->authAdmin();
@@ -697,7 +683,6 @@ class AdminsController extends ResourceController
         }
 
         if ($this->adminModel->where('dni', $dni)->delete()) {
-            // Registrar en el historial
             $this->registrarHistorial(
                 $adminAuth['id'],     
                 $admin['id'],        
@@ -716,7 +701,9 @@ class AdminsController extends ResourceController
         ], 500);
     }
 
-
+    //=============================================
+    // FUNCION PARA ELIMINAR ADMINISTRADORES POR ID
+    //=============================================
     public function deleteAdministradorById($id)
     {
         $admin = $this->authAdmin();
@@ -748,7 +735,9 @@ class AdminsController extends ResourceController
     }
 
 
-
+    //===========================================
+    // FUNCION PARA BUSCAR ADMINISTRADORES POR DNI
+    //===========================================
     public function searchAdminByDNI($dni = null)
     {
         $admin = $this->authAdmin();
@@ -780,6 +769,9 @@ class AdminsController extends ResourceController
         ]) ->setStatusCode(200);
     }
 
+    //===========================================
+    // FUNCION PARA BUSCAR ADMINISTRADORES POR ID
+    //===========================================
     public function searchAdminById($id)
     {
         $admin = $this->authAdmin();
@@ -811,6 +803,9 @@ class AdminsController extends ResourceController
         ]) ->setStatusCode(200);
     }
 
+    //===========================================
+    // FUNCION PARA LISTAR EL HISTORIAL DE ADMINS
+    //===========================================
     public function listarHistorial()
     {
         $admin = $this->authAdmin();
@@ -843,46 +838,5 @@ class AdminsController extends ResourceController
                 'anterior'  => ($currentPage > 1) ? current_url() . '?page=' . ($currentPage - 1) : null
             ]
         ], 200);
-    }
-
-    //====================================
-    // METODOS PRIVADO DE LA CLASE
-    //==================================== 
-    private function enviarCorreo($correo, $code, $estado, $comentario)
-    {
-        $email = \Config\Services::email();
-
-        $email->setFrom('munijloenlinea@gmail.com', 'Municipalidad Distrital de José Leonardo Ortiz');
-        $email->setTo($correo);
-        $email->setSubject('Código de Seguimiento de Denuncia');
-
-        $mensaje = "
-            <html><body>
-            <p>Estimado usuario,</p>
-            <p>Estado actual de su denuncia: $estado</p>
-            <p><strong>Código:</strong> $code</p>
-            <p><strong>Estado:</strong> $estado</p>
-            <p><strong>Comentario:</strong> $comentario</p>
-            <p><a href='http://localhost:5173/tracking-denuncia?codigo=$code'>Ver seguimiento</a></p>
-            </body></html>
-        ";
-
-        $email->setMessage($mensaje);
-
-        if($email->send()){
-            return true;
-        } else {
-            return $email->printDebugger(['headers']);
-        }
-    }
-
-    private function registrarHistorial($adminId, $afectadoId, $accion, $motivo)
-    {
-        $this->historialModel->insert([
-            'administrador_id' => $adminId,
-            'afectado_id'      => $afectadoId,
-            'accion'           => $accion,
-            'motivo'           => $motivo
-        ]);
     }
 }
