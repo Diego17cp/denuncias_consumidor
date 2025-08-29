@@ -424,32 +424,6 @@ class AdminsController extends ResourceController
             ]
         ]);
     }
-
-    //==============================================
-    // FUNCION PARA OBTENER ESTADISTICAS DE DENUNCIAS
-    //==============================================
-    public function getDenunciasStats()
-    {
-        $admin = $this->authAdmin();
-        if (is_object($admin)) return $admin;
-        $total = $this->denunciaModel->countAllResults();
-        $pending = $this->denunciaModel->where('estado', 'registrado')->countAllResults();
-        $inProcess = $this->denunciaModel->where('estado', 'en_proceso')->countAllResults();
-        $closed = $this->denunciaModel->where('estado', 'finalizada')->countAllResults();
-        $recieved = $this->denunciaModel->whereNotIn('estado', ['registrado'])->countAllResults();
-
-        return $this->respond([
-            'success' => true,
-            'data' => [
-                'total' => $total,
-                'pending' => $pending,
-                'in_process' => $inProcess,
-                'closed' => $closed,
-                'recieved' => $recieved
-            ]
-        ]);
-    }
-
     
     //========================================
     // FUNCION PARA LISTAR DENUNCIAS ACTIVAS
@@ -513,6 +487,31 @@ class AdminsController extends ResourceController
                 'next'        => $page < ceil($pager->getTotal() / $perPage) ? base_url("admin/activas/" . ($page + 1)) : null,
                 'prev'        => $page > 1 ? base_url("admin/activas/" . ($page - 1)) : null,
             ],
+        ]);
+    }
+
+    //==============================================
+    // FUNCION PARA OBTENER ESTADISTICAS DE DENUNCIAS
+    //==============================================
+    public function getDenunciasStats()
+    {
+        $admin = $this->authAdmin();
+        if (is_object($admin)) return $admin;
+        $total = $this->denunciaModel->countAllResults();
+        $pending = $this->denunciaModel->where('estado', 'registrado')->countAllResults();
+        $inProcess = $this->denunciaModel->where('estado', 'en_proceso')->countAllResults();
+        $closed = $this->denunciaModel->where('estado', 'finalizada')->countAllResults();
+        $recieved = $this->denunciaModel->whereNotIn('estado', ['registrado'])->countAllResults();
+
+        return $this->respond([
+            'success' => true,
+            'data' => [
+                'total' => $total,
+                'pending' => $pending,
+                'in_process' => $inProcess,
+                'closed' => $closed,
+                'recieved' => $recieved
+            ]
         ]);
     }
 
