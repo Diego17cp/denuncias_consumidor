@@ -384,7 +384,7 @@ class DenunciaModel extends Model
     //                 ->paginate($perPage, 'default', $page);
     // }
 
-    public function DenunciasActivas($perPage = 2, $page = null)
+    public function DenunciasActivas($perPage = 10, $page = null)
     {
         return $this->select('denuncia.*, 
                             COALESCE(denunciante.razon_social, denunciante.nombre) AS denunciante_nombre,
