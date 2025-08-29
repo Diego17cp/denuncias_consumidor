@@ -20,6 +20,7 @@ const TrackingDenuncia = () => {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
 	const [isSubmitted, setIsSubmitted] = useState(false);
+	const [isJustRegistered, setIsJustRegistered] = useState(false);
 
 	const estadosDenuncia = {
 		registrada: {
@@ -157,8 +158,14 @@ const TrackingDenuncia = () => {
 				response.data.data.length > 0
 			) {
 				setEventos(response.data.data);
-			} else {
+				setIsJustRegistered(false);
+			} else if (response.data && response.data.success && response.data.data.length === 0) {
 				setEventos([]);
+				setIsJustRegistered(true);
+			}
+			else {
+				setEventos([]);
+				setIsJustRegistered(false);
 				toast.error("No se encontró la denuncia con ese código.");
 			}
 		} catch (err) {
@@ -506,6 +513,49 @@ const TrackingDenuncia = () => {
 								</motion.div>
 							</motion.div>
 						)}
+				</AnimatePresence>
+
+				{/* Special "only registered" message */}
+				<AnimatePresence>
+					{isSubmitted && !loading && isJustRegistered && (
+						<motion.div
+							initial={{ opacity: 0, height: 0 }}
+							animate={{ opacity: 1, height: "auto" }}
+							exit={{ opacity: 0, height: 0 }}
+							transition={{ duration: 0.4 }}
+							className="p-6 bg-yellow-50 rounded-lg border border-yellow-200 shadow-sm"
+						>
+							<div className="flex items-start gap-4">
+								<div className="text-yellow-600 mt-1">
+									<FiAlertCircle className="text-2xl" />
+								</div>
+								<div className="flex-1">
+									<h3 className="text-lg font-semibold text-yellow-800">
+										Denuncia registrada — sin seguimiento
+									</h3>
+									<p className="text-sm text-yellow-700 mt-1">
+										Hemos recibido tu denuncia correctamente, pero aún no se ha asignado
+										seguimiento por parte de un administrador. En cuanto se realice una
+										acción, podrás ver el historial aquí.
+									</p>
+									<div className="mt-4 flex flex-wrap gap-3">
+										<button
+											onClick={() => (window.location.href = "/")}
+											className="px-4 py-2 bg-white rounded-lg text-sm shadow-sm transition-all duration-200 hover:shadow-md border border-gray-200 ease-in-out cursor-pointer"
+										>
+											Volver al inicio
+										</button>
+										<button
+											// onClick={() => window.open('mailto:soporte@tusitio.local')}
+											className="px-4 py-2 bg-yellow-600 text-white rounded-lg text-sm shadow-sm transition-all duration-200 hover:shadow-md  ease-in-out cursor-pointer"
+										>
+											Contactar soporte
+										</button>
+									</div>
+								</div>
+							</div>
+						</motion.div>
+					)}
 				</AnimatePresence>
 
 				{/* Estado inicial */}
