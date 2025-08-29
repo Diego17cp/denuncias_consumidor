@@ -363,30 +363,6 @@ class AdminsController extends ResourceController
 
         return $this->respond(['success' => true, 'data' => $data]);
     }
-
-
-    
-
-    // public function getRegistradas(){
-    //     $admin = $this->authAdmin();
-    //     if (is_object($admin)) return $admin;
-
-    //     $perPage = $this->request->getGet('per_page') ?? 10;
-    //     $page = $this->request->getGet('page') ?? 1;
-
-    //     $denuncias = $this->denunciaModel->DenunciasRegistradas($perPage);
-
-    //     if (empty($denuncias)) {
-    //         return $this->fail(['message' => 'No hay denuncias registradas']);
-    //     }
-
-    //     return $this->response->setStatusCode(200)->setJSON([
-    //         'success' => true,
-    //         'data' => $denuncias,
-    //         'pager' => $this->denunciaModel->pager->getDetails() 
-    //     ]);
-    // }
-
     public function getRegistradas()
     {
         $page = $this->request->getGet("page");
@@ -451,27 +427,6 @@ class AdminsController extends ResourceController
             ]
         ]);
     }
-
-    // public function getdenunciasActivas()
-    // {
-    //     $admin = $this->authAdmin();
-    //     if (is_object($admin)) return $admin;
-
-    //     $perPage = $this->request->getGet('per_page') ?? 10;
-    //     $page = $this->request->getGet('page') ?? 1;
-
-    //     $denuncias = $this->denunciaModel->DenunciasActivas($perPage);
-
-    //     if (empty($denuncias)) {
-    //         return $this->fail(['message' => 'No hay denuncias activas']);
-    //     }
-    //     return $this->response->setStatusCode(200)->setJSON([
-    //         'success' => true,
-    //         'data' => $denuncias,
-    //         'pager' => $this->denunciaModel->pager->getDetails()
-    //     ]);
-    // }
-
     public function getDenunciasActivas()
     {
         $page = $this->request->getGet("page");
@@ -533,8 +488,6 @@ class AdminsController extends ResourceController
             ],
         ]);
     }
-
-
 
     // =========================
     // Funciones de SUPER ADMINS
