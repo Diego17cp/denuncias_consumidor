@@ -1,4 +1,3 @@
-import React from "react";
 import { X, Eye, EyeOff, User, Key, Shield } from "lucide-react";
 import { useAdmin } from "../../hooks/admin/usuarios/useAdmin";
 import { Loader } from "dialca-ui"
@@ -9,19 +8,19 @@ export default function ModalUsuario({
 	selectedUser,
 	roles,
 	closeModal,
+	onCreateUser,
+	formData,
+	handleInputChange,
+	isCreating,
+	updateUser,
+	handlePasswordChange,
+	handleRoleChange,
+	updatedPassword,
+	updatedRol,
 }) {
     const {
-        createUser: formData,
 		showPassword,
-		isCreating,
 		handleShowPassword,
-		handleInputChange,
-		handleCreateUser,
-		updatedPassword,
-		handlePasswordChange,
-		updateUser,
-		handleRoleChange,
-		updatedRol
 	} = useAdmin();
 
     if (!open) return null;
@@ -74,7 +73,11 @@ export default function ModalUsuario({
 				<main className="p-6 max-h-[70vh] overflow-y-auto">
 					{modalType === "crear" && (
 						<form
-							onSubmit={handleCreateUser}
+							onSubmit={(e) => {
+								e.preventDefault();
+								onCreateUser()
+								closeModal();
+							}}
 							className="space-y-5"
 						>
 							<div>
@@ -248,7 +251,7 @@ export default function ModalUsuario({
 									name="password"
 									value={updatedPassword.password}
 									onChange={handlePasswordChange}
-									className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+									className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
 									placeholder="Ingrese la nueva contraseña"
 								/>
 							</div>
@@ -263,7 +266,7 @@ export default function ModalUsuario({
 									name="confirmPassword"
 									value={updatedPassword.confirmPassword}
 									onChange={handlePasswordChange}
-									className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+									className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
 									placeholder="Confirme la nueva contraseña"
 								/>
 							</div>
@@ -307,7 +310,7 @@ export default function ModalUsuario({
 								<select
 									value={updatedRol}
 									onChange={handleRoleChange}
-									className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
+									className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
 								>
 									<option value="" disabled>Selecciona un rol</option>
 									{roles.map((role) => (
@@ -331,6 +334,7 @@ export default function ModalUsuario({
 								<button
 									onClick={() => {
 										updateUser(selectedUser.dni, "rol");
+										closeModal();
 									}}
 									className="cursor-pointer flex-1 px-4 py-3 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg font-medium"
 								>
