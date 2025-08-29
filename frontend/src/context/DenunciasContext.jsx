@@ -5,6 +5,31 @@ import { toast } from "sonner";
 
 const MAX_FILES = 10;
 const MAX_SIZE_MB = 20;
+const ALLOWED_MIME = new Set([
+	"image/jpeg",
+	"image/png",
+	"image/gif",
+	"image/webp",
+	"application/pdf",
+	"application/msword",
+	"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+	"text/plain",
+	"application/zip",
+	"application/x-zip-compressed",
+	"multipart/x-zip",
+]);
+const ALLOWED_EXT = new Set([
+	"jpg",
+	"jpeg",
+	"png",
+	"gif",
+	"webp",
+	"pdf",
+	"doc",
+	"docx",
+	"txt",
+	"zip",
+]);
 
 const DenunciasContext = createContext();
 
@@ -27,24 +52,60 @@ export function DenunciasProvider({ children }) {
 	const isFilesLimitReached =
 		files.length > MAX_FILES || totalSize > MAX_SIZE_MB;
 
+	const isAllowedFile = (file) => {
+		const ext = file.name.split(".").pop().toLowerCase();
+		if (file.type && ALLOWED_MIME.has(file.type)) return true;
+		if (ALLOWED_EXT.has(ext)) return true;
+		return false;
+	};
+
 	const handleFileChange = (e) => {
 		setError("");
 		const selectedFiles = Array.from(e.target.files);
-		const totalFiles = files.length + selectedFiles.length;
 
-		if (totalFiles > MAX_FILES) {
-			setError("Solo puedes subir 10 archivos.");
+		const rejected = [];
+		const accepted = [];
+
+		for (const file of selectedFiles) {
+			if (!isAllowedFile(file)) {
+				rejected.push(file.name);
+				continue;
+			}
+			accepted.push(file);
+		}
+
+		if (rejected.length > 0) {
+			setError(
+				`Los siguientes archivos no están permitidos: ${rejected.join(
+					", "
+				)}. Tipos permitidos: ${Array.from(ALLOWED_EXT).join(", ")}.`
+			);
+		}
+
+		if (accepted.length === 0) {
 			return;
 		}
 
-		const newFiles = [...files, ...selectedFiles];
+		const totalFiles = files.length + accepted.length;
+		if (totalFiles > MAX_FILES) {
+			setError((prev) =>
+				prev
+					? `${prev} Solo puedes subir ${MAX_FILES} archivos.`
+					: `Solo puedes subir ${MAX_FILES} archivos.`
+			);
+			return;
+		}
+
+		const newFiles = [...files, ...accepted];
 		const totalSizeMB = newFiles.reduce(
 			(acc, file) => acc + file.size / (1024 * 1024),
 			0
 		);
 		if (totalSizeMB > MAX_SIZE_MB) {
-			setError(
-				"El tamaño total de los archivos no debe superar los 20MB."
+			setError((prev) =>
+				prev
+					? `${prev} El tamaño total de los archivos no debe superar los ${MAX_SIZE_MB}MB.`
+					: `El tamaño total de los archivos no debe superar los ${MAX_SIZE_MB}MB.`
 			);
 			return;
 		}
@@ -91,7 +152,11 @@ export function DenunciasProvider({ children }) {
 				return;
 			const data = await getServiceData("dni", denunciado.dni);
 			if (data)
-				setDenunciado((prev) => ({ ...prev, nombres: data.nombre, direccion: data.direccion }));
+				setDenunciado((prev) => ({
+					...prev,
+					nombres: data.nombre,
+					direccion: data.direccion,
+				}));
 		};
 
 		const getRucData = async () => {
@@ -253,7 +318,10 @@ export function DenunciasProvider({ children }) {
 				denunciado.tipoDocumento === "RUC" && denunciado.representante
 					? denunciado.representante
 					: null,
-			tipo_documento: denunciado.tipoDocumento === "CEDULA" ? "CE" : denunciado.tipoDocumento,
+			tipo_documento:
+				denunciado.tipoDocumento === "CEDULA"
+					? "CE"
+					: denunciado.tipoDocumento,
 			documento:
 				denunciado.tipoDocumento === "DNI"
 					? denunciado.dni
@@ -281,9 +349,9 @@ export function DenunciasProvider({ children }) {
 					: null,
 			tipo_documento: tipoDocumento === "CEDULA" ? "CE" : tipoDocumento,
 			razon_social:
-			tipoDocumento === "RUC" && denunciante.razonSocial
-			? denunciante.razonSocial
-			: null,
+				tipoDocumento === "RUC" && denunciante.razonSocial
+					? denunciante.razonSocial
+					: null,
 			direccion: denunciante.domicilio,
 			celular:
 				denunciante.celular.length === 9 ? denunciante.celular : null,
@@ -366,7 +434,7 @@ export function DenunciasProvider({ children }) {
 				handleSubmit,
 				isSubmitting,
 				trackingCode,
-				isDenunciaEnviada
+				isDenunciaEnviada,
 			}}
 		>
 			{children}
