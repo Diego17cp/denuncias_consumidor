@@ -4,6 +4,8 @@ import { X, User, Shield } from "lucide-react";
 export default function ModalDetalleHistorial({ open, detalles, getActionConfig, formatDate, onClose }) {
     if (!open || !detalles) return null;
 
+    const actionCfg = getActionConfig(detalles.accion, detalles.motivo);
+
     return (
         <div className="fixed inset-0 flex items-center justify-center p-4 z-50 bg-black/30 backdrop-blur-sm">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all max-h-screen overflow-y-auto">
@@ -24,13 +26,21 @@ export default function ModalDetalleHistorial({ open, detalles, getActionConfig,
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Acción</label>
-                                <p className="mt-1 text-sm text-gray-900">{getActionConfig(detalles.accion).label}</p>
+                                <p className="mt-1 text-sm text-gray-900">{actionCfg.label}</p>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Fecha y Hora</label>
-                                <p className="mt-1 text-sm text-gray-900">{formatDate(detalles.fecha)}</p>
+                                <p className="mt-1 text-sm text-gray-900">{formatDate(detalles.created_at || detalles.fecha)}</p>
                             </div>
                         </div>
+
+                        {/* Motivo / descripción de la acción */}
+                        {detalles.motivo && (
+                          <div className="mt-4">
+                            <label className="block text-sm font-medium text-gray-700">Motivo / Detalle</label>
+                            <p className="mt-1 text-sm text-gray-700 whitespace-pre-wrap">{detalles.motivo}</p>
+                          </div>
+                        )}
                     </div>
 
                     {/* Usuario afectado */}
@@ -41,8 +51,8 @@ export default function ModalDetalleHistorial({ open, detalles, getActionConfig,
                                 <User className="h-5 w-5 text-blue-600" />
                             </div>
                             <div>
-                                <p className="text-sm font-medium text-blue-900">{detalles.usuarioAfectado.nombre}</p>
-                                <p className="text-xs text-blue-700">DNI: {detalles.usuarioAfectado.dni}</p>
+                                <p className="text-sm font-medium text-blue-900">{detalles.nombre_afectado}</p>
+                                <p className="text-xs text-blue-700">DNI: {detalles.dni_afectado}</p>
                             </div>
                         </div>
                     </div>
@@ -55,8 +65,8 @@ export default function ModalDetalleHistorial({ open, detalles, getActionConfig,
                                 <Shield className="h-5 w-5 text-purple-600" />
                             </div>
                             <div>
-                                <p className="text-sm font-medium text-purple-900">{detalles.administrador.nombre}</p>
-                                <p className="text-xs text-purple-700">DNI: {detalles.administrador.dni}</p>
+                                <p className="text-sm font-medium text-purple-900">{detalles.nombre_administrador}</p>
+                                <p className="text-xs text-purple-700">DNI: {detalles.dni_administrador}</p>
                             </div>
                         </div>
                     </div>
