@@ -1,24 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     X,
     User,
     Shield,
     FileBox,
-    Clock,
     MessageSquare,
     Download,
 } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
 import { useDenunciasGestion } from "../../../hooks/admin/denuncias/useDenunciasGestion";
-
-// Mapeo de colores por estado
-const estadoColors = {
-    Registrada: "bg-green-50 border-green-400 text-green-700",
-    Pendiente: "bg-amber-50 border-amber-400 text-amber-700",
-    Cerrada: "bg-slate-50 border-slate-400 text-slate-700",
-    Archivada: "bg-red-50 border-red-400 text-red-700",
-};
+import { Loader } from "dialca-ui";
 
 export default function ModalDetalleDenuncia({
     open,
@@ -34,6 +26,8 @@ export default function ModalDetalleDenuncia({
 
     const API_URL = import.meta.env.VITE_CI_API_BASE_URL
 
+    const [isUpdating, setIsUpdating] = useState(false)
+
     const onUpdate = async () => {
         const data = {
             tracking_code: denuncia.tracking_code,
@@ -44,6 +38,7 @@ export default function ModalDetalleDenuncia({
             toast.error("Por favor, coloca un comentario y selecciona un estado.");
             return;
         }
+        setIsUpdating(true);
         try {
             const response = await axios.post(`${API_URL}/admin/procesos-denuncia`, data, {
                 withCredentials: true
@@ -62,6 +57,8 @@ export default function ModalDetalleDenuncia({
             }
             console.error("Error inesperado:", err);
             toast.error("Error al actualizar la denuncia. Inténtalo de nuevo.");
+        } finally {
+            setIsUpdating(false);
         }
     }
 
@@ -234,10 +231,15 @@ export default function ModalDetalleDenuncia({
                     </button>
                     <button
                         onClick={onUpdate}
-                        className="cursor-pointer px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg transition-all duration-300 flex items-center justify-center shadow-lg"
+                        disabled={isUpdating}
+                        className="cursor-pointer px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:cursor-not-allowed disabled:bg-blue-200 text-white font-semibold rounded-lg transition-all duration-300 flex items-center justify-center shadow-lg"
                     >
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        Actualizar Estado
+                        {isUpdating ? <Loader size={6} /> : (
+                            <>
+                                <MessageSquare className="h-4 w-4 mr-2" />
+                                Actualizar Estado
+                            </>
+                        )}
                     </button>
                 </div>
             </div>
