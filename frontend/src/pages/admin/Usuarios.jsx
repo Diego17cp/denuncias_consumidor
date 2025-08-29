@@ -9,7 +9,8 @@ import {
   ToggleRight,
   AlertCircle,
   UserCheck,
-  Users
+  Users,
+  FileText
 } from 'lucide-react';
 import ModalUsuario from "./ModalUsuario";
 import { useAdmin } from '../../hooks/admin/usuarios/useAdmin';
@@ -215,66 +216,81 @@ export function Usuarios() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredUsers.map((user) => (
-                      <tr key={user.dni} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {user.dni}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {user.nombre}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            getRoleColor(user.rol) === 'blue' ? 'bg-blue-100 text-blue-800' :
-                            getRoleColor(user.rol) === 'red' ? 'bg-red-100 text-red-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}>
-                            {user.rol === "super_admin" ? "Super Admin." : "Administrador"}
-                            {/* {user.rol.charAt(0).toUpperCase() + user.rol.slice(1)} */}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            getStatusColor(user.estado) === 'green' ? 'bg-green-100 text-green-800' :
-                            getStatusColor(user.estado) === 'red' ? 'bg-red-100 text-red-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}>
-                            {getStatusLabel(user.estado)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={() => openModal('password', user)}
-                              className="p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors"
-                              title="Cambiar contraseña"
-                            >
-                              <Key className="cursor-pointer h-4 w-4" />
-                            </button>
-                            <button
-                              onClick={() => openModal('role', user)}
-                              className="p-2 text-green-600 hover:text-green-900 hover:bg-green-50 rounded-lg transition-colors"
-                              title="Cambiar rol"
-                            >
-                              <Edit className="cursor-pointer h-4 w-4" />
-                            </button>
-                            <button
-                              onClick={() => toggleUserStatus(user.dni, user.estado === "1" ? "0" : "1")}
-                              className={`p-2 rounded-lg transition-colors ${user.estado === '1'
-                                  ? 'text-red-600 hover:text-red-900 hover:bg-red-50'
-                                  : 'text-green-600 hover:text-green-900 hover:bg-green-50'
-                                }`}
-                              title={user.estado === '1' ? 'Desactivar' : 'Activar'}
-                            >
-                              {user.estado === '1' ?
-                                <ToggleRight className="cursor-pointer h-4 w-4" /> :
-                                <ToggleLeft className="cursor-pointer h-4 w-4" />
-                              }
-                            </button>
+                    {filteredUsers.length > 0 ? (
+                      filteredUsers.map((user) => (
+                        <tr key={user.dni} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {user.dni}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {user.nombre}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              getRoleColor(user.rol) === 'blue' ? 'bg-blue-100 text-blue-800' :
+                              getRoleColor(user.rol) === 'red' ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {user.rol === "super_admin" ? "Super Admin." : "Administrador"}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              getStatusColor(user.estado) === 'green' ? 'bg-green-100 text-green-800' :
+                              getStatusColor(user.estado) === 'red' ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {getStatusLabel(user.estado)}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div className="flex items-center space-x-2">
+                              <button
+                                onClick={() => openModal('password', user)}
+                                className="p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors"
+                                title="Cambiar contraseña"
+                              >
+                                <Key className="cursor-pointer h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => openModal('role', user)}
+                                className="p-2 text-green-600 hover:text-green-900 hover:bg-green-50 rounded-lg transition-colors"
+                                title="Cambiar rol"
+                              >
+                                <Edit className="cursor-pointer h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => toggleUserStatus(user.dni, user.estado === "1" ? "0" : "1")}
+                                className={`p-2 rounded-lg transition-colors ${user.estado === '1'
+                                    ? 'text-red-600 hover:text-red-900 hover:bg-red-50'
+                                    : 'text-green-600 hover:text-green-900 hover:bg-green-50'
+                                  }`}
+                                title={user.estado === '1' ? 'Desactivar' : 'Activar'}
+                              >
+                                {user.estado === '1' ?
+                                  <ToggleRight className="cursor-pointer h-4 w-4" /> :
+                                  <ToggleLeft className="cursor-pointer h-4 w-4" />
+                                }
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={5} className="px-6 py-12 text-center">
+                          <div className="flex flex-col items-center justify-center gap-3">
+                            <FileText className="h-8 w-8 text-gray-300" />
+                            <div className="text-gray-500">
+                              No hay usuarios que coincidan con los filtros aplicados.
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              Ajusta los filtros o agrega nuevos usuarios para que aparezcan aquí.
+                            </div>
                           </div>
                         </td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>
