@@ -63,7 +63,7 @@ const TrackingDenuncia = () => {
 				"La denuncia ha sido aceptada y se procederá con las acciones correspondientes.",
 		},
 		finalizada: {
-			label: "Finalziada",
+			label: "Finalizada",
 			color: "bg-green-100 text-green-800",
 			darkColor: "bg-green-600 text-white",
 			icon: <FiCheckCircle className="text-lg" />,
