@@ -380,7 +380,7 @@ export const Denuncias = () => {
             <tr>
               <th className="px-6 py-4 text-left text-sm font-bold text-slate-700">Código</th>
               <th className="px-6 py-4 text-left text-sm font-bold text-slate-700">Denunciado</th>
-              <th className="px-6 py-4 text-left text-sm font-bold text-slate-700">DNI</th>
+              <th className="px-6 py-4 text-left text-sm font-bold text-slate-700">Documento</th>
               <th className="px-6 py-4 text-left text-sm font-bold text-slate-700">Estado</th>
               <th className="px-6 py-4 text-left text-sm font-bold text-slate-700">Motivo</th>
               <th className="px-6 py-4 text-left text-sm font-bold text-slate-700">Fecha</th>
