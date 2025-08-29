@@ -516,8 +516,6 @@ class AdminsController extends ResourceController
         ]);
     }
 
-
-
     // =========================
     // FUNCIONES PARA SUPER ADMINS
     // =========================
