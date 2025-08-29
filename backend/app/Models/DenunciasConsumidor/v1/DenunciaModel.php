@@ -301,12 +301,25 @@ class DenunciaModel extends Model
             ->findAll();
     }
 
+    // public function searchByDocumentoDenunciado($documento)
+    // {
+    //     return $this->select('denuncia.*, 
+    //                         denunciado.nombre AS nombre_denunciado, 
+    //                         denunciado.documento AS documento_denunciado,
+    //                         denunciante.nombre AS nombre_denunciante,
+    //                         denunciante.documento AS documento_denunciante')
+    //                 ->join('denunciado', 'denunciado.id = denuncia.denunciado_id')
+    //                 ->join('denunciante', 'denunciante.id = denuncia.denunciante_id', 'left')
+    //                 ->where('denunciado.documento', $documento)
+    //                 ->findAll();
+    // }
+
     public function searchByDocumentoDenunciado($documento)
     {
         return $this->select('denuncia.*, 
-                            denunciado.nombre AS nombre_denunciado, 
+                            COALESCE(NULLIF(denunciado.razon_social, ""), NULLIF(denunciado.nombre, "")) AS nombre_denunciado, 
                             denunciado.documento AS documento_denunciado,
-                            denunciante.nombre AS nombre_denunciante,
+                            COALESCE(NULLIF(denunciante.razon_social, ""), NULLIF(denunciante.nombre, "")) AS nombre_denunciante,
                             denunciante.documento AS documento_denunciante')
                     ->join('denunciado', 'denunciado.id = denuncia.denunciado_id')
                     ->join('denunciante', 'denunciante.id = denuncia.denunciante_id', 'left')
@@ -314,18 +327,34 @@ class DenunciaModel extends Model
                     ->findAll();
     }
 
+
+    // public function searchByNombreDenunciado($nombre)
+    // {
+    //     return $this->select('denuncia.*, 
+    //                         denunciado.nombre AS nombre_denunciado, 
+    //                         denunciado.documento AS documento_denunciado,
+    //                         denunciante.nombre AS nombre_denunciante,
+    //                         denunciante.documento AS documento_denunciante')
+    //                 ->join('denunciado', 'denunciado.id = denuncia.denunciado_id')
+    //                 ->join('denunciante', 'denunciante.id = denuncia.denunciante_id', 'left')
+    //                 ->like('denunciado.nombre', $nombre) 
+    //                 ->findAll();
+    // }
     public function searchByNombreDenunciado($nombre)
     {
         return $this->select('denuncia.*, 
-                            denunciado.nombre AS nombre_denunciado, 
+                            COALESCE(NULLIF(denunciado.nombre, ""), denunciado.razon_social) AS nombre_denunciado, 
                             denunciado.documento AS documento_denunciado,
-                            denunciante.nombre AS nombre_denunciante,
+                            COALESCE(NULLIF(denunciante.nombre, ""), denunciante.razon_social) AS nombre_denunciante,
                             denunciante.documento AS documento_denunciante')
                     ->join('denunciado', 'denunciado.id = denuncia.denunciado_id')
                     ->join('denunciante', 'denunciante.id = denuncia.denunciante_id', 'left')
-                    ->like('denunciado.nombre', $nombre) 
+                    ->groupStart()
+                        ->like('denunciado.nombre', $nombre)
+                        ->orLike('denunciado.razon_social', $nombre)
+                    ->groupEnd()
                     ->findAll();
-    }
+}
 
     // public function DenunciasRegistradas($perPage = 10, $page = 1)
     // {
