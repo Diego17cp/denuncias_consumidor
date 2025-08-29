@@ -19,6 +19,7 @@ export default function StepDenunciante({ onNext, onPrev, isSubmitting }) {
 		isStepDenuncianteValid,
 		anonimo,
 		setAnonimo,
+		isFetching,
 	} = useDenuncias();
 
 	// Animaciones optimizadas
@@ -127,7 +128,8 @@ export default function StepDenunciante({ onNext, onPrev, isSubmitting }) {
 					</motion.button>
 				</div>
 			</motion.div>
-
+			
+			
 			{/* Si NO es anónimo, muestra los campos */}
 			{!anonimo && (
 				<>
@@ -190,33 +192,26 @@ export default function StepDenunciante({ onNext, onPrev, isSubmitting }) {
 										Nombre completo{" "}
 										<span className="text-red-500">*</span>
 									</label>
-									<input
-										type="text"
-										name="nombres"
-										value={denunciante.nombres}
-										readOnly={
-											tipoDocumento === "RUC" ||
-											tipoDocumento === "DNI"
-										}
-										onChange={handleDenuncianteChange}
-										placeholder="Nombres completos"
-										className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
-									/>
+									<div className="relative">
+										<input
+											type="text"
+											name="nombres"
+											value={denunciante.nombres}
+											readOnly={
+												tipoDocumento === "RUC" ||
+												tipoDocumento === "DNI"
+											}
+											onChange={handleDenuncianteChange}
+											placeholder="Nombres completos"
+											className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
+										/>
+										{isFetching.denunciante.dni && (
+											<div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs">
+												<Loader size={6} />
+											</div>
+										)}
+									</div>
 								</motion.div>
-
-								{/* <motion.div variants={itemVariants} className="space-y-1 md:col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        Apellidos <span className="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="apellidos"
-                                        value={denunciante.apellidos}
-                                        onChange={handleDenuncianteChange}
-                                        placeholder="Apellidos completos"
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
-                                    />
-                                </motion.div> */}
 							</motion.div>
 						)}
 					</AnimatePresence>
@@ -290,14 +285,21 @@ export default function StepDenunciante({ onNext, onPrev, isSubmitting }) {
 										Razón Social{" "}
 										<span className="text-red-500">*</span>
 									</label>
-									<input
-										type="text"
-										name="razonSocial"
-										value={denunciante.razonSocial}
-										onChange={handleDenuncianteChange}
-										placeholder="Razón social completa"
-										className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
-									/>
+									<div className="relative">
+										<input
+											type="text"
+											name="razonSocial"
+											value={denunciante.razonSocial}
+											onChange={handleDenuncianteChange}
+											placeholder="Razón social completa"
+											className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
+										/>
+										{isFetching.denunciante.ruc && (
+											<div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs">
+												<Loader size={6} />
+											</div>
+										)}
+									</div>
 								</motion.div>
 							</motion.div>
 						)}
@@ -308,14 +310,21 @@ export default function StepDenunciante({ onNext, onPrev, isSubmitting }) {
 						<label className="block text-sm font-medium text-gray-700">
 							Domicilio <span className="text-red-500">*</span>
 						</label>
-						<input
-							type="text"
-							name="domicilio"
-							value={denunciante.domicilio}
-							onChange={handleDenuncianteChange}
-							placeholder="Dirección completa"
-							className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
-						/>
+						<div className="relative">
+							<input
+								type="text"
+								name="domicilio"
+								value={denunciante.domicilio}
+								onChange={handleDenuncianteChange}
+								placeholder="Dirección completa"
+								className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
+							/>
+							{isFetching.denunciante.dni && (
+								<div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs">
+									<Loader size={6} />
+								</div>
+							)}
+						</div>
 					</motion.div>
 
 					<motion.div
@@ -327,41 +336,62 @@ export default function StepDenunciante({ onNext, onPrev, isSubmitting }) {
 								Departamento{" "}
 								<span className="text-red-500">*</span>
 							</label>
-							<input
-								type="text"
-								name="departamento"
-								value={denunciante.departamento}
-								onChange={handleDenuncianteChange}
-								placeholder="Departamento"
-								className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
-							/>
+							<div className="relative">
+								<input
+									type="text"
+									name="departamento"
+									value={denunciante.departamento}
+									onChange={handleDenuncianteChange}
+									placeholder="Departamento"
+									className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
+								/>
+								{isFetching.denunciante.dni && (
+									<div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs">
+										<Loader size={6} />
+									</div>
+								)}
+							</div>
 						</div>
 						<div className="space-y-1">
 							<label className="block text-sm font-medium text-gray-700">
 								Provincia{" "}
 								<span className="text-red-500">*</span>
 							</label>
-							<input
-								type="text"
-								name="provincia"
-								value={denunciante.provincia}
-								onChange={handleDenuncianteChange}
-								placeholder="Provincia"
-								className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
-							/>
+							<div className="relative">
+								<input
+									type="text"
+									name="provincia"
+									value={denunciante.provincia}
+									onChange={handleDenuncianteChange}
+									placeholder="Provincia"
+									className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
+								/>
+								{isFetching.denunciante.dni && (
+									<div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs">
+										<Loader size={6} />
+									</div>
+								)}
+							</div>
 						</div>
 						<div className="space-y-1">
 							<label className="block text-sm font-medium text-gray-700">
 								Distrito <span className="text-red-500">*</span>
 							</label>
-							<input
-								type="text"
-								name="distrito"
-								value={denunciante.distrito}
-								onChange={handleDenuncianteChange}
-								placeholder="Distrito"
-								className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
-							/>
+							<div className="relative">
+								<input
+									type="text"
+									name="distrito"
+									value={denunciante.distrito}
+									onChange={handleDenuncianteChange}
+									placeholder="Distrito"
+									className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
+								/>
+								{isFetching.denunciante.dni && (
+									<div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs">
+										<Loader size={6} />
+									</div>
+								)}
+							</div>
 						</div>
 					</motion.div>
 
@@ -539,6 +569,37 @@ export default function StepDenunciante({ onNext, onPrev, isSubmitting }) {
 					</div>
 				</>
 			)}
+
+			{/* Mensaje informativo si la denuncia es anónima */}
+			<AnimatePresence>
+				{anonimo && (
+					<motion.div
+						initial={{ opacity: 0, y: -6 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0, y: -6 }}
+						transition={{ duration: 0.2 }}
+						className="p-4 bg-amber-50 border-l-4 border-amber-400 rounded-md shadow-sm flex gap-3 items-start text-sm text-amber-800"
+					>
+						<div className="text-2xl mt-0.5">
+							<FaUserSecret />
+						</div>
+						<div className="flex-1">
+							<p className="font-semibold">Denuncia anónima activada</p>
+							<p className="text-xs mt-1 text-amber-700/90">
+								La denuncia se enviará sin tus datos personales y no podremos contactarte para seguimiento
+								o aclaraciones. Si necesitas recibir respuesta, desactiva el anonimato o deja un correo/telefono opcional.
+							</p>
+						</div>
+						<button
+							type="button"
+							onClick={() => setAnonimo(false)}
+							className="ml-2 px-3 py-1 rounded-md bg-white border border-amber-200 text-amber-700 text-xs hover:bg-amber-100 transition"
+						>
+							Desactivar anonimato
+						</button>
+					</motion.div>
+				)}
+			</AnimatePresence>
 
 			{/* Botones de navegación */}
 			<motion.div

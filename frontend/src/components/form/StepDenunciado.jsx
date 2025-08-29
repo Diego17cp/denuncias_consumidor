@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useDenuncias } from "../../context/DenunciasContext";
 import { FaUser, FaBuilding, FaAddressCard } from "react-icons/fa";
+import { Loader } from "dialca-ui";
 
 export default function StepDatosDenunciado({ onNext, onPrev }) {
     const {
@@ -8,6 +9,7 @@ export default function StepDatosDenunciado({ onNext, onPrev }) {
         handleDenunciadoChange,
         handleDenunciadoDigits,
         isStepDenunciadoValid,
+        isFetching
     } = useDenuncias();
 
     // Opciones de tipo de documento
@@ -102,31 +104,23 @@ export default function StepDatosDenunciado({ onNext, onPrev }) {
                             <label className="block text-sm font-medium text-gray-700">
                                 Nombre completo <span className="text-red-500">*</span>
                             </label>
-                            <input
-                                type="text"
-                                readOnly={ denunciado.tipoDocumento === "RUC" || denunciado.tipoDocumento === "DNI" }
-                                name="nombres"
-                                value={denunciado.nombres}
-                                onChange={handleDenunciadoChange}
-                                placeholder="Nombre completo"
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
-                            />
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    readOnly={ denunciado.tipoDocumento === "RUC" || denunciado.tipoDocumento === "DNI" }
+                                    name="nombres"
+                                    value={denunciado.nombres}
+                                    onChange={handleDenunciadoChange}
+                                    placeholder="Nombre completo"
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
+                                />
+                                {isFetching.denunciado.dni && (
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs">
+                                        <Loader size={6} />
+                                    </div>
+                                )}
+                            </div>
                         </motion.div>
-
-                        {/* Campo de Apellidos */}
-                        {/* <motion.div className="space-y-1 md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700">
-                                Apellidos <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                name="apellidos"
-                                value={denunciado.apellidos}
-                                onChange={handleDenunciadoChange}
-                                placeholder="Apellidos completos"
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
-                            />
-                        </motion.div> */}
                     </motion.div>
                 )}
 
@@ -160,14 +154,21 @@ export default function StepDatosDenunciado({ onNext, onPrev }) {
                             <label className="block text-sm font-medium text-gray-700">
                                 Razón Social <span className="text-red-500">*</span>
                             </label>
-                            <input
-                                type="text"
-                                name="razonSocial"
-                                value={denunciado.razonSocial}
-                                onChange={handleDenunciadoChange}
-                                placeholder="Razón Social"
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
-                            />
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    name="razonSocial"
+                                    value={denunciado.razonSocial}
+                                    onChange={handleDenunciadoChange}
+                                    placeholder="Razón Social"
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-muni-primary focus:border-muni-primary transition-all ease-in-out duration-300"
+                                />
+                                {isFetching.denunciado.ruc && (
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs">
+                                        <Loader size={6} />
+                                    </div>
+                                )}
+                            </div>
                         </motion.div>
 
                         {/* Campo de Representante Legal */}
