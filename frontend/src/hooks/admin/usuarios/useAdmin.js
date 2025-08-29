@@ -54,10 +54,9 @@ export const useAdmin = () => {
 		setCreateErrors(errors);
 		return Object.keys(errors).length === 0;
 	};
-	const handleCreateUser = async (e) => {
-		e.preventDefault();
-		if (!validateCreateUser()) {
-			toast.error("Por favor, corrige los errores en el formulario.");
+	const handleCreateUser = async () => {
+        if (!validateCreateUser()) {
+            toast.error("Por favor, corrige los errores en el formulario.");
 			return;
 		}
         try {
@@ -80,6 +79,15 @@ export const useAdmin = () => {
             );
             if (response.data.success || response.status === 201) {
                 toast.success(response.data.message || "Usuario creado exitosamente.");
+                setCreateUser({
+                    dni: "",
+                    nombre: "",
+                    password: "",
+                    rol: "",
+                    estado: "",
+                    confirmPassword: "",
+                });
+                await reFetchUsers();
             } else {
                 toast.error(response.data.error || "Error al crear el usuario.");
             }
@@ -92,7 +100,7 @@ export const useAdmin = () => {
             setIsCreating(false);
         }
 	};
-
+    
     const [users, setUsers] = useState([]);
     const [isLoadingUsers, setIsLoadingUsers] = useState(false);
     const fetchUsers = useCallback(async () => {
@@ -114,6 +122,26 @@ export const useAdmin = () => {
             setIsLoadingUsers(false);
         }
     }, [API_URL])
+    const reFetchUsers = async () => {
+        try {
+            setIsLoadingUsers(true)
+            const response = await axios.get(`${API_URL}/admin`, {
+                withCredentials: true
+            })
+            if (response.data.success || response.status === 200) {
+                const data = response.data.data
+                setUsers(data)
+            }
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                toast.error(error.response?.data?.error || "Error al obtener los usuarios.");
+            }
+            console.error(error);
+        } finally {
+            setIsLoadingUsers(false);
+        }
+    }
+    
     const [dniSearch, setDniSearch] = useState("")
     const [isSearching, setIsSearching] = useState(false)
     const [searchedUser, setSearchedUser] = useState(null)
