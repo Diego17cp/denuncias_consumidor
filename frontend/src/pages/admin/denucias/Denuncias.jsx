@@ -65,7 +65,12 @@ export const Denuncias = () => {
     handlePageChange,
     getStatistics,
     isLoading,
-    isRecieving
+    isRecieving,
+    searchResultsDisponibles,
+    searchResultsRecibidas,
+    buscarDenunciasPorNombre,
+    limpiarBusquedaDisponibles,
+    limpiarBusquedaRecibidas
   } = useDenunciasGestion()
 
   useEffect(() => {
@@ -145,7 +150,7 @@ export const Denuncias = () => {
   )
 
   // --- Tabla de denuncias disponibles SIN prioridad ---
-  const DenunciaDisponibleTable = () => (
+  const DenunciaDisponibleTable = ({ denuncias }) => (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
@@ -183,7 +188,7 @@ export const Denuncias = () => {
                     </td>
                   </tr>
                 ))
-              : registeredDenuncias.map((denuncia, index) => (
+              : denuncias.map((denuncia, index) => (
                   <tr
                     key={denuncia.id}
                     className={`hover:bg-slate-50 transition-colors duration-200 ${
@@ -191,50 +196,52 @@ export const Denuncias = () => {
                     }`}
                   >
                     <td className="px-6 py-4">
-                      <div className="font-semibold text-slate-900">{denuncia.denunciado}</div>
+                      <div className="font-semibold text-slate-900">
+                        {denuncia.denunciado?.nombre || denuncia.denunciado}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center text-sm text-slate-600">
                         <User className="h-4 w-4 mr-2 text-slate-400" />
-                        <span>{denuncia.denunciante}</span>
+                        <span>{denuncia.denunciante?.nombre || denuncia.denunciante}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center text-sm text-slate-600">
                         <Calendar className="h-4 w-4 mr-2 text-slate-400" />
-                        <span>{denuncia.fecha_incidente}</span>
+                        <span>{denuncia.fecha_incidente || denuncia.fecha}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-start text-sm text-slate-600 max-w-xs">
                         <MapPin className="h-4 w-4 mr-2 mt-0.5 text-slate-400 flex-shrink-0" />
-                        <span className="line-clamp-2">{denuncia.lugar}</span>
+                        <span className="line-clamp-2">{denuncia.lugar || denuncia.lugarIncidente}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm text-slate-700 max-w-md">
-                        <p className="line-clamp-2">{denuncia.descripcion}</p>
+                        <p className="line-clamp-2">{denuncia.descripcion || denuncia.detalleIncidente}</p>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      
-                        <button
-                          onClick={() => recieveDenuncia(denuncia.tracking_code)}
-                          disabled={isRecieving.get(denuncia.tracking_code)}
-                          className={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm ${
-                            isRecieving.get(denuncia.tracking_code) ? "bg-slate-300 text-slate-700 cursor-not-allowed" : "bg-[#002f59] hover:bg-muni-primary text-white hover:shadow-md cursor-pointer"
-                          }`}
-                        >
-                          {isRecieving.get(denuncia.tracking_code) ? (
-                            <Loader size='sm' />
-                          ) : (
-                            <>
-                              <CheckCircle className="h-4 w-4 mr-2" />
-                              Recibir
-                            </>
-                          )}
-                        </button>
-                      
+                      <button
+                        onClick={() => recieveDenuncia(denuncia.tracking_code)}
+                        disabled={isRecieving.get(denuncia.tracking_code)}
+                        className={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm ${
+                          isRecieving.get(denuncia.tracking_code)
+                            ? "bg-slate-300 text-slate-700 cursor-not-allowed"
+                            : "bg-[#002f59]  text-white hover:shadow-md cursor-pointer"
+                        }`}
+                      >
+                        {isRecieving.get(denuncia.tracking_code) ? (
+                          <Loader size='sm' />
+                        ) : (
+                          <>
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            Recibir
+                          </>
+                        )}
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -252,7 +259,7 @@ export const Denuncias = () => {
     </div>
   )
 
-  const DenunciasRecibidasTable = () => (
+  const DenunciasRecibidasTable = ({ denuncias }) => (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
@@ -294,7 +301,7 @@ export const Denuncias = () => {
                     </td>
                   </tr>
                 ))
-              : recievedDenuncias.map((denuncia, index) => (
+              : denuncias.map((denuncia, index) => (
                   <tr
                     key={denuncia.id}
                     className={`hover:bg-slate-50 transition-colors duration-200 ${
@@ -305,27 +312,25 @@ export const Denuncias = () => {
                       <div className="text-primary font-bold text-sm">{denuncia.tracking_code}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-semibold text-slate-900">{denuncia.denunciado.nombre}</div>
+                      <div className="font-semibold text-slate-900">{denuncia.denunciado?.nombre || denuncia.denunciado}</div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center text-sm text-slate-600">
                         <User className="h-4 w-4 mr-2 text-slate-400" />
-                        <span>{denuncia.denunciante.nombre}</span>
+                        <span>{denuncia.denunciante?.nombre || denuncia.denunciante}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center text-sm text-slate-600">
                         <Calendar className="h-4 w-4 mr-2 text-slate-400" />
-                        <span>
-                          {denuncia.fecha_incidente}
-                        </span>
+                        <span>{denuncia.fecha_incidente || denuncia.fecha}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <span
                         className={`inline-flex px-3 py-1.5 rounded-full text-xs font-semibold border ${getStatusStyles(denuncia.estado)}`}
                       >
-                        {estados.find((estado) => estado.value === denuncia.estado)?.label}
+                        {estados.find((estado) => estado.value === denuncia.estado)?.label || denuncia.estado}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -523,34 +528,51 @@ export const Denuncias = () => {
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
                 <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-3">Buscar</label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                        <Search className="h-4 w-4 text-slate-400" />
-                      </div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-3">Buscar por nombre del denunciado</label>
+                    <div className="flex gap-2">
                       <input
                         type="text"
-                        placeholder="Buscar denuncias..."
-                        className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                        value={searchName}
+                        onChange={(e) => setSearchName(e.target.value)}
+                        placeholder="Nombre completo"
+                        className="w-full pl-4 pr-4 py-3 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                       />
+                      <button
+                        onClick={() => buscarDenunciasPorNombre(searchName, "disponibles")}
+                        className="cursor-pointer px-4 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all"
+                        disabled={isSearching || !searchName}
+                      >
+                        {isSearching ? <Loader size="sm" /> : <Search className="h-4 w-4" />}
+                      </button>
+                      <button
+                        onClick={limpiarBusquedaDisponibles}
+                        className="cursor-pointer px-4 py-3 bg-slate-500 text-white rounded-xl font-semibold hover:bg-slate-600 transition-all"
+                      >
+                        Limpiar
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
             )}
 
-            {registeredDenuncias.length === 0 ? (
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center">
-                <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <FileText className="h-8 w-8 text-slate-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-slate-700 mb-3">No hay denuncias disponibles</h3>
-                <p className="text-slate-500 max-w-md mx-auto">
-                  Todas las denuncias han sido recibidas o no hay nuevas denuncias en el sistema.
-                </p>
-              </div>
+            {/* Mostrar resultados de búsqueda si existen */}
+            {searchResultsDisponibles.length > 0 ? (
+              <DenunciaDisponibleTable denuncias={searchResultsDisponibles} />
             ) : (
-              <DenunciaDisponibleTable />
+              registeredDenuncias.length === 0 ? (
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center">
+                  <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <FileText className="h-8 w-8 text-slate-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-slate-700 mb-3">No hay denuncias disponibles</h3>
+                  <p className="text-slate-500 max-w-md mx-auto">
+                    Todas las denuncias han sido recibidas o no hay nuevas denuncias en el sistema.
+                  </p>
+                </div>
+              ) : (
+                <DenunciaDisponibleTable denuncias={registeredDenuncias} />
+              )
             )}
           </div>
         )}
@@ -575,7 +597,7 @@ export const Denuncias = () => {
               </button>
             </div>
 
-            {/* Filtros avanzados SIN select de prioridad ni fecha */}
+            {/* Filtros avanzados*/}
             {expandedFilters && (
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -595,36 +617,51 @@ export const Denuncias = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-3">Buscar</label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                        <Search className="h-4 w-4 text-slate-400" />
-                      </div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-3">Buscar por nombre del denunciado</label>
+                    <div className="flex gap-2">
                       <input
                         type="text"
-                        placeholder="Buscar denuncias..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                        value={searchName}
+                        onChange={(e) => setSearchName(e.target.value)}
+                        placeholder="Nombre completo"
+                        className="w-full pl-4 pr-4 py-3 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                       />
+                      <button
+                        onClick={() => buscarDenunciasPorNombre(searchName, "recibidos")}
+                        className="cursor-pointer px-4 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all"
+                        disabled={isSearching || !searchName}
+                      >
+                        {isSearching ? <Loader size="sm" /> : <Search className="h-4 w-4" />}
+                      </button>
+                      <button
+                        onClick={limpiarBusquedaRecibidas}
+                        className="cursor-pointer px-4 py-3 bg-slate-500 text-white rounded-xl font-semibold hover:bg-slate-600 transition-all"
+                      >
+                        Limpiar
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
             )}
 
-            {filteredDenuncias.length === 0 ? (
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center">
-                <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <Search className="h-8 w-8 text-slate-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-slate-700 mb-3">No se encontraron denuncias</h3>
-                <p className="text-slate-500 max-w-md mx-auto">
-                  No hay denuncias que coincidan con los filtros aplicados
-                </p>
-              </div>
+            {/* Mostrar resultados de búsqueda si existen */}
+            {searchResultsRecibidas.length > 0 ? (
+              <DenunciasRecibidasTable denuncias={searchResultsRecibidas} />
             ) : (
-              <DenunciasRecibidasTable />
+              filteredDenuncias.length === 0 ? (
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center">
+                  <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <Search className="h-8 w-8 text-slate-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-slate-700 mb-3">No se encontraron denuncias</h3>
+                  <p className="text-slate-500 max-w-md mx-auto">
+                    No hay denuncias que coincidan con los filtros aplicados
+                  </p>
+                </div>
+              ) : (
+                <DenunciasRecibidasTable denuncias={filteredDenuncias} />
+              )
             )}
           </div>
         )}

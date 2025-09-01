@@ -16,6 +16,8 @@ export function useDenunciasGestion() {
 	const [searchDocument, setSearchDocument] = useState("");
 	const [searchName, setSearchName] = useState("");
 	const [searchResults, setSearchResults] = useState([]);
+	const [searchResultsDisponibles, setSearchResultsDisponibles] = useState([]);
+	const [searchResultsRecibidas, setSearchResultsRecibidas] = useState([]);
 	const [expandedFilters, setExpandedFilters] = useState(false);
 	const [pager, setPager] = useState({
 		registradas: {
@@ -432,11 +434,58 @@ export function useDenunciasGestion() {
 		}
 	};
 
+	// Nueva función para buscar en la API por nombre del denunciado 
+	const buscarDenunciasPorNombre = async (nombre, tab) => {
+		setIsSearching(true);
+		try {
+			const response = await axios.get(
+				`${API_URL}/admin/nombre/${nombre}`,
+				{ withCredentials: true }
+			);
+			if (response.data.success || response.status === 200) {
+				let resultados = response.data.data;
+				if (tab === "disponibles") {
+					// Solo mostrar denuncias con estado "registrada" 
+					resultados = resultados.filter(
+						(d) =>
+							d.estado &&
+							["registrado"].includes(
+								String(d.estado).toLowerCase()
+							)
+					);
+					setSearchResultsDisponibles(resultados);
+				} else if (tab === "recibidos") {
+					// Mostrar denuncias que NO sean "registrada" 
+					resultados = resultados.filter(
+						(d) =>
+							d.estado &&
+							!["registrado"].includes(
+								String(d.estado).toLowerCase()
+							)
+					);
+					setSearchResultsRecibidas(resultados);
+				}
+			} else {
+				if (tab === "disponibles") setSearchResultsDisponibles([]);
+				else if (tab === "recibidos") setSearchResultsRecibidas([]);
+				toast.error("No se encontraron denuncias con ese nombre.");
+			}
+		} catch (error) {
+			if (tab === "disponibles") setSearchResultsDisponibles([]);
+			else if (tab === "recibidos") setSearchResultsRecibidas([]);
+			toast.error("Ocurrió un error al buscar denuncias.");
+		} finally {
+			setIsSearching(false);
+		}
+	};
+
 	const limpiarBusqueda = () => {
 		setSearchDocument("");
 		setSearchName("");
 		setSearchResults([]);
 	};
+	const limpiarBusquedaDisponibles = () => setSearchResultsDisponibles([]);
+	const limpiarBusquedaRecibidas = () => setSearchResultsRecibidas([]);
 
 	async function getStatistics() {
 		try {
@@ -488,6 +537,8 @@ export function useDenunciasGestion() {
 		setSearchName,
 		searchResults,
 		setSearchResults,
+		searchResultsDisponibles,
+		searchResultsRecibidas,
 		expandedFilters,
 		setExpandedFilters,
 		registeredDenuncias,
@@ -510,7 +561,10 @@ export function useDenunciasGestion() {
 		mostrarDetalles,
 		actualizarDenuncia,
 		buscarDenuncias,
+		buscarDenunciasPorNombre,
 		limpiarBusqueda,
+		limpiarBusquedaDisponibles,
+		limpiarBusquedaRecibidas,
 		stats,
 		handlePageChange,
 		getStatistics,
