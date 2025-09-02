@@ -57,7 +57,6 @@ class DenunciaController extends ResourceController
             ]);
         }
 
-        // Ordenar por fecha de creación descendente (más recientes primero)
         $seguimientos = $this->seguimientoDenunciasModel
             ->where('denuncia_id', $denuncia['id'])
             ->orderBy('created_at', 'DESC')
