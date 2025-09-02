@@ -60,4 +60,22 @@ class SeguimientoDenunciaModel extends Model
                     ->orderBy('created_at', 'DESC')
                     ->findAll();
     }
+
+    // Obtener el historial de estados de una denuncia por su ID
+    public function HistorialEstados(int $denunciaId): array
+    {
+        return $this->db->table($this->table)
+            ->select('
+                seguimiento_denuncia.estado,
+                seguimiento_denuncia.comentario,
+                seguimiento_denuncia.created_at AS fecha,
+                administrador.nombre AS administrador
+            ')
+            ->join('administrador', 'administrador.id = seguimiento_denuncia.administrador_id')
+            ->where('seguimiento_denuncia.denuncia_id', $denunciaId)
+            ->orderBy('seguimiento_denuncia.created_at', 'ASC')
+            ->get()
+            ->getResultArray();
+    }
+
 }

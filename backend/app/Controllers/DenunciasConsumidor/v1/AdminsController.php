@@ -288,9 +288,6 @@ class AdminsController extends ResourceController
             ->where('id', $denuncia['denunciante_id'])
             ->first();
 
-        // if ($correo) {
-        //     $this->enviarCorreo($correo['email'], $code, $estado, $comentario);
-        // }
         if ($correo && !empty($correo['email'])) {
             $mailService = new MailService();
             $mailService->seguimientogMail($correo['email'], $code, $estado, $comentario);
@@ -430,6 +427,95 @@ class AdminsController extends ResourceController
         return $this->respond(['success' => true, 'data' => $data]);
     }
 
+
+    //=============================
+    // FUNCION PARA BUSCAR DENUNCIA
+    // POR NOMBRE DEL DENUNCIANTE
+    //=============================
+    public function searchDenunciaByNombreDenunciante($nombre = null)
+    {
+        $admin = $this->authAdmin();
+        if (is_object($admin)) return $admin;
+
+        if (empty($nombre)) {
+            return $this->fail(['message' => 'Falta el parámetro nombre del denunciante']);
+        }
+
+        $denuncias = $this->denunciaModel->searchByNombreDenunciante($nombre);
+
+        if (empty($denuncias)) {
+            return $this->fail(['message' => 'No se encontró ninguna denuncia para este nombre']);
+        }
+
+        $data = array_map(function ($denuncia) {
+            return [
+                'id'             => $denuncia['id'],
+                'tracking_code'  => $denuncia['tracking_code'],
+                'estado'         => $denuncia['estado'],
+                'descripcion'    => $denuncia['descripcion'],
+                'fecha_incidente'=> $denuncia['fecha_incidente'],
+                'lugar'          => $denuncia['lugar'],
+                'denunciante' => [
+                    'nombre'    => $denuncia['nombre_denunciante'] ?? 'Anónimo',
+                    'documento' => $denuncia['documento_denunciante'],
+                    'tipo'      => strlen($denuncia['documento_denunciante']) === 11 ? 'Empresa (RUC)' : 'Persona',
+                ],
+                'denunciado' => [
+                    'nombre'    => $denuncia['nombre_denunciado'] ?? 'Desconocido',
+                    'documento' => $denuncia['documento_denunciado'] ?? 'No especificado',
+                ],
+                'created_at' => $denuncia['created_at'],
+            ];
+        }, $denuncias);
+
+        return $this->respond(['success' => true, 'data' => $data]);
+    }
+
+
+    //=============================
+    // FUNCION PARA BUSCAR DENUNCIA 
+    // POR DOCUMENTO DEL DENUNCIANTE
+    //=============================
+    public function searchDenunciaByDocumentoDenunciante($documento = null)
+    {
+        $admin = $this->authAdmin();
+        if (is_object($admin)) return $admin;
+
+        if (empty($documento)) {
+            return $this->fail(['message' => 'Falta el parámetro documento del denunciante']);
+        }
+
+        $denuncias = $this->denunciaModel->searchByDocumentoDenunciante($documento);
+
+        if (empty($denuncias)) {
+            return $this->fail(['message' => 'No se encontró ninguna denuncia para este documento']);
+        }
+
+        $data = array_map(function ($denuncia) {
+            return [
+                'id'             => $denuncia['id'],
+                'tracking_code'  => $denuncia['tracking_code'],
+                'estado'         => $denuncia['estado'],
+                'descripcion'    => $denuncia['descripcion'],
+                'fecha_incidente'=> $denuncia['fecha_incidente'],
+                'lugar'          => $denuncia['lugar'],
+                'denunciante' => [
+                    'nombre'    => $denuncia['nombre_denunciante'] ?? 'Anónimo',
+                    'documento' => $denuncia['documento_denunciante'],
+                    'tipo'      => strlen($denuncia['documento_denunciante']) === 11 ? 'Empresa (RUC)' : 'Persona',
+                ],
+                'denunciado' => [
+                    'nombre'    => $denuncia['nombre_denunciado'] ?? 'Desconocido',
+                    'documento' => $denuncia['documento_denunciado'] ?? 'No especificado',
+                ],
+                'created_at' => $denuncia['created_at'],
+            ];
+        }, $denuncias);
+
+        return $this->respond(['success' => true, 'data' => $data]);
+    }
+
+
     //===========================================
     // FUNCION PARA LISTAR DENUNCIAS REGISTRADAS
     //===========================================
@@ -497,9 +583,7 @@ class AdminsController extends ResourceController
         $data = [];
         foreach ($denuncias as $denuncia) {
             // Conteos
-            $historialCount = $this->seguimientoDenunciaModel
-                ->where('denuncia_id', $denuncia['id'])
-                ->countAllResults();
+            $historial = $this->seguimientoDenunciaModel->HistorialEstados($denuncia['id']);
 
             $adjuntosCount = $this->adjuntoModel
                 ->where('denuncia_id', $denuncia['id'])
@@ -520,7 +604,7 @@ class AdminsController extends ResourceController
                     'nombre'    => $denuncia['denunciado_nombre']    ?? 'Desconocido',
                     'documento' => $denuncia['denunciado_documento'] ?? 'No especificado',
                 ],
-                'historial' => $historialCount,   
+                'historial' => $historial,   
                 'adjuntos'  => $adjuntosCount,    
                 'created_at'=> $denuncia['created_at'],
             ];

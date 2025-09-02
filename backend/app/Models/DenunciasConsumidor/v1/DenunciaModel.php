@@ -301,6 +301,34 @@ class DenunciaModel extends Model
             ->findAll();
     }
 
+    public function searchByDocumentoDenunciante($documento)
+    {
+        return $this->select('denuncia.*, 
+                            COALESCE(NULLIF(denunciante.razon_social, ""), NULLIF(denunciante.nombre, "")) AS nombre_denunciante, 
+                            denunciante.documento AS documento_denunciante,
+                            COALESCE(NULLIF(denunciado.razon_social, ""), NULLIF(denunciado.nombre, "")) AS nombre_denunciado,
+                            denunciado.documento AS documento_denunciado')
+                    ->join('denunciante', 'denunciante.id = denuncia.denunciante_id')
+                    ->join('denunciado', 'denunciado.id = denuncia.denunciado_id', 'left')
+                    ->where('denunciante.documento', $documento)
+                    ->findAll();
+    }
+
+    public function searchByNombreDenunciante($nombre)
+    {
+        return $this->select('denuncia.*, 
+                            COALESCE(NULLIF(denunciante.nombre, ""), denunciante.razon_social) AS nombre_denunciante, 
+                            denunciante.documento AS documento_denunciante,
+                            COALESCE(NULLIF(denunciado.nombre, ""), denunciado.razon_social) AS nombre_denunciado,
+                            denunciado.documento AS documento_denunciado')
+                    ->join('denunciante', 'denunciante.id = denuncia.denunciante_id')
+                    ->join('denunciado', 'denunciado.id = denuncia.denunciado_id', 'left')
+                    ->groupStart()
+                        ->like('denunciante.nombre', $nombre)
+                        ->orLike('denunciante.razon_social', $nombre)
+                    ->groupEnd()
+                    ->findAll();
+    }
 
     public function searchByDocumentoDenunciado($documento)
     {
@@ -346,18 +374,40 @@ class DenunciaModel extends Model
     }
 
 
-    public function DenunciasActivas($perPage = 10, $page = null)
-    {
-        return $this->select('denuncia.*, 
-                            COALESCE(denunciante.razon_social, denunciante.nombre) AS denunciante_nombre,
-                            denunciante.documento AS denunciante_documento,
-                            COALESCE(denunciado.razon_social, denunciado.nombre) AS denunciado_nombre,
-                            denunciado.documento AS denunciado_documento')
-                    ->join('denunciante', 'denunciante.id = denuncia.denunciante_id', 'left')
-                    ->join('denunciado',  'denunciado.id  = denuncia.denunciado_id',  'left')
-                    ->where('denuncia.estado !=', 'registrado')
-                    ->orderBy('denuncia.created_at', 'DESC')
-                    ->paginate($perPage, 'default', $page);
-    }
+    // public function DenunciasActivas($perPage = 10, $page = null)
+    // {
+    //     return $this->select('denuncia.*, 
+    //                         COALESCE(denunciante.razon_social, denunciante.nombre) AS denunciante_nombre,
+    //                         denunciante.documento AS denunciante_documento,
+    //                         COALESCE(denunciado.razon_social, denunciado.nombre) AS denunciado_nombre,
+    //                         denunciado.documento AS denunciado_documento')
+    //                 ->join('denunciante', 'denunciante.id = denuncia.denunciante_id', 'left')
+    //                 ->join('denunciado',  'denunciado.id  = denuncia.denunciado_id',  'left')
+    //                 ->where('denuncia.estado !=', 'registrado')
+    //                 ->orderBy('denuncia.created_at', 'DESC')
+    //                 ->paginate($perPage, 'default', $page);               
+    // }
 
+        public function DenunciasActivas($perPage = 10, $page = null)
+        {
+            $result = $this->select('denuncia.*, 
+                                    COALESCE(denunciante.razon_social, denunciante.nombre) AS denunciante_nombre,
+                                    denunciante.documento AS denunciante_documento,
+                                    COALESCE(denunciado.razon_social, denunciado.nombre) AS denunciado_nombre,
+                                    denunciado.documento AS denunciado_documento')
+                            ->join('denunciante', 'denunciante.id = denuncia.denunciante_id', 'left')
+                            ->join('denunciado',  'denunciado.id  = denuncia.denunciado_id',  'left')
+                            ->where('denuncia.estado !=', 'registrado')
+                            ->orderBy('denuncia.created_at', 'DESC')
+                            ->paginate($perPage, 'default', $page);
+
+            
+            $seguimientoModel = new \App\Models\DenunciasConsumidor\v1\SeguimientoDenunciaModel();
+
+            foreach ($result as &$denuncia) {
+                $denuncia['historial_estados'] = $seguimientoModel->HistorialEstados($denuncia['id']);
+            }
+
+            return $result;
+    }
 }
