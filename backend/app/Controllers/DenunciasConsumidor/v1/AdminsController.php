@@ -11,6 +11,7 @@ use App\Models\DenunciasConsumidor\v1\AdministradorModel;
 use App\Controllers\DenunciasConsumidor\v1\AuthController;
 use App\Models\DenunciasConsumidor\v1\HistorialAdminModel;
 use CodeIgniter\Config\Services;
+use App\Services\MailService;
 
 class AdminsController extends ResourceController
 {
@@ -90,33 +91,33 @@ class AdminsController extends ResourceController
         return isset($admin['rol']) && $admin['rol'] === 'admin';
     }
 
-    private function enviarCorreo($correo, $code, $estado, $comentario)
-    {
-        $email = \Config\Services::email();
+    // private function enviarCorreo($correo, $code, $estado, $comentario)
+    // {
+    //     $email = \Config\Services::email();
 
-        $email->setFrom('munijloenlinea@gmail.com', 'Municipalidad Distrital de José Leonardo Ortiz');
-        $email->setTo($correo);
-        $email->setSubject('Código de Seguimiento de Denuncia');
+    //     $email->setFrom('munijloenlinea@gmail.com', 'Municipalidad Distrital de José Leonardo Ortiz');
+    //     $email->setTo($correo);
+    //     $email->setSubject('Código de Seguimiento de Denuncia');
 
-        $mensaje = "
-            <html><body>
-            <p>Estimado usuario,</p>
-            <p>Estado actual de su denuncia: $estado</p>
-            <p><strong>Código:</strong> $code</p>
-            <p><strong>Estado:</strong> $estado</p>
-            <p><strong>Comentario:</strong> $comentario</p>
-            <p><a href='http://localhost:5173/tracking-denuncia?codigo=$code'>Ver seguimiento</a></p>
-            </body></html>
-        ";
+    //     $mensaje = "
+    //         <html><body>
+    //         <p>Estimado usuario,</p>
+    //         <p>Estado actual de su denuncia: $estado</p>
+    //         <p><strong>Código:</strong> $code</p>
+    //         <p><strong>Estado:</strong> $estado</p>
+    //         <p><strong>Comentario:</strong> $comentario</p>
+    //         <p><a href='http://localhost:5173/tracking-denuncia?codigo=$code'>Ver seguimiento</a></p>
+    //         </body></html>
+    //     ";
 
-        $email->setMessage($mensaje);
+    //     $email->setMessage($mensaje);
 
-        if($email->send()){
-            return true;
-        } else {
-            return $email->printDebugger(['headers']);
-        }
-    }
+    //     if($email->send()){
+    //         return true;
+    //     } else {
+    //         return $email->printDebugger(['headers']);
+    //     }
+    // }
 
     private function registrarHistorial($adminId, $afectadoId, $accion, $motivo)
     {
@@ -128,26 +129,87 @@ class AdminsController extends ResourceController
         ]);
     }
 
+    //🌟🌟🌟🌟🌟🌟🌟🌟🌟🌟🌟
     //===========================
     // FUNCIONES PARA ADMINS
     //===========================
+    //🌟🌟🌟🌟🌟🌟🌟🌟🌟🌟🌟
 
     //============================================
     // FUNCION PARA RECIBIR DENUNCIA POR EL ADMIN
     //============================================
+    // public function recibirAdmin()
+    // {
+    //     $admin = $this->authAdmin();
+    //     if (is_object($admin)) return $admin;
+
+    //     $input = $this->request->getJSON(true); 
+
+    //     $code       = $input['tracking_code'] ?? null;
+    //     $estado     = 'recibida'; 
+    //     $comentario = 'La denuncia ha sido recibida por el administrador'; 
+
+    //     if (empty($code)) {
+    //         return $this->fail(['message' => 'Falta el código de seguimiento o tracking_code']);
+    //     }
+
+    //     $seguimientoData = [
+    //         'administrador_id' => $admin['id'],
+    //         'estado'           => $estado,
+    //         'comentario'       => $comentario,
+    //     ];
+
+    //     $resultado = $this->denunciaModel->recibirDenuncia(
+    //         $code,
+    //         $estado,
+    //         $comentario,
+    //         $seguimientoData
+    //     );
+
+    //     if (!$resultado) {
+    //         return $this->respond([
+    //             'success' => false,
+    //             'message' => 'No se encontró la denuncia con el código ingresado.'
+    //         ], 404);
+    //     }
+
+    //     $denuncia = $resultado['denuncia'];
+    //     $correo = null;
+
+    //     if (!empty($denuncia['denunciante_id'])) {
+    //         $denunciante = $this->denuncianteModel->find($denuncia['denunciante_id']);
+    //         if ($denunciante && !empty($denunciante['email'])) {
+    //             $correo = $denunciante['email'];
+    //         }
+    //     }
+
+    //     if ($correo) {
+    //         $enviado = $this->enviarCorreo($correo, $code, $estado, $comentario);
+    //         if ($enviado !== true) {
+    //             log_message('error', 'Error al enviar correo: ' . print_r($enviado, true));
+    //         }
+    //     }
+
+    //     return $this->respond([
+    //         'success'    => true,
+    //         'message'    => 'Denuncia recibida correctamente',
+    //         'denuncia'   => $resultado['denuncia'],
+    //         'seguimiento'=> $resultado['seguimiento']
+    //     ]);
+    // }
+
     public function recibirAdmin()
     {
         $admin = $this->authAdmin();
         if (is_object($admin)) return $admin;
 
         $input = $this->request->getJSON(true); 
-
         $code       = $input['tracking_code'] ?? null;
         $estado     = 'recibida'; 
         $comentario = 'La denuncia ha sido recibida por el administrador'; 
 
         if (empty($code)) {
-            return $this->fail(['message' => 'Faltan parámetros requeridos']);
+            return $this->fail(['message' => 'Falta el código de seguimiento o tracking_code']);
         }
 
         $seguimientoData = [
@@ -156,35 +218,18 @@ class AdminsController extends ResourceController
             'comentario'       => $comentario,
         ];
 
-        $resultado = $this->denunciaModel->recibirDenuncia(
-            $code,
-            $estado,
-            $comentario,
-            $seguimientoData
-        );
+        $resultado = $this->denunciaModel->recibirDenuncia($code, $estado, $comentario, $seguimientoData);
 
         if (!$resultado) {
-            return $this->respond([
-                'success' => false,
-                'message' => 'No se encontró la denuncia con el código ingresado.'
-            ], 404);
+            return $this->respond(['success' => false, 'message' => 'No se encontró la denuncia.'], 404);
         }
 
         $denuncia = $resultado['denuncia'];
-        $correo = null;
+        $correo = $this->denuncianteModel->select('email')->where('id', $denuncia['denunciante_id'])->first();
 
-        if (!empty($denuncia['denunciante_id'])) {
-            $denunciante = $this->denuncianteModel->find($denuncia['denunciante_id']);
-            if ($denunciante && !empty($denunciante['correo'])) {
-                $correo = $denunciante['correo'];
-            }
-        }
-
-        if ($correo) {
-            $enviado = $this->enviarCorreo($correo, $code, $estado, $comentario);
-            if ($enviado !== true) {
-                log_message('error', 'Error al enviar correo: ' . print_r($enviado, true));
-            }
+        if ($correo && !empty($correo['email'])) {
+            $mailService = new MailService();
+            $mailService->seguimientogMail($correo['email'], $code, $estado, $comentario);
         }
 
         return $this->respond([
@@ -192,7 +237,7 @@ class AdminsController extends ResourceController
             'message'    => 'Denuncia recibida correctamente',
             'denuncia'   => $resultado['denuncia'],
             'seguimiento'=> $resultado['seguimiento']
-        ]);
+        ], 200);
     }
 
     //============================================
@@ -243,8 +288,12 @@ class AdminsController extends ResourceController
             ->where('id', $denuncia['denunciante_id'])
             ->first();
 
-        if ($correo) {
-            $this->enviarCorreo($correo['email'], $code, $estado, $comentario);
+        // if ($correo) {
+        //     $this->enviarCorreo($correo['email'], $code, $estado, $comentario);
+        // }
+        if ($correo && !empty($correo['email'])) {
+            $mailService = new MailService();
+            $mailService->seguimientogMail($correo['email'], $code, $estado, $comentario);
         }
 
         return $this->respond(['success' => true, 'message' => 'Denuncia actualizada']);
@@ -516,9 +565,11 @@ class AdminsController extends ResourceController
         ]);
     }
 
-    // =========================
+    //🌟🌟🌟🌟🌟🌟🌟🌟🌟🌟🌟
+    // ==========================
     // FUNCIONES PARA SUPER ADMINS
-    // =========================
+    // ==========================
+    //🌟🌟🌟🌟🌟🌟🌟🌟🌟🌟🌟
 
 
     //=======================================
