@@ -425,7 +425,7 @@ export function useDenunciasGestion() {
 					"Error en la solicitud:",
 					error.response || error.message
 				);
-				toast.error("Ocurrió un error al buscar denuncias.");
+				toast.error(error.response?.data?.messages.message || "Ocurrió un error al buscar denuncias.");
 			}
 			console.error("Error al buscar denuncias:", error);
 			setSearchResults([]);
