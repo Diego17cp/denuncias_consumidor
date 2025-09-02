@@ -33,4 +33,39 @@ class MailService
         log_message('error', 'Error al enviar email a ' . $to . ': ' . $email->printDebugger(['headers']));
         return false;
     }
+
+    public function seguimientogMail(string $to, string $trackingCode, string $estado, string $comentario): bool
+    {
+        $email = Services::email();
+
+    
+        $frontend = env('FRONTEND_URL') ?: 'http://localhost:5173';
+        $logoUrl = rtrim($frontend, '/') . '/logo-gestion.png';
+        $trackingUrl = rtrim($frontend, '/') . '/tracking-denuncia?codigo=' . urlencode($trackingCode);
+
+
+        $email->setTo($to);
+        $email->setFrom(config('Email')->fromEmail ?? 'munijloenlinea@gmail.com', config('Email')->fromName ?? 'Municipalidad Distrital de José Leonardo Ortiz');
+        $email->setSubject('Seguimiento de su denuncia');
+
+
+        $html = view('emails/seguimiento_email', [
+            'trackingCode' => $trackingCode,
+            'estado'       => $estado,
+            'comentario'   => $comentario,
+            'logoUrl'      => $logoUrl,
+            'trackingUrl'  => $trackingUrl
+        ]);
+
+        $email->setMessage($html);
+
+        // Enviamos
+        if ($email->send()) {
+            log_message('info', "Email enviado a {$to} con código de seguimiento {$trackingCode}");
+            return true;
+        }
+
+        log_message('error', 'Error al enviar email: ' . $email->printDebugger(['headers']));
+        return false;
+    }
 }
