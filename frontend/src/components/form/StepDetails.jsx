@@ -87,7 +87,7 @@ export default function StepDetalles({ onNext }) {
                     <textarea
                         value={descripcion}
                         onChange={(e) => {
-                            if (e.target.value.length <= 200) {
+                            if (e.target.value.length <= 500) {
                                 setDescripcion(e.target.value);
                             }
                         }}
@@ -98,16 +98,16 @@ export default function StepDetalles({ onNext }) {
                     {/* Contador de caracteres */}
                     <div
                         className={`absolute right-3 bottom-3 text-xs ${
-                            descripcion.length >= 50 && descripcion.length <= 200
+                            descripcion.length >= 50 && descripcion.length <= 500
                                 ? "text-gray-500"
                                 : "text-red-500"
                         }`}
                     >
-                        {descripcion.length}/200
+                        {descripcion.length}/500
                     </div>
                 </div>
                 <p className="mt-1 text-xs text-gray-500">
-                    Mínimo 50 caracteres, máximo 200.
+                    Mínimo 50 caracteres, máximo 500.
                 </p>
             </motion.div>
 

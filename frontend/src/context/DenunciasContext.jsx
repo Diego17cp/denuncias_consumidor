@@ -348,7 +348,7 @@ export function DenunciasProvider({ children }) {
 	// Validaciones
 	const isStepDetailsValid =
 		descripcion.trim().length >= 50 &&
-		descripcion.trim().length <= 200 &&
+		descripcion.trim().length <= 500 &&
 		lugar.trim() !== "" &&
 		fecha.trim() !== "" &&
 		files.length > 0 &&
