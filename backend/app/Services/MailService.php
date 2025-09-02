@@ -48,10 +48,11 @@ class MailService
         $email->setFrom(config('Email')->fromEmail ?? 'munijloenlinea@gmail.com', config('Email')->fromName ?? 'Municipalidad Distrital de José Leonardo Ortiz');
         $email->setSubject('Seguimiento de su denuncia');
 
+        $estado_legible = ucwords(str_replace('_', ' ', $estado));
 
         $html = view('emails/seguimiento_email', [
             'trackingCode' => $trackingCode,
-            'estado'       => $estado,
+            'estado'       => $estado_legible,
             'comentario'   => $comentario,
             'logoUrl'      => $logoUrl,
             'trackingUrl'  => $trackingUrl
@@ -59,7 +60,6 @@ class MailService
 
         $email->setMessage($html);
 
-        // Enviamos
         if ($email->send()) {
             log_message('info', "Email enviado a {$to} con código de seguimiento {$trackingCode}");
             return true;
