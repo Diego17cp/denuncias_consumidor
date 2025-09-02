@@ -222,6 +222,7 @@ CREATE TABLE `seguimiento_denuncia` (
   `denuncia_id` int unsigned NOT NULL,
   `administrador_id` int unsigned NOT NULL,
   `comentario` text COLLATE utf8mb4_general_ci NOT NULL,
+  `estado` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `deleted_at` datetime DEFAULT NULL,
