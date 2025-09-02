@@ -112,9 +112,13 @@ $routes->group('/', [
         $routes->get('buscar-id/(:num)', 'AdminsController::searchDenunciasByDenuncianteId/$1', ['filter' => 'auth:super_admin,admin']);
         
         // Buscar denuncias por documento del denunciado
-        $routes->get('documento/(:num)', 'AdminsController::searchDenunciaByDocumentoDenunciado/$1', ['filter' => 'auth:super_admin,admin']);
+        $routes->get('documento-1/(:num)', 'AdminsController::searchDenunciaByDocumentoDenunciado/$1', ['filter' => 'auth:super_admin,admin']);
         // Buscar denuncias por nombre del denunciado
-        $routes->get('nombre/(:any)', 'AdminsController::searchDenunciaByNombreDenunciado/$1', ['filter' => 'auth:super_admin,admin']);
+        $routes->get('nombre-1/(:any)', 'AdminsController::searchDenunciaByNombreDenunciado/$1', ['filter' => 'auth:super_admin,admin']);
+        // Buscar denuncias por documento del denunciante
+        $routes->get('documento-2/(:num)', 'AdminsController::searchDenunciaByDocumentoDenunciante/$1', ['filter' => 'auth:super_admin,admin']);
+        // Buscar denuncias por nombre del denunciante
+        $routes->get('nombre-2/(:any)', 'AdminsController::searchDenunciaByNombreDenunciante/$1', ['filter' => 'auth:super_admin,admin']);
         // Listar historial de acciones de administradores
         $routes->get('historial', 'AdminsController::listarHistorial', ['filter' => 'auth:super_admin']);
     });
