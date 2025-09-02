@@ -36,7 +36,18 @@
                     <!-- Body -->
                     <tr>
                         <td style="padding:28px 32px;color:#344054;">
-                            <h2 style="margin:0 0 8px;font-size:20px;">Estado de su denuncia: <?= esc($estado) ?></h2>
+                            <?php
+                            $coloresEstados = [
+                                'Recibida'    => '#433DF2',
+                                'En Proceso'  => '#FBBF24', 
+                                'Aceptada'    => '#04BF55', 
+                                'Rechazada'   => '#F01B56',
+                                'Finalizada'  => '#6B7382'  
+                            ];
+
+                            $colorEstado = $coloresEstados[$estado] ?? '#344054'; 
+                            ?>
+                            <h2 style="margin:0 0 8px;font-size:20px;">Estado de su denuncia: <span style="color:<?= $colorEstado ?>;"><?= esc($estado) ?></span></h2>
                             <p style="margin:0 0 16px;color:#556074;">Su denuncia ha sido actualizada. Revise los detalles a continuación:</p>
 
                             <p style="margin:0 0 16px;"><strong>Comentario del administrador:</strong><br><?= esc($comentario) ?></p>
