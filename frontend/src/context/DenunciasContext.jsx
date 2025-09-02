@@ -17,6 +17,18 @@ const ALLOWED_MIME = new Set([
 	"application/zip",
 	"application/x-zip-compressed",
 	"multipart/x-zip",
+	"audio/mpeg",
+	"audio/mp3",
+	"audio/wav",
+	"audio/ogg",
+	"audio/webm",
+	"audio/mp4",
+	"video/mp4",
+	"video/webm",
+	"video/ogg",
+	"video/quicktime",
+	"video/x-msvideo",
+	"video/x-ms-wmv",
 ]);
 const ALLOWED_EXT = new Set([
 	"jpg",
@@ -29,6 +41,17 @@ const ALLOWED_EXT = new Set([
 	"docx",
 	"txt",
 	"zip",
+	"mp3",
+	"m4a",
+	"wav",
+	"ogg",
+	"weba",
+	"mp4",
+	"webm",
+	"mov",
+	"avi",
+	"wmv",
+	"m4v",
 ]);
 
 const DenunciasContext = createContext();
