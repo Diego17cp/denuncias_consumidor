@@ -11,6 +11,7 @@ import {
 } from "react-icons/fi";
 import axios from "axios";
 import { toast } from "sonner";
+import { useLocation, useSearchParams } from "react-router"
 
 const TrackingDenuncia = () => {
 	const API_URL = import.meta.env.VITE_CI_API_BASE_URL;
@@ -21,6 +22,21 @@ const TrackingDenuncia = () => {
 	const [error, setError] = useState(null);
 	const [isSubmitted, setIsSubmitted] = useState(false);
 	const [isJustRegistered, setIsJustRegistered] = useState(false);
+	const [searchParams] = useSearchParams()
+	const trackingCode = searchParams.get("codigo")
+
+	useEffect(() => {
+		if (trackingCode) {
+			setCodigo(trackingCode)
+		} else {
+			setCodigo("")
+		}
+	}, [trackingCode])
+	useEffect(() => {
+        if (trackingCode && codigo && codigo === trackingCode) {
+            handleConsultar()
+        }
+    }, [codigo, trackingCode])
 
 	const estadosDenuncia = {
 		registrada: {
