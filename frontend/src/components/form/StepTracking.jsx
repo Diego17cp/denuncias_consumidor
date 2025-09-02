@@ -16,7 +16,8 @@ const TrackingCodeScreen = () => {
     anonimo,
     denunciado,
     denunciante,
-    tipoDocumento
+    tipoDocumento,
+    resetForm
   } = useDenuncias()
   const [copied, setCopied] = useState(false); // estado para la notificación
   const [isDownloading, setIsDownloading] = useState(false);
@@ -50,9 +51,8 @@ const TrackingCodeScreen = () => {
 		setIsDownloading(true);
 		try {
 			generarDenunciaPDF(formData);
-
 			toast.success("PDF generado correctamente. Redirigiendo a la página principal...");
-
+      resetForm();
 			// setTimeout(() => {
 			// 	window.location.href = "/";
 			// }, 3000);

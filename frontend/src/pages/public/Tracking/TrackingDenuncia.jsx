@@ -547,7 +547,7 @@ const TrackingDenuncia = () => {
 								</div>
 								<div className="flex-1">
 									<h3 className="text-lg font-semibold text-yellow-800">
-										Denuncia registrada — sin seguimiento
+										Denuncia registrada
 									</h3>
 									<p className="text-sm text-yellow-700 mt-1">
 										Hemos recibido tu denuncia correctamente, pero aún no se ha asignado

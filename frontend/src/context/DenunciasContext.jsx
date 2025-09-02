@@ -348,7 +348,7 @@ export function DenunciasProvider({ children }) {
 	// Validaciones
 	const isStepDetailsValid =
 		descripcion.trim().length >= 50 &&
-		descripcion.trim().length <= 200 &&
+		descripcion.trim().length <= 500 &&
 		lugar.trim() !== "" &&
 		fecha.trim() !== "" &&
 		files.length > 0 &&
@@ -518,7 +518,6 @@ export function DenunciasProvider({ children }) {
 				const data = response.data;
 				setTrackingCode(data.tracking_code);
 				setIsDenunciaEnviada(true);
-				resetForm();
 				toast.success(data.message || "Denuncia enviada exitosamente");
 				return true;
 			}
@@ -578,6 +577,7 @@ export function DenunciasProvider({ children }) {
 				trackingCode,
 				isDenunciaEnviada,
 				isFetching,
+				resetForm
 			}}
 		>
 			{children}
