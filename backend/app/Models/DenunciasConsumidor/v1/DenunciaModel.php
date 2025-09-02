@@ -301,18 +301,6 @@ class DenunciaModel extends Model
             ->findAll();
     }
 
-    // public function searchByDocumentoDenunciado($documento)
-    // {
-    //     return $this->select('denuncia.*, 
-    //                         denunciado.nombre AS nombre_denunciado, 
-    //                         denunciado.documento AS documento_denunciado,
-    //                         denunciante.nombre AS nombre_denunciante,
-    //                         denunciante.documento AS documento_denunciante')
-    //                 ->join('denunciado', 'denunciado.id = denuncia.denunciado_id')
-    //                 ->join('denunciante', 'denunciante.id = denuncia.denunciante_id', 'left')
-    //                 ->where('denunciado.documento', $documento)
-    //                 ->findAll();
-    // }
 
     public function searchByDocumentoDenunciado($documento)
     {
@@ -344,17 +332,6 @@ class DenunciaModel extends Model
                     ->findAll();
     }
 
-    // public function DenunciasRegistradas($perPage = 10, $page = 1)
-    // {
-    //     return $this->select('denuncia.*, 
-    //                         denunciante.nombre AS denunciante_nombre, 
-    //                         denunciado.nombre AS denunciado_nombre')
-    //                 ->join('denunciante', 'denunciante.id = denuncia.denunciante_id', 'left')
-    //                 ->join('denunciado', 'denunciado.id = denuncia.denunciado_id', 'left')
-    //                 ->where('denuncia.estado', 'registrado')
-    //                 ->orderBy('denuncia.created_at', 'DESC')
-    //                 ->paginate($perPage, 'default', $page);
-    // }
 
     public function DenunciasRegistradas($perPage = 10, $page = 1)
     {
@@ -368,21 +345,6 @@ class DenunciaModel extends Model
                     ->paginate($perPage, 'default', $page);
     }
 
-
-    // public function DenunciasActivas($perPage = 2, $page = null)
-    // {
-    //     return $this->select('denuncia.*, 
-    //                         denunciante.nombre   AS denunciante_nombre,
-    //                         denunciante.documento AS denunciante_documento,
-    //                         denunciado.nombre    AS denunciado_nombre,
-    //                         denunciado.documento AS denunciado_documento')
-    //                 ->join('denunciante', 'denunciante.id = denuncia.denunciante_id', 'left')
-    //                 ->join('denunciado',  'denunciado.id  = denuncia.denunciado_id',  'left')
-    //                 //->whereIn('denuncia.estado', ['recibida', 'en proceso', 'pendiente'])
-    //                 ->where('denuncia.estado !=', 'registrado')
-    //                 ->orderBy('denuncia.created_at', 'DESC')
-    //                 ->paginate($perPage, 'default', $page);
-    // }
 
     public function DenunciasActivas($perPage = 10, $page = null)
     {
