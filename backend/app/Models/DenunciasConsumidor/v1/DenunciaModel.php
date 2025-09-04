@@ -40,7 +40,7 @@ class DenunciaModel extends Model
         'denunciante_id'  => 'permit_empty|integer',
         'descripcion'     => 'required|string',
         'fecha_incidente' => 'required|valid_date',
-        'denunciado_id'   => 'required|integer',
+        'denunciado_id' => 'permit_empty|is_natural_no_zero',
         'estado'          => 'required|string|max_length[20]',
         'lugar'           => 'permit_empty|string|max_length[50]',
     ];
@@ -62,7 +62,6 @@ class DenunciaModel extends Model
             'valid_date'  => 'Debe proporcionar una fecha de incidente válida.'
         ],
         'denunciado_id' => [
-            //'required' => 'Debe especificar la persona denunciada.',
             'integer'  => 'El ID del denunciado debe ser un número entero.'
         ],
         'denunciante_id' => [
