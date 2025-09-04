@@ -94,34 +94,6 @@ class AdminsController extends ResourceController
         return isset($admin['rol']) && $admin['rol'] === 'admin';
     }
 
-    // private function enviarCorreo($correo, $code, $estado, $comentario)
-    // {
-    //     $email = \Config\Services::email();
-
-    //     $email->setFrom('munijloenlinea@gmail.com', 'Municipalidad Distrital de José Leonardo Ortiz');
-    //     $email->setTo($correo);
-    //     $email->setSubject('Código de Seguimiento de Denuncia');
-
-    //     $mensaje = "
-    //         <html><body>
-    //         <p>Estimado usuario,</p>
-    //         <p>Estado actual de su denuncia: $estado</p>
-    //         <p><strong>Código:</strong> $code</p>
-    //         <p><strong>Estado:</strong> $estado</p>
-    //         <p><strong>Comentario:</strong> $comentario</p>
-    //         <p><a href='http://localhost:5173/tracking-denuncia?codigo=$code'>Ver seguimiento</a></p>
-    //         </body></html>
-    //     ";
-
-    //     $email->setMessage($mensaje);
-
-    //     if($email->send()){
-    //         return true;
-    //     } else {
-    //         return $email->printDebugger(['headers']);
-    //     }
-    // }
-
     private function registrarHistorial($adminId, $afectadoId, $accion, $motivo)
     {
         $this->historialModel->insert([
@@ -137,69 +109,6 @@ class AdminsController extends ResourceController
     // FUNCIONES PARA ADMINS
     //===========================
     //🌟🌟🌟🌟🌟🌟🌟🌟🌟🌟🌟
-
-    //============================================
-    // FUNCION PARA RECIBIR DENUNCIA POR EL ADMIN
-    //============================================
-    // public function recibirAdmin()
-    // {
-    //     $admin = $this->authAdmin();
-    //     if (is_object($admin)) return $admin;
-
-    //     $input = $this->request->getJSON(true); 
-
-    //     $code       = $input['tracking_code'] ?? null;
-    //     $estado     = 'recibida'; 
-    //     $comentario = 'La denuncia ha sido recibida por el administrador'; 
-
-    //     if (empty($code)) {
-    //         return $this->fail(['message' => 'Falta el código de seguimiento o tracking_code']);
-    //     }
-
-    //     $seguimientoData = [
-    //         'administrador_id' => $admin['id'],
-    //         'estado'           => $estado,
-    //         'comentario'       => $comentario,
-    //     ];
-
-    //     $resultado = $this->denunciaModel->recibirDenuncia(
-    //         $code,
-    //         $estado,
-    //         $comentario,
-    //         $seguimientoData
-    //     );
-
-    //     if (!$resultado) {
-    //         return $this->respond([
-    //             'success' => false,
-    //             'message' => 'No se encontró la denuncia con el código ingresado.'
-    //         ], 404);
-    //     }
-
-    //     $denuncia = $resultado['denuncia'];
-    //     $correo = null;
-
-    //     if (!empty($denuncia['denunciante_id'])) {
-    //         $denunciante = $this->denuncianteModel->find($denuncia['denunciante_id']);
-    //         if ($denunciante && !empty($denunciante['email'])) {
-    //             $correo = $denunciante['email'];
-    //         }
-    //     }
-
-    //     if ($correo) {
-    //         $enviado = $this->enviarCorreo($correo, $code, $estado, $comentario);
-    //         if ($enviado !== true) {
-    //             log_message('error', 'Error al enviar correo: ' . print_r($enviado, true));
-    //         }
-    //     }
-
-    //     return $this->respond([
-    //         'success'    => true,
-    //         'message'    => 'Denuncia recibida correctamente',
-    //         'denuncia'   => $resultado['denuncia'],
-    //         'seguimiento'=> $resultado['seguimiento']
-    //     ]);
-    // }
 
     public function recibirAdmin()
     {
@@ -628,55 +537,58 @@ class AdminsController extends ResourceController
         ]);
     }
 
-    // public function addDenunciadoToDenuncia($denunciaId = null)
-    // {
-    //     $admin = $this->authAdmin();
-    //     if (is_object($admin)) return $admin;
+    //===============================================
+    // FUNCION PARA ASIGNAR DENUNCIADO A UNA DENUNCIA
+    //===============================================
+    public function addDenunciadoPanel($denunciaId = null)
+    {
+        $admin = $this->authAdmin();
+        if (is_object($admin)) return $admin;
 
-    //     if (empty($denunciaId)) {
-    //         return $this->fail(['message' => 'Falta el ID de la denuncia']);
-    //     }
+        if (empty($denunciaId)) {
+            return $this->fail(['message' => 'Falta el ID de la denuncia']);
+        }
 
-    //     $data = $this->request->getJSON(true); 
+        $data = $this->request->getJSON(true); 
 
-    //     // Validar que la denuncia existe
-    //     $denuncia = $this->denunciaModel->find($denunciaId);
-    //     if (!$denuncia) {
-    //         return $this->fail(['message' => 'No se encontró la denuncia']);
-    //     }
+        // Validar que la denuncia existe
+        $denuncia = $this->denunciaModel->find($denunciaId);
+        if (!$denuncia) {
+            return $this->fail(['message' => 'No se encontró la denuncia']);
+        }
 
-    //     // Si la denuncia ya tiene denunciado, evitar duplicar
-    //     if (!empty($denuncia['denunciado_id'])) {
-    //         return $this->fail(['message' => 'Esta denuncia ya tiene un denunciado asignado']);
-    //     }
+        // Si la denuncia ya tiene denunciado, evitar duplicar
+        if (!empty($denuncia['denunciado_id'])) {
+            return $this->fail(['message' => 'Esta denuncia ya tiene un denunciado asignado']);
+        }
 
-    //     // Crear denunciado (campos opcionales)
-    //     $denunciadoData = [
-    //         'nombre'             => $data['nombre'] ?? null,
-    //         'razon_social'       => $data['razon_social'] ?? null,
-    //         'documento'          => $data['documento'] ?? null,
-    //         'tipo_documento'     => $data['tipo_documento'] ?? null,
-    //         'representante_legal'=> $data['representante_legal'] ?? null,
-    //         'direccion'          => $data['direccion'] ?? null,
-    //         'celular'            => $data['celular'] ?? null,
-    //     ];
+        // Crear denunciado (campos opcionales)
+        $denunciadoData = [
+            'nombre'             => $data['nombre'] ?? null,
+            'razon_social'       => $data['razon_social'] ?? null,
+            'documento'          => $data['documento'] ?? null,
+            'tipo_documento'     => $data['tipo_documento'] ?? null,
+            'representante_legal'=> $data['representante_legal'] ?? null,
+            'direccion'          => $data['direccion'] ?? null,
+            'celular'            => $data['celular'] ?? null,
+        ];
 
-    //     $denunciadoId = $this->denunciadoModel->insert($denunciadoData);
+        $denunciadoId = $this->denunciadoModel->insert($denunciadoData);
 
-    //     if (!$denunciadoId) {
-    //         return $this->fail(['message' => 'Error al registrar denunciado', 'errors' => $this->denunciadoModel->errors()]);
-    //     }
+        if (!$denunciadoId) {
+            return $this->fail(['message' => 'Error al registrar denunciado', 'errors' => $this->denunciadoModel->errors()]);
+        }
 
-    //     // Actualizar denuncia con el ID del denunciado
-    //     $this->denunciaModel->update($denunciaId, ['denunciado_id' => $denunciadoId]);
+        // Actualizar denuncia con el ID del denunciado
+        $this->denunciaModel->update($denunciaId, ['denunciado_id' => $denunciadoId]);
 
-    //     return $this->respond([
-    //         'success'   => true,
-    //         'message'   => 'Denunciado creado y asignado correctamente',
-    //         'denunciado'=> $denunciadoData,
-    //         'denuncia'  => $denunciaId
-    //     ]);
-    // }
+        return $this->respond([
+            'success'   => true,
+            'message'   => 'Denunciado creado y asignado correctamente',
+            'denunciado'=> $denunciadoData,
+            'denuncia'  => $denunciaId
+        ], 200);
+    }
 
 
     //==============================================
