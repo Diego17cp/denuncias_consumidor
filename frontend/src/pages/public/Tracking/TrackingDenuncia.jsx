@@ -11,7 +11,7 @@ import {
 } from "react-icons/fi";
 import axios from "axios";
 import { toast } from "sonner";
-import { useLocation, useSearchParams } from "react-router"
+import { useSearchParams } from "react-router";
 
 const TrackingDenuncia = () => {
 	const API_URL = import.meta.env.VITE_CI_API_BASE_URL;
@@ -21,31 +21,30 @@ const TrackingDenuncia = () => {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
 	const [isSubmitted, setIsSubmitted] = useState(false);
-	const [isJustRegistered, setIsJustRegistered] = useState(false);
-	const [searchParams] = useSearchParams()
-	const trackingCode = searchParams.get("codigo")
+	const [searchParams] = useSearchParams();
+	const trackingCode = searchParams.get("codigo");
 
 	useEffect(() => {
 		if (trackingCode) {
-			setCodigo(trackingCode)
+			setCodigo(trackingCode);
 		} else {
-			setCodigo("")
+			setCodigo("");
 		}
-	}, [trackingCode])
+	}, [trackingCode]);
 	useEffect(() => {
-        if (trackingCode && codigo && codigo === trackingCode) {
-            handleConsultar()
-        }
-    }, [codigo, trackingCode])
+		if (trackingCode && codigo && codigo === trackingCode) {
+			handleConsultar();
+		}
+	}, [codigo, trackingCode]);
 
 	const estadosDenuncia = {
-		registrada: {
+		registrado: {
 			label: "Registrada",
 			color: "bg-blue-100 text-blue-800",
 			darkColor: "bg-blue-600 text-white",
 			icon: <FiFileText className="text-lg" />,
 			descripcion:
-				"Hemos recibido tu denuncia y está siendo revisada por nuestro equipo.",
+				"Hemos recibido tu denuncia y está esperando a ser revisada por nuestro equipo.",
 		},
 		recibida: {
 			label: "Recibida",
@@ -119,32 +118,49 @@ const TrackingDenuncia = () => {
 		}
 	};
 	const buildTimelineFromEvents = (eventsArray) => {
-		if (!Array.isArray(eventsArray) || eventsArray.length === 0) return [];
+		let timeline = [];
+		// SIEMPRE agregar "registrada" como primer estado
+		timeline.push({
+			estado: "registrada",
+			fecha: "Registrada",
+			isActive: false,
+			isCompleted: true,
+			comentario:
+				"Tu denuncia ha sido registrada exitosamente en el sistema.",
+		});
 
-		// ordenar asc por created_at
-		const sorted = [...eventsArray].sort(
-			(a, b) => new Date(a.created_at) - new Date(b.created_at)
-		);
+		if (Array.isArray(eventsArray) && eventsArray.length > 0) {
+			const sorted = [...eventsArray].sort(
+				(a, b) => new Date(a.created_at) - new Date(b.created_at)
+			);
+			const uniqueByEstado = sorted.reduce((acc, ev) => {
+				if (!acc.find((x) => x.estado === ev.estado)) acc.push(ev);
+				return acc;
+			}, []);
+			// agregar los eventos después de "registrada"
+			const eventTimeline = uniqueByEstado.map((ev, idx) => ({
+				estado: ev.estado,
+				fecha: formatDate(ev.created_at),
+				isActive: idx === uniqueByEstado.length - 1,
+				isCompleted: idx < uniqueByEstado.length - 1,
+				comentario: ev.comentario,
+			}));
 
-		// reducir a estados únicos en orden (si quieren mostrar repetidos, quitar este step)
-		const uniqueByEstado = sorted.reduce((acc, ev) => {
-			if (!acc.find((x) => x.estado === ev.estado)) acc.push(ev);
-			return acc;
-		}, []);
+			timeline = timeline.concat(eventTimeline);
+		}
 
-		return uniqueByEstado.map((ev, idx) => ({
-			estado: ev.estado,
-			fecha: formatDate(ev.created_at),
-			isActive: idx === uniqueByEstado.length - 1,
-			isCompleted: idx < uniqueByEstado.length - 1,
-			comentario: ev.comentario,
+		// Actualizar estados: el último es activo, los anteriores completados
+		return timeline.map((item, idx) => ({
+			...item,
+			isActive: idx === timeline.length - 1,
+			isCompleted: idx < timeline.length - 1,
 		}));
 	};
 
 	const [timeline, setTimeline] = useState([]);
 
 	useEffect(() => {
-		if (eventos) {
+		if (eventos !== null) {
 			setTimeline(buildTimelineFromEvents(eventos));
 		} else {
 			setTimeline([]);
@@ -167,33 +183,45 @@ const TrackingDenuncia = () => {
 			const response = await axios.get(
 				`${API_URL}/denuncias/codigo/${codigo}`
 			);
-			if (
-				response.data &&
-				response.data.success &&
-				Array.isArray(response.data.data) &&
-				response.data.data.length > 0
-			) {
-				setEventos(response.data.data);
-				setIsJustRegistered(false);
-			} else if (response.data && response.data.success && response.data.data.length === 0) {
-				setEventos([]);
-				setIsJustRegistered(true);
-			}
-			else {
-				setEventos([]);
-				setIsJustRegistered(false);
+			if (response.data && response.data.success) {
+				// Array con datos: hay seguimiento
+				if (
+					Array.isArray(response.data.data) &&
+					response.data.data.length > 0
+				) {
+					setEventos(response.data.data);
+				}
+				// Array vacío: existe pero sin seguimiento
+				else if (
+					Array.isArray(response.data.data) &&
+					response.data.data.length === 0
+				) {
+					setEventos([]);
+				}
+			} else {
+				// Si success es false, la denuncia NO EXISTE
+				setEventos(null);
 				toast.error("No se encontró la denuncia con ese código.");
 			}
 		} catch (err) {
+			// En caso de error (404, 500, etc), la denuncia NO EXISTE o hay problema
+			setEventos(null);
 			if (axios.isAxiosError(err)) {
-				toast.error(
-					"Error al consultar la denuncia. Inténtalo de nuevo."
-				);
+				if (err.response?.status === 404) {
+					toast.error(
+						"No se encontró ninguna denuncia con ese código."
+					);
+				} else {
+					toast.error(
+						"Error al consultar la denuncia. Inténtalo de nuevo."
+					);
+				}
 				console.error(
 					"Error en la solicitud:",
 					err.response || err.message
 				);
 			} else {
+				toast.error("Error inesperado al consultar la denuncia.");
 				console.error("Error inesperado:", err);
 			}
 		} finally {
@@ -350,6 +378,7 @@ const TrackingDenuncia = () => {
 				<AnimatePresence>
 					{isSubmitted &&
 						!loading &&
+						eventos !== null && // Solo mostrar si la denuncia existe
 						timeline &&
 						timeline.length > 0 && (
 							<motion.div
@@ -530,50 +559,6 @@ const TrackingDenuncia = () => {
 							</motion.div>
 						)}
 				</AnimatePresence>
-
-				{/* Special "only registered" message */}
-				<AnimatePresence>
-					{isSubmitted && !loading && isJustRegistered && (
-						<motion.div
-							initial={{ opacity: 0, height: 0 }}
-							animate={{ opacity: 1, height: "auto" }}
-							exit={{ opacity: 0, height: 0 }}
-							transition={{ duration: 0.4 }}
-							className="p-6 bg-yellow-50 rounded-lg border border-yellow-200 shadow-sm"
-						>
-							<div className="flex items-start gap-4">
-								<div className="text-yellow-600 mt-1">
-									<FiAlertCircle className="text-2xl" />
-								</div>
-								<div className="flex-1">
-									<h3 className="text-lg font-semibold text-yellow-800">
-										Denuncia registrada
-									</h3>
-									<p className="text-sm text-yellow-700 mt-1">
-										Hemos recibido tu denuncia correctamente, pero aún no se ha asignado
-										seguimiento por parte de un administrador. En cuanto se realice una
-										acción, podrás ver el historial aquí.
-									</p>
-									<div className="mt-4 flex flex-wrap gap-3">
-										<button
-											onClick={() => (window.location.href = "/")}
-											className="px-4 py-2 bg-white rounded-lg text-sm shadow-sm transition-all duration-200 hover:shadow-md border border-gray-200 ease-in-out cursor-pointer"
-										>
-											Volver al inicio
-										</button>
-										<button
-											// onClick={() => window.open('mailto:soporte@tusitio.local')}
-											className="px-4 py-2 bg-yellow-600 text-white rounded-lg text-sm shadow-sm transition-all duration-200 hover:shadow-md  ease-in-out cursor-pointer"
-										>
-											Contactar soporte
-										</button>
-									</div>
-								</div>
-							</div>
-						</motion.div>
-					)}
-				</AnimatePresence>
-
 				{/* Estado inicial */}
 				<AnimatePresence>
 					{!isSubmitted && !loading && (
@@ -601,6 +586,41 @@ const TrackingDenuncia = () => {
 							>
 								<div className="w-24 h-1 bg-gray-300 rounded-full" />
 							</motion.div>
+						</motion.div>
+					)}
+				</AnimatePresence>
+
+				{/* Mensaje cuando no se encontró la denuncia */}
+				<AnimatePresence>
+					{isSubmitted && !loading && eventos === null && (
+						<motion.div
+							className="text-center py-12"
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							exit={{ opacity: 0 }}
+						>
+							<div className="inline-block p-4 bg-red-50 rounded-full mb-4">
+								<FiAlertCircle className="text-2xl text-red-600" />
+							</div>
+							<h3 className="text-xl font-bold text-gray-800 mb-2">
+								Denuncia no encontrada
+							</h3>
+							<p className="text-gray-600 max-w-md mx-auto mb-6">
+								El código de seguimiento ingresado no
+								corresponde a ninguna denuncia registrada en
+								nuestro sistema.
+							</p>
+							<button
+								onClick={() => {
+									setCodigo("");
+									setIsSubmitted(false);
+									setEventos(null);
+									setError(null);
+								}}
+								className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
+							>
+								Intentar nuevamente
+							</button>
 						</motion.div>
 					)}
 				</AnimatePresence>
