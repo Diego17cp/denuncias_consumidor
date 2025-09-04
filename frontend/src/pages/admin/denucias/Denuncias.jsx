@@ -45,6 +45,8 @@ export const Denuncias = () => {
     setSearchDocument,
     searchName,
     setSearchName,
+    searchDenunciante,
+    setSearchDenunciante,
     searchResults,
     expandedFilters,
     setExpandedFilters,
@@ -337,11 +339,20 @@ export const Denuncias = () => {
                       <div className="flex items-center gap-4 text-xs text-slate-500">
                         <div className="flex items-center">
                           <Activity className="h-3 w-3 mr-1" />
-                          <span>{denuncia.historial}</span>
+                          {/* Muestra el último estado del historial */}
+                          <span>
+                            {Array.isArray(denuncia.historial) && denuncia.historial.length > 0
+                              ? denuncia.historial[denuncia.historial.length - 1].estado
+                              : ""}
+                          </span>
                         </div>
                         <div className="flex items-center">
                           <FileBox className="h-3 w-3 mr-1" />
-                          <span>{denuncia.adjuntos}</span>
+                          <span>
+                            {Array.isArray(denuncia.adjuntos)
+                              ? denuncia.adjuntos.join(", ")
+                              : denuncia.adjuntos || ""}
+                          </span>
                         </div>
                       </div>
                     </td>
@@ -675,9 +686,9 @@ export const Denuncias = () => {
                   <Search className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-slate-900 mb-2">Búsqueda Avanzada</h3>
-                <p className="text-slate-600">Busca denuncias por documento o nombre del denunciado</p>
+                <p className="text-slate-600">Busca denuncias por documento, nombre del denunciado o nombre del denunciante</p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-3">Número de Documento</label>
                   <input
@@ -694,12 +705,21 @@ export const Denuncias = () => {
                     type="text"
                     value={searchName}
                     onChange={(e) => setSearchName(e.target.value)}
-                    placeholder="Nombre completo"
+                    placeholder="Nombre completo del denunciado"
+                    className="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all duration-200 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-3">Nombre del Denunciante</label>
+                  <input
+                    type="text"
+                    value={searchDenunciante}
+                    onChange={(e) => setSearchDenunciante(e.target.value)}
+                    placeholder="Nombre completo del denunciante"
                     className="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all duration-200 text-sm"
                   />
                 </div>
               </div>
-
               <div className="flex justify-center gap-4 mb-8">
                 <button
                   onClick={buscarDenuncias}
@@ -719,7 +739,7 @@ export const Denuncias = () => {
                   Limpiar Búsqueda
                 </button>
               </div>
-              {searchResults.length === 0 && (searchDocument || searchName) && !isSearching && (
+              {searchResults.length === 0 && (searchDocument || searchName || searchDenunciante) && !isSearching && (
                 <div className="mt-10 p-8 bg-amber-50 border border-amber-200 rounded-2xl">
                   <div className="flex items-center justify-center">
                     <div className="text-center">
@@ -733,11 +753,11 @@ export const Denuncias = () => {
                 </div>
               )}
             </div>
-              {searchResults.length > 0 && (
-                <div className="mt-10 w-full">
-                  <SearchResultsTable />
-                </div>
-              )}
+            {searchResults.length > 0 && (
+              <div className="mt-10 w-full">
+                <SearchResultsTable />
+              </div>
+            )}
           </div>
         )}
       </main>
