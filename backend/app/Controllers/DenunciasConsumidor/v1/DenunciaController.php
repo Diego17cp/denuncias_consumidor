@@ -34,7 +34,9 @@ class DenunciaController extends ResourceController
         return $this->respond($denuncias);
     }
 
+    // ==============================
     // CREAR NUEVA DENUNCIA
+    // ==============================
     public function create()
     {
         $data = $this->request->getPost();
@@ -45,7 +47,9 @@ class DenunciaController extends ResourceController
 
 
 
-    //Consultar seguimientos por código de tracking
+    //==============================================
+    // CONSULTAR SEGUIMIENTO DE DENUNCIA POR TRACKING CODE
+    //==============================================
     public function query($code)
     {
         $denuncia = $this->denunciasModel->where('tracking_code', $code)->first();
