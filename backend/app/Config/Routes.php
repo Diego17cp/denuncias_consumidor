@@ -121,5 +121,7 @@ $routes->group('/', [
         $routes->get('nombre-2/(:any)', 'AdminsController::searchDenunciaByNombreDenunciante/$1', ['filter' => 'auth:super_admin,admin']);
         // Listar historial de acciones de administradores
         $routes->get('historial', 'AdminsController::listarHistorial', ['filter' => 'auth:super_admin']);
+        // ASIGNAR DENUNCIADO A UNA DENUNCIA EXISTENTE 
+        $routes->post('add-denunciado/(:num)', 'AdminsController::AddDenunciadoPanel/$1', ['filter' => 'auth:super_admin, admin']);
     });
 });
