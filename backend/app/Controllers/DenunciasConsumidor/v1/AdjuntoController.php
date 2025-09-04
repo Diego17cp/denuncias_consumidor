@@ -38,7 +38,6 @@ class AdjuntoController extends BaseController
             mkdir($uploadPath, 0777, true);
         }
 
-        // Procesar múltiples archivos adjuntos (campo "adjuntos[]")
         $files = $this->request->getFiles();
 
         if (isset($files['adjuntos'])) {
