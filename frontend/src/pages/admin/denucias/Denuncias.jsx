@@ -341,9 +341,7 @@ export const Denuncias = () => {
                           <Activity className="h-3 w-3 mr-1" />
                           {/* Muestra el último estado del historial */}
                           <span>
-                            {Array.isArray(denuncia.historial) && denuncia.historial.length > 0
-                              ? denuncia.historial[denuncia.historial.length - 1].estado
-                              : ""}
+                            {denuncia.historial_count}
                           </span>
                         </div>
                         <div className="flex items-center">
