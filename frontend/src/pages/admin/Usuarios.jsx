@@ -389,7 +389,7 @@ export function Usuarios() {
                     <div className="mt-6 pt-5 border-t border-gray-100 flex flex-col gap-3">
                       <button
                         onClick={() => openModal('password', searchedUser)}
-                        className="w-full px-4 py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm font-medium rounded-lg transition-colors flex items-center justify-center"
+                        className="cursor-pointer w-full px-4 py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm font-medium rounded-lg transition-colors flex items-center justify-center"
                       >
                         <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
@@ -398,7 +398,7 @@ export function Usuarios() {
                       </button>
                       <button
                         onClick={() => openModal('role', searchedUser)}
-                        className="w-full px-4 py-3 bg-green-50 hover:bg-green-100 text-green-700 text-sm font-medium rounded-lg transition-colors flex items-center justify-center"
+                        className="cursor-pointer w-full px-4 py-3 bg-green-50 hover:bg-green-100 text-green-700 text-sm font-medium rounded-lg transition-colors flex items-center justify-center"
                       >
                         <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -407,7 +407,7 @@ export function Usuarios() {
                       </button>
                       <button
                         onClick={() => toggleUserStatus(searchedUser.dni, searchedUser.estado === "1" ? "0" : "1")}
-                        className={`w-full px-4 py-3 text-sm font-medium rounded-lg transition-colors flex items-center justify-center ${searchedUser.estado === "1"
+                        className={`cursor-pointer w-full px-4 py-3 text-sm font-medium rounded-lg transition-colors flex items-center justify-center ${searchedUser.estado === "1"
                             ? "bg-red-50 hover:bg-red-100 text-red-700"
                             : "bg-green-50 hover:bg-green-100 text-green-700"
                           }`}
