@@ -7,6 +7,8 @@ import StepDatosDenunciante from "../../../components/form/StepDenunciante";
 import { useDenuncias } from "../../../context/DenunciasContext";
 import TrackingCodeScreen from "../../../components/form/StepTracking";
 import { motion } from "framer-motion";
+import ModalDenunciadoDecision from "../../../components/form/ModalDenunciadoDecision";
+import { useState } from "react";
 
 export const FormDenuncia = () => {
     const { useStepper, steps } = defineStepper(
@@ -25,6 +27,9 @@ export const FormDenuncia = () => {
         handleSubmit,
         isSubmitting,
     } = useDenuncias();
+
+    const [showDenunciadoModal, setShowDenunciadoModal] = useState(false);
+    const [skipDenunciado, setSkipDenunciado] = useState(false);
 
     const isStepEnabled = (stepId) => {
         const order = steps.map((s) => s.id);
@@ -47,6 +52,21 @@ export const FormDenuncia = () => {
 
     return (
         <div className="mx-auto max-w-4xl mt-8">
+            {/* Modal para preguntar si kiere rellenar los datos del denunciado */}
+            <ModalDenunciadoDecision
+                open={showDenunciadoModal}
+                onYes={() => {
+                    setShowDenunciadoModal(false);
+                    setSkipDenunciado(false);
+                    stepper.next(); // paso de denunciado
+                }}
+                onNo={() => {
+                    setShowDenunciadoModal(false);
+                    setSkipDenunciado(true);
+                    stepper.goTo("complainant-data"); //paso de denunciante
+                }}
+            />
+
             {/* Stepper */}
             <div className="p-4 mb-8">
                 <div className="grid grid-cols-4 gap-4">
@@ -145,18 +165,26 @@ export const FormDenuncia = () => {
                 {stepper.switch({
                     details: () => (
                         <StepDetalles
-                            onNext={() => isStepDetailsValid && stepper.next()}
+                            onNext={() => setShowDenunciadoModal(true)}
                         />
                     ),
                     "denounced-data": () => (
-                        <StepDatosDenunciado
-                            onPrev={stepper.prev}
-                            onNext={() => isStepDenunciadoValid && stepper.next()}
-                        />
+                        !skipDenunciado && (
+                            <StepDatosDenunciado
+                                onPrev={stepper.prev}
+                                onNext={() => stepper.next()}
+                            />
+                        )
                     ),
                     "complainant-data": () => (
                         <StepDatosDenunciante
-                            onPrev={stepper.prev}
+                            onPrev={() => {
+                                if (skipDenunciado) {
+                                    stepper.goTo("details");
+                                } else {
+                                    stepper.prev();
+                                }
+                            }}
                             onNext={handleSubmitAndNext}
                             isSubmitting={isSubmitting}
                         />
