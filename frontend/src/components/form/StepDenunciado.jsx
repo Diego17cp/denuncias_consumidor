@@ -2,13 +2,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useDenuncias } from "../../context/DenunciasContext";
 import { FaUser, FaBuilding, FaAddressCard } from "react-icons/fa";
 import { Loader } from "dialca-ui";
+// para q pase como si estuviera lleno todo
+const isStepDenunciadoValid = true;
 
 export default function StepDatosDenunciado({ onNext, onPrev }) {
     const {
         denunciado,
         handleDenunciadoChange,
         handleDenunciadoDigits,
-        isStepDenunciadoValid,
+        // isStepDenunciadoValid,
         isFetching
     } = useDenuncias();
 

@@ -355,25 +355,25 @@ export function DenunciasProvider({ children }) {
 		files.length <= MAX_FILES &&
 		totalSize <= MAX_SIZE_MB;
 
-	const isStepDenunciadoValid =
-		denunciado.tipoDocumento === "DNI"
-			? denunciado.dni.trim().length === 8 &&
-			  denunciado.nombres.trim() !== "" &&
-			  denunciado.direccion.trim() !== "" &&
-			  (denunciado.celular.trim().length === 9 ||
-					denunciado.celular.trim() === "")
-			: denunciado.tipoDocumento === "CEDULA"
-			? denunciado.dni.trim() !== "" &&
-			  denunciado.nombres.trim() !== "" &&
-			  denunciado.direccion.trim() !== "" &&
-			  (denunciado.celular.trim().length === 9 ||
-					denunciado.celular.trim() === "")
-			: denunciado.ruc.trim().length === 11 &&
-			  denunciado.representante.trim() !== "" &&
-			  denunciado.razonSocial.trim() !== "" &&
-			  denunciado.direccion.trim() !== "" &&
-			  (denunciado.celular.trim().length === 9 ||
-					denunciado.celular.trim() === "");
+	const isStepDenunciadoValid = true;
+		// denunciado.tipoDocumento === "DNI"
+		// 	? denunciado.dni.trim().length === 8 &&
+		// 	  denunciado.nombres.trim() !== "" &&
+		// 	  denunciado.direccion.trim() !== "" &&
+		// 	  (denunciado.celular.trim().length === 9 ||
+		// 			denunciado.celular.trim() === "")
+		// 	: denunciado.tipoDocumento === "CEDULA"
+		// 	? denunciado.dni.trim() !== "" &&
+		// 	  denunciado.nombres.trim() !== "" &&
+		// 	  denunciado.direccion.trim() !== "" &&
+		// 	  (denunciado.celular.trim().length === 9 ||
+		// 			denunciado.celular.trim() === "")
+		// 	: denunciado.ruc.trim().length === 11 &&
+		// 	  denunciado.representante.trim() !== "" &&
+		// 	  denunciado.razonSocial.trim() !== "" &&
+		// 	  denunciado.direccion.trim() !== "" &&
+		// 	  (denunciado.celular.trim().length === 9 ||
+		// 			denunciado.celular.trim() === "");
 
 	const isStepDenuncianteValid = anonimo
 		? true
