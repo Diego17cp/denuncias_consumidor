@@ -5,6 +5,7 @@ namespace App\Controllers\DenunciasConsumidor\v1;
 use CodeIgniter\RESTful\ResourceController;
 use App\Models\DenunciasConsumidor\v1\DenuncianteModel;
 use App\Models\DenunciasConsumidor\v1\DenunciaModel;
+use App\Models\DenunciasConsumidor\v1\DenunciadoModel;
 use App\Models\DenunciasConsumidor\v1\SeguimientoDenunciaModel;
 use App\Models\DenunciasConsumidor\v1\AdjuntoModel;
 use App\Models\DenunciasConsumidor\v1\AdministradorModel;
@@ -18,6 +19,7 @@ class AdminsController extends ResourceController
     // Models
     private $denuncianteModel;
     private $denunciaModel;
+    private $denunciadoModel;
     private $seguimientoDenunciaModel;
     private $adminModel;
     private $adjuntoModel;
@@ -34,6 +36,7 @@ class AdminsController extends ResourceController
         $this->denunciaModel             = new DenunciaModel();
         $this->seguimientoDenunciaModel  = new SeguimientoDenunciaModel();
         $this->adjuntoModel              = new AdjuntoModel();
+        $this->denunciadoModel           = new DenunciadoModel();
 
         // Modelos de admins
         $this->adminModel     = new AdministradorModel();
@@ -604,7 +607,8 @@ class AdminsController extends ResourceController
                     'nombre'    => $denuncia['denunciado_nombre']    ?? 'Desconocido',
                     'documento' => $denuncia['denunciado_documento'] ?? 'No especificado',
                 ],
-                'historial' => $historial,   
+                'historial' => $historial,  
+                'historial_count' => count($historial), 
                 'adjuntos'  => $adjuntosCount,    
                 'created_at'=> $denuncia['created_at'],
             ];
@@ -623,6 +627,57 @@ class AdminsController extends ResourceController
             ],
         ]);
     }
+
+    // public function addDenunciadoToDenuncia($denunciaId = null)
+    // {
+    //     $admin = $this->authAdmin();
+    //     if (is_object($admin)) return $admin;
+
+    //     if (empty($denunciaId)) {
+    //         return $this->fail(['message' => 'Falta el ID de la denuncia']);
+    //     }
+
+    //     $data = $this->request->getJSON(true); 
+
+    //     // Validar que la denuncia existe
+    //     $denuncia = $this->denunciaModel->find($denunciaId);
+    //     if (!$denuncia) {
+    //         return $this->fail(['message' => 'No se encontró la denuncia']);
+    //     }
+
+    //     // Si la denuncia ya tiene denunciado, evitar duplicar
+    //     if (!empty($denuncia['denunciado_id'])) {
+    //         return $this->fail(['message' => 'Esta denuncia ya tiene un denunciado asignado']);
+    //     }
+
+    //     // Crear denunciado (campos opcionales)
+    //     $denunciadoData = [
+    //         'nombre'             => $data['nombre'] ?? null,
+    //         'razon_social'       => $data['razon_social'] ?? null,
+    //         'documento'          => $data['documento'] ?? null,
+    //         'tipo_documento'     => $data['tipo_documento'] ?? null,
+    //         'representante_legal'=> $data['representante_legal'] ?? null,
+    //         'direccion'          => $data['direccion'] ?? null,
+    //         'celular'            => $data['celular'] ?? null,
+    //     ];
+
+    //     $denunciadoId = $this->denunciadoModel->insert($denunciadoData);
+
+    //     if (!$denunciadoId) {
+    //         return $this->fail(['message' => 'Error al registrar denunciado', 'errors' => $this->denunciadoModel->errors()]);
+    //     }
+
+    //     // Actualizar denuncia con el ID del denunciado
+    //     $this->denunciaModel->update($denunciaId, ['denunciado_id' => $denunciadoId]);
+
+    //     return $this->respond([
+    //         'success'   => true,
+    //         'message'   => 'Denunciado creado y asignado correctamente',
+    //         'denunciado'=> $denunciadoData,
+    //         'denuncia'  => $denunciaId
+    //     ]);
+    // }
+
 
     //==============================================
     // FUNCION PARA OBTENER ESTADISTICAS DE DENUNCIAS
