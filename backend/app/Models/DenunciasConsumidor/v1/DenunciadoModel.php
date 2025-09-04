@@ -15,7 +15,6 @@ class DenunciadoModel extends Model
     protected $protectFields    = true;
 
     protected $allowedFields = [
-        'id',
         'nombre',
         'documento',
         'representante_legal',
@@ -45,12 +44,10 @@ class DenunciadoModel extends Model
 
     protected $validationMessages = [
         'nombre' => [
-            'required'    => 'El campo {field} es obligatorio.',
             'min_length'  => 'El campo {field} debe tener al menos {param} caracteres.',
             'max_length'  => 'El campo {field} no puede exceder {param} caracteres.'
         ],
         'tipo_documento' => [
-            'required' => 'El campo {field} es obligatorio.',
             'in_list'  => 'El {field} debe ser uno de: DNI, CEDULA o RUC.'
         ],
         'direccion' => [
@@ -60,7 +57,6 @@ class DenunciadoModel extends Model
             'max_length' => 'El campo {field} no puede exceder {param} caracteres.'
         ],
         'documento' => [
-            'required'    => 'El campo {field} es obligatorio.',
             'min_length'  => 'El campo {field} debe tener al menos {param} caracteres.',
             'max_length'  => 'El campo {field} no puede exceder {param} caracteres.'
         ],
