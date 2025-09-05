@@ -13,22 +13,22 @@ class CreateTables extends Migration
             'id' => [
                 'type' => 'INT',
                 'unsigned' => true,
-                'auto_increment' => true
+                'auto_increment' => true,
             ],
             'nombre' => [
                 'type' => 'VARCHAR',
                 'constraint' => '100',
-                'null' => false
+                'null' => true
             ],
             'documento' => [
                 'type' => 'VARCHAR',
                 'constraint' => '20',
-                'null' => false
+                'null' => true
             ],
             'tipo_documento' => [
                 'type' => 'ENUM',
                 'constraint' => ['DNI', 'CE', 'RUC'],
-                'null' => false
+                'null' => true
             ],
             'representante_legal' => [
                 'type' => 'VARCHAR',
@@ -174,7 +174,7 @@ class CreateTables extends Migration
             'denunciado_id' => [
                 'type' => 'INT',
                 'unsigned' => true,
-                'null' => false
+                'null' => true
             ],
             'descripcion' => [
                 'type' => 'TEXT',
@@ -208,8 +208,8 @@ class CreateTables extends Migration
             ]
         ]);
         $this->forge->addKey('id', true);
-        $this->forge->addForeignKey('denunciante_id', 'denunciante', 'id', 'NO ACTION', 'SER NULL');
-        $this->forge->addForeignKey('denunciado_id', 'denunciado', 'id', 'NO ACTION', 'CASCADE');
+        $this->forge->addForeignKey('denunciante_id', 'denunciante', 'id', 'NO ACTION', 'SET NULL');
+        $this->forge->addForeignKey('denunciado_id', 'denunciado', 'id', 'NO ACTION', 'SET NULL');
         $this->forge->createTable('denuncia');
 
         // Create 'adjunto' table
