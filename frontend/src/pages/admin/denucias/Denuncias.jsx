@@ -21,8 +21,9 @@ import {
   Activity,
 } from "lucide-react"
 import ModalDetalleDenuncia from "./ModalDetalleDenuncia"
+import ModalAgregarDenunciado from "./ModalAgregarDenunciado"
 import { Loader } from "dialca-ui"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { PaginationNav } from "../../../components/PaginationNav"
 
 export const Denuncias = () => {
@@ -76,6 +77,9 @@ export const Denuncias = () => {
     limpiarBusquedaDisponibles,
     limpiarBusquedaRecibidas
   } = useDenunciasGestion()
+
+  const [modalAgregarOpen, setModalAgregarOpen] = useState(false);
+  const [denunciaSeleccionada, setDenunciaSeleccionada] = useState(null);
 
   useEffect(() => {
     getStatistics()
@@ -263,7 +267,7 @@ export const Denuncias = () => {
     </div>
   )
 
-  const DenunciasRecibidasTable = ({ denuncias }) => (
+  const DenunciasRecibidasTable = ({ denuncias, onAgregarDenunciado }) => (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
@@ -357,13 +361,39 @@ export const Denuncias = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <button
-                        onClick={() => mostrarDetalles(denuncia)}
-                        className="cursor-pointer inline-flex items-center px-4 py-2 bg-[#002f59] text-white rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm hover:shadow-md"
-                      >
-                        <Eye className="h-4 w-4 mr-2" />
-                        Detalles
-                      </button>
+                      <div className="flex gap-2 justify-center">
+                        <button
+                          onClick={() => mostrarDetalles(denuncia)}
+                          className="cursor-pointer inline-flex items-center px-4 py-2 bg-[#002f59] text-white rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm hover:shadow-md"
+                        >
+                          <Eye className="h-4 w-4 mr-2" />
+                          Detalles
+                        </button>
+                        <button
+                          onClick={() => onAgregarDenunciado(denuncia)}
+                          disabled={
+                            denuncia.denunciado &&
+                            (
+                              (typeof denuncia.denunciado === "string" && denuncia.denunciado.trim() !== "" && denuncia.denunciado.toLowerCase() !== "desconocido") ||
+                              (typeof denuncia.denunciado === "object" && denuncia.denunciado.nombre && denuncia.denunciado.nombre.trim() !== "" && denuncia.denunciado.nombre.toLowerCase() !== "desconocido")
+                            )
+                          }
+                          className={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm
+                            ${(
+                              denuncia.denunciado &&
+                              (
+                                (typeof denuncia.denunciado === "string" && denuncia.denunciado.trim() !== "" && denuncia.denunciado.toLowerCase() !== "desconocido") ||
+                                (typeof denuncia.denunciado === "object" && denuncia.denunciado.nombre && denuncia.denunciado.nombre.trim() !== "" && denuncia.denunciado.nombre.toLowerCase() !== "desconocido")
+                              )
+                            )
+                              ? "bg-slate-300 text-slate-500 cursor-not-allowed"
+                              : "bg-[#002f59] text-white hover:shadow-md cursor-pointer"
+                            }`}
+                        >
+                          <User className="h-4 w-4 mr-2" />
+                          Añadir denunciado
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -658,7 +688,10 @@ export const Denuncias = () => {
 
             {/* Mostrar resultados de búsqueda si existen */}
             {searchResultsRecibidas.length > 0 ? (
-              <DenunciasRecibidasTable denuncias={searchResultsRecibidas} />
+              <DenunciasRecibidasTable denuncias={searchResultsRecibidas} onAgregarDenunciado={(denuncia) => {
+                setDenunciaSeleccionada(denuncia);
+                setModalAgregarOpen(true);
+              }} />
             ) : (
               filteredDenuncias.length === 0 ? (
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center">
@@ -671,7 +704,10 @@ export const Denuncias = () => {
                   </p>
                 </div>
               ) : (
-                <DenunciasRecibidasTable denuncias={filteredDenuncias} />
+                <DenunciasRecibidasTable denuncias={filteredDenuncias} onAgregarDenunciado={(denuncia) => {
+                  setDenunciaSeleccionada(denuncia);
+                  setModalAgregarOpen(true);
+                }} />
               )
             )}
           </div>
@@ -783,6 +819,14 @@ export const Denuncias = () => {
         callback={async () => {
           await getStatistics();
           await fetchRecievedDenuncias();
+        }}
+      />
+      <ModalAgregarDenunciado
+        open={modalAgregarOpen}
+        onClose={() => setModalAgregarOpen(false)}
+        onSubmit={(data) => {
+          // aca haces la logica para agregar el denunciado a la denuncia q se escoje @diego17cp
+          setModalAgregarOpen(false);
         }}
       />
     </div>
