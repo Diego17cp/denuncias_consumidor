@@ -106,7 +106,7 @@ export default function ModalAgregarDenunciado({
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		if (tipoDocumento === "DNI" || tipoDocumento === "CEDULA") {
+		if (tipoDocumento === "DNI" || tipoDocumento === "CE") {
 			if (!form.dni || !form.nombres || !form.direccion) {
 				toast.error(
 					"Por favor, complete todos los campos obligatorios."
@@ -220,7 +220,7 @@ export default function ModalAgregarDenunciado({
 					{/* Campos dinámicos según tipo de documento */}
 					<AnimatePresence mode="wait">
 						{(tipoDocumento === "DNI" ||
-							tipoDocumento === "CEDULA") && (
+							tipoDocumento === "CE") && (
 							<motion.div
 								key="dniFields"
 								initial={{ opacity: 0, height: 0 }}
