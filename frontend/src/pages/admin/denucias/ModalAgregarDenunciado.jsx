@@ -30,7 +30,7 @@ export default function ModalAgregarDenunciado({
 	const documentOptions = [
 		{ value: "DNI", label: "DNI", icon: <FaUser /> },
 		{ value: "RUC", label: "RUC", icon: <FaBuilding /> },
-		{ value: "CEDULA", label: "Cédula", icon: <FaAddressCard /> },
+		{ value: "CE", label: "Cédula", icon: <FaAddressCard /> },
 	];
 
 	const handleChange = (e) => {
