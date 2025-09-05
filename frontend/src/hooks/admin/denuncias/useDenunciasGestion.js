@@ -12,7 +12,7 @@ export function useDenunciasGestion() {
 	const [showDetails, setShowDetails] = useState(false);
 	const [newComment, setNewComment] = useState("");
 	const [newStatus, setNewStatus] = useState("");
-	const [searchType, setSearchType] = useState("DNI");
+	const [searchType, setSearchType] = useState("DNI_DENUNCIADO");
 	const [searchDocument, setSearchDocument] = useState("");
 	const [searchName, setSearchName] = useState("");
 	const [searchDenunciante, setSearchDenunciante] = useState("");
@@ -404,14 +404,24 @@ export function useDenunciasGestion() {
 		setIsSearching(true);
 		let resultados = [];
 		try {
-			// Buscar por documento
+			// Buscar por documento según el tipo seleccionado pues
 			if (searchDocument.length > 0) {
-				const response = await axios.get(
-					`${API_URL}/admin/documento/${searchDocument}`,
-					{ withCredentials: true }
-				);
-				if (response.data.success || response.status === 200) {
-					resultados = response.data.data;
+				if (searchType === "DNI_DENUNCIADO") {
+					const response = await axios.get(
+						`${API_URL}/admin/documento-1/${searchDocument}`,
+						{ withCredentials: true }
+					);
+					if (response.data.success || response.status === 200) {
+						resultados = response.data.data;
+					}
+				} else if (searchType === "DNI_DENUNCIANTE") {
+					const response = await axios.get(
+						`${API_URL}/admin/documento-2/${searchDocument}`,
+						{ withCredentials: true }
+					);
+					if (response.data.success || response.status === 200) {
+						resultados = response.data.data;
+					}
 				}
 			}
 			// Buscar por nombre del denunciado

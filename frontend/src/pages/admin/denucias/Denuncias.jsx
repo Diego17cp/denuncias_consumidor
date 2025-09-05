@@ -43,6 +43,8 @@ export const Denuncias = () => {
     setNewStatus,
     searchDocument,
     setSearchDocument,
+    searchType,
+    setSearchType,
     searchName,
     setSearchName,
     searchDenunciante,
@@ -688,14 +690,24 @@ export const Denuncias = () => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-3">Número de Documento</label>
-                  <input
-                    type="text"
-                    value={searchDocument}
-                    onChange={(e) => setSearchDocument(e.target.value)}
-                    placeholder="Ingrese DNI, RUC o Cedula"
-                    className="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all duration-200 text-sm"
-                  />
+                  <label className="block text-sm font-semibold text-slate-700 mb-3">Buscar por DNI</label>
+                  <div className="flex rounded-xl border border-slate-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-all duration-200">
+                    <select
+                      value={searchType}
+                      onChange={e => setSearchType(e.target.value)}
+                      className="bg-slate-100 p-3 text-sm border-r border-slate-300 focus:outline-none"
+                    >
+                      <option value="DNI_DENUNCIADO">Denunciado</option>
+                      <option value="DNI_DENUNCIANTE">Denunciante</option>
+                    </select>
+                    <input
+                      type="text"
+                      value={searchDocument}
+                      onChange={e => setSearchDocument(e.target.value)}
+                      placeholder="Ingrese el número de documento"
+                      className="flex-1 p-3 text-sm focus:outline-none"
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-3">Nombre del Denunciado</label>
