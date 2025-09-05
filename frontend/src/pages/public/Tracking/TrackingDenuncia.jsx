@@ -493,7 +493,7 @@ const TrackingDenuncia = () => {
 																{meta.label}
 															</h3>
 															<span
-																className={`text-xs px-2 py-1 rounded-full ${
+																className={`px-3 py-1 text-sm rounded-full ${
 																	item.isActive
 																		? meta.color
 																		: "bg-gray-100 text-gray-500"
