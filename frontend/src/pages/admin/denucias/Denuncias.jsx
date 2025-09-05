@@ -723,7 +723,7 @@ export const Denuncias = () => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-3">Buscar por DNI</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-3">Buscar por DNI, RUC o Cédula</label>
                   <div className="flex rounded-xl border border-slate-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-all duration-200">
                     <select
                       value={searchType}
