@@ -31,8 +31,6 @@ export const Denuncias = () => {
   const {
     activeTab,
     setActiveTab,
-    searchTerm,
-    setSearchTerm,
     statusFilter,
     setStatusFilter,
     selectedDenuncia,
@@ -62,7 +60,6 @@ export const Denuncias = () => {
     limpiarBusqueda,
     stats,
     fetchRegisteredDenuncias,
-    recievedDenuncias,
     fetchRecievedDenuncias,
     recieveDenuncia,
     isSearching,
@@ -689,7 +686,7 @@ export const Denuncias = () => {
             {/* Mostrar resultados de búsqueda si existen */}
             {searchResultsRecibidas.length > 0 ? (
               <DenunciasRecibidasTable denuncias={searchResultsRecibidas} onAgregarDenunciado={(denuncia) => {
-                setDenunciaSeleccionada(denuncia);
+                (denuncia);
                 setModalAgregarOpen(true);
               }} />
             ) : (
@@ -824,10 +821,14 @@ export const Denuncias = () => {
       <ModalAgregarDenunciado
         open={modalAgregarOpen}
         onClose={() => setModalAgregarOpen(false)}
-        onSubmit={(data) => {
-          // aca haces la logica para agregar el denunciado a la denuncia q se escoje @diego17cp
+        closeModal={() => {
           setModalAgregarOpen(false);
+          setDenunciaSeleccionada(null);
         }}
+        callback={async () => {
+          await fetchRecievedDenuncias();
+        }}
+        denunciaId={denunciaSeleccionada ? denunciaSeleccionada.id : null}
       />
     </div>
   )
